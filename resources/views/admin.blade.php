@@ -5,8 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Perekam Template Kanji</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; display: flex; flex-direction: column; padding: 0; margin: 0; }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .navbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info span {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .main-content { padding: 20px; flex-grow: 1; }
+        
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; max-width: 600px; margin: 0 auto; }
         
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
@@ -29,24 +74,35 @@
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <h2>🔧 Admin Panel - Rekam Kanji</h2>
+        <div class="user-info">
+            <span>Welcome, <strong>{{ Auth::user()->name }}</strong> (Admin)</span>
+            <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                @csrf
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </div>
 
-    <div class="card">
-        <h2>Admin Panel: Rekam Kanji</h2>
-        
-        <div class="form-group">
-            <label>Huruf Kanji Target</label>
-            <input type="text" id="inputChar" placeholder="Contoh: 一, 二, 三, 水" autocomplete="off">
-        </div>
-        <div class="form-group">
-            <label>Arti / Makna</label>
-            <input type="text" id="inputMeaning" placeholder="Contoh: Satu, Dua, Tiga, Air" autocomplete="off">
-        </div>
+    <div class="main-content">
+        <div class="card">
+            <h2>Admin Panel: Rekam Kanji</h2>
+            
+            <div class="form-group">
+                <label>Huruf Kanji Target</label>
+                <input type="text" id="inputChar" placeholder="Contoh: 一, 二, 三, 水" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Arti / Makna</label>
+                <input type="text" id="inputMeaning" placeholder="Contoh: Satu, Dua, Tiga, Air" autocomplete="off">
+            </div>
 
-        <div class="canvas-container">
-            <div class="grid v"></div>
-            <div class="grid h"></div>
-            <canvas id="kanjiCanvas" width="300" height="300"></canvas>
-        </div>
+            <div class="canvas-container">
+                <div class="grid v"></div>
+                <div class="grid h"></div>
+                <canvas id="kanjiCanvas" width="300" height="300"></canvas>
+            </div>
 
         <div>
             <button class="btn btn-clear" onclick="clearCanvas()">Hapus Canvas</button>
@@ -176,5 +232,7 @@
             }
         }
     </script>
+        </div>
+    </div>
 </body>
 </html>

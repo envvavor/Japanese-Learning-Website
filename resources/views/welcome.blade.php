@@ -199,7 +199,7 @@
 
             // B. Cek Arah & Bentuk per Goresan (Resampling ke 30 titik agar setara)
             const NUM_POINTS = 30; 
-            const TOLERANCE = 35; // Batas toleransi error pixel
+            const TOLERANCE = 30; // Batas toleransi error pixel
 
             for (let i = 0; i < templateKanji.length; i++) {
                 const userPts = resample(allStrokes[i], NUM_POINTS);
@@ -220,6 +220,60 @@
             statusMsg.innerText = "✅ BENAR! Tulisan Sempurna!";
             statusMsg.style.color = "#27ae60";
         }
+
+        // --- 5. LOGIKA VALIDASI STROKE ORDER WITH POINT ---
+        // function validateStroke() {
+        //     if (allStrokes.length === 0) {
+        //         statusMsg.innerText = "⚠️ Tulis hurufnya dulu!";
+        //         statusMsg.style.color = "#e67e22";
+        //         return;
+        //     }
+
+        //     // Parameter untuk evaluasi bentuk/goresan
+        //     const NUM_POINTS = 30;
+        //     const TOLERANCE = 35; // batas toleransi error pixel
+
+        //     const templateCount = templateKanji.length;
+        //     const userCount = allStrokes.length;
+        //     const matchedCount = Math.min(templateCount, userCount);
+
+        //     let totalScore = 0; // kumulatif skor per goresan
+
+        //     for (let i = 0; i < matchedCount; i++) {
+        //         const userPts = resample(allStrokes[i], NUM_POINTS);
+        //         const tempPts = resample(templateKanji[i], NUM_POINTS);
+
+        //         let totalError = 0;
+        //         for (let j = 0; j < NUM_POINTS; j++) {
+        //             totalError += getDistance(userPts[j], tempPts[j]);
+        //         }
+        //         const avgError = totalError / NUM_POINTS;
+
+        //         // hitung persentase untuk goresan ini (0‑100)
+        //         const strokePct = Math.max(0, 100 - (avgError / TOLERANCE) * 100);
+        //         totalScore += strokePct;
+        //     }
+
+        //     // jika jumlah goresan tidak sama, sisa goresan dihitung 0 (penalti otomatis)
+        //     const overallPct = totalScore / templateCount;
+        //     let msg = `Skor: ${overallPct.toFixed(1)}%`;
+
+        //     // tambahkan informasi jumlah goresan jika berbeda
+        //     if (userCount !== templateCount) {
+        //         msg += ` (Kamu: ${userCount}, Target: ${templateCount})`;
+        //     }
+
+        //     if (overallPct >= 100) {
+        //         statusMsg.innerText = "✅ BENAR! Tulisan Sempurna!";
+        //         statusMsg.style.color = "#27ae60";
+        //     } else if (overallPct >= 70) {
+        //         statusMsg.innerText = msg;
+        //         statusMsg.style.color = "#f39c12"; // oranye ketika mendekati benar
+        //     } else {
+        //         statusMsg.innerText = msg;
+        //         statusMsg.style.color = "#e74c3c"; // merah untuk skor rendah
+        //     }
+        // }
 
         // --- 6. FUNGSI MATEMATIKA UNTUK VALIDASI ---
         function getDistance(p1, p2) {
