@@ -23,9 +23,19 @@ Route::get('/dashboard', function () {
 })->name('dashboard')->middleware('auth');
 
 // Protected routes - Admin panel
-Route::get('/admin', function () {
-    return view('admin');
-})->name('admin')->middleware(['auth', 'admin']);
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/', function () {
+            $totalKanji = \App\Models\Kanji::where('category', 'kanji')->count();
+            $totalHiragana = \App\Models\Kanji::where('category', 'hiragana')->count();
+            $totalKatakana = \App\Models\Kanji::where('category', 'katakana')->count();
+            return view('admin.dashboard', compact('totalKanji', 'totalHiragana', 'totalKatakana'));
+        })->name('dashboard');
+        
+        Route::resource('kanjis', \App\Http\Controllers\Admin\AdminKanjiController::class);
+    });
 
 Route::get('/list/{category?}', function ($category = null) {
     return view('welcome', ['category' => $category]);

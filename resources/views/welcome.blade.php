@@ -3,86 +3,82 @@
 @section('title', 'Belajar Kanji')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-6 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
 
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-10">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
         <div>
-            <h1 class="text-3xl font-semibold text-slate-800 tracking-tight">
-                Belajar {{ $category ? ucfirst($category) : 'Kanji' }}
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight">
+                Belajar {{ $category ? ucfirst($category) : 'Huruf' }}
             </h1>
-            <p class="text-slate-500 mt-1 text-sm">
+            <p class="text-base text-slate-500 mt-1">
                 Pilih karakter untuk mulai latihan penulisan.
             </p>
         </div>
 
         <a href="{{ route('dashboard') }}"
-           class="px-5 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition text-sm">
+            class="inline-flex items-center justify-center px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
             Kembali
         </a>
     </div>
 
-    <!-- MENU AREA -->
-    <div id="menuArea">
-
-        <div id="kanjiGrid"
-             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            <div class="col-span-full text-center text-slate-400">
-                Memuat data...
+    <div id="menuArea" class="transition-all duration-500">
+        <div id="kanjiGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <div class="col-span-full text-center py-10">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
+                <p class="text-slate-400 font-medium">Memuat data karakter...</p>
             </div>
         </div>
-
     </div>
 
-    <!-- PRACTICE AREA -->
-    <div id="practiceArea"
-         class="hidden mt-12 bg-white border border-slate-200 rounded-2xl shadow-sm p-8 max-w-3xl mx-auto">
+    <div id="practiceArea" class="hidden mt-6 bg-white border border-slate-200 rounded-3xl shadow-2xl p-8 sm:p-10 max-w-2xl mx-auto relative overflow-hidden transition-all duration-500">
+        
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
 
-        <div class="flex justify-between items-center mb-6">
-            <h2 id="targetTitle"
-                class="text-xl font-semibold text-slate-800">
+        <div class="flex justify-between items-center mb-8 mt-2">
+            <h2 id="targetTitle" class="text-2xl font-bold text-slate-800">
                 Latihan
             </h2>
 
-            <button onclick="backToMenu()"
-                    class="text-sm text-slate-500 hover:text-slate-800 transition">
-                Kembali
+            <button onclick="backToMenu()" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-rose-600 transition-colors bg-slate-50 hover:bg-rose-50 px-4 py-2 rounded-xl">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Tutup
             </button>
         </div>
 
-        <p class="text-sm text-slate-500 mb-6">
+        <p class="text-sm text-slate-500 mb-8 text-center bg-slate-50 p-3 rounded-lg border border-slate-100">
             Ikuti urutan dan arah goresan sesuai standar penulisan Jepang.
         </p>
 
-        <!-- Canvas Container -->
-        <div class="flex justify-center mb-6">
-            <div class="relative border border-slate-300 bg-white rounded-lg overflow-hidden">
-                <div class="absolute pointer-events-none border-l border-red-200 h-full left-1/2"></div>
-                <div class="absolute pointer-events-none border-t border-red-200 w-full top-1/2"></div>
+       <div class="flex justify-center mb-8">
+            <div class="relative bg-white border-4 border-slate-700 rounded-lg shadow-inner overflow-hidden w-full max-w-[320px] aspect-square">
+                <div class="absolute pointer-events-none border-l-2 border-dashed border-red-300 h-full left-1/2 opacity-60"></div>
+                <div class="absolute pointer-events-none border-t-2 border-dashed border-red-300 w-full top-1/2 opacity-60"></div>
+                
                 <canvas id="kanjiCanvas"
                         width="320"
                         height="320"
-                        class="block touch-none bg-white">
+                        class="block w-full h-full touch-none relative z-10 cursor-crosshair">
                 </canvas>
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex justify-center gap-4 mb-4">
-            <button onclick="clearCanvas()"
-                    class="px-5 py-2 text-sm rounded-lg border border-slate-300 hover:bg-slate-100 transition">
+        <div class="flex justify-center gap-4 mb-6">
+            <button onclick="clearCanvas()" class="flex-1 sm:flex-none sm:w-32 px-5 py-3 text-sm font-semibold rounded-xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 transition-all">
                 Reset
             </button>
 
-            <button onclick="validateStroke()"
-                    class="px-5 py-2 text-sm rounded-lg bg-slate-800 text-white hover:bg-slate-700 transition">
-                Periksa
+            <button onclick="validateStroke()" class="flex-1 sm:flex-none sm:w-40 px-5 py-3 text-sm font-bold rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                Periksa Tulisan
             </button>
         </div>
 
-        <div id="statusMsg"
-             class="text-center text-sm font-medium text-slate-600 min-h-[24px]">
-            Mode latihan dimulai.
+        <div id="statusMsg" class="text-center text-sm font-bold text-slate-600 min-h-[24px] px-4 py-3 rounded-xl bg-slate-50 border border-slate-100">
+            Pilih karakter untuk memulai.
         </div>
 
     </div>
@@ -100,7 +96,7 @@
         const ctx = canvas.getContext('2d');
         const statusMsg = document.getElementById('statusMsg');
 
-        ctx.lineWidth = 12;
+        ctx.lineWidth = 14;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.strokeStyle = '#2c3e50';
@@ -193,11 +189,22 @@
         }
 
         // --- 4. LOGIKA MENGGAMBAR DI CANVAS ---
-        function getPos(e) {
+       function getPos(e) {
             const rect = canvas.getBoundingClientRect();
+            
+            // Hitung skala (ukuran asli canvas dibagi ukuran tampilan di layar)
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            // Ambil posisi jari/mouse
             const clientX = e.clientX || e.touches[0].clientX;
             const clientY = e.clientY || e.touches[0].clientY;
-            return { x: clientX - rect.left, y: clientY - rect.top };
+
+            // Kalikan koordinat dengan skala agar presisi
+            return { 
+                x: (clientX - rect.left) * scaleX, 
+                y: (clientY - rect.top) * scaleY 
+            };
         }
 
         function startDrawing(e) {
@@ -246,7 +253,7 @@
 
             // B. Cek Arah & Bentuk per Goresan (Resampling ke 30 titik agar setara)
             const NUM_POINTS = 30; 
-            const TOLERANCE = 30; // Batas toleransi error pixel
+            const TOLERANCE = 40; // Batas toleransi error pixel
 
             for (let i = 0; i < templateKanji.length; i++) {
                 const userPts = resample(allStrokes[i], NUM_POINTS);
