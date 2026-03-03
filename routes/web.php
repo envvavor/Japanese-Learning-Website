@@ -27,6 +27,22 @@ Route::get('/admin', function () {
     return view('admin');
 })->name('admin')->middleware(['auth', 'admin']);
 
-Route::get('/list', function () {
-    return view('welcome'); // Ganti 'welcome' jadi 'landing'
+Route::get('/list/{category?}', function ($category = null) {
+    return view('welcome', ['category' => $category]);
 })->name('list-kanji')->middleware('auth');
+
+// kategori terpisah dengan halaman sendiri
+Route::get('/hiragana', function () {
+    return view('welcome', ['category' => 'hiragana']);
+})->middleware('auth');
+Route::get('/katakana', function () {
+    return view('welcome', ['category' => 'katakana']);
+})->middleware('auth');
+Route::get('/kanji', function () {
+    return view('welcome', ['category' => 'kanji']);
+})->middleware('auth');
+
+// detail kanji untuk melihat informasi
+Route::get('/kanji/{character}', function ($character) {
+    return view('kanji-detail', ['character' => $character]);
+})->name('kanji.detail')->middleware('auth');

@@ -9,7 +9,7 @@ class Kanji extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['character', 'meaning', 'strokes'];
+    protected $fillable = ['character', 'meaning', 'strokes', 'category', 'level', 'stroke_order_image', 'kunyomi', 'onyomi'];
 
     protected $casts = [
         'strokes' => 'array',
