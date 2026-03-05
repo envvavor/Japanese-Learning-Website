@@ -14,4 +14,9 @@ class Kanji extends Model
     protected $casts = [
         'strokes' => 'array',
     ];
+
+    public function examples()
+    {
+        return $this->hasMany(KanjiExample::class);
+    }
 }

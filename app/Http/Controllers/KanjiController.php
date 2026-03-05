@@ -21,7 +21,7 @@ class KanjiController extends Controller
 
     public function show($character)
     {
-        $kanji = Kanji::where('character', $character)->first();
+        $kanji = Kanji::with('examples')->where('character', $character)->first();
         if (!$kanji) {
             return response()->json(['message' => 'Kanji tidak ditemukan'], 404);
         }
@@ -36,7 +36,7 @@ class KanjiController extends Controller
             $request->merge(['strokes' => json_decode($request->strokes, true)]);
         }
 
-        $request->validate([
+        $validatedData = $request->validate([
             'character' => 'required|string',
             'meaning' => 'required|string',
             'strokes' => 'required|array',
@@ -45,6 +45,12 @@ class KanjiController extends Controller
             'stroke_order_image' => 'nullable|file|image',
             'kunyomi' => 'nullable|string',
             'onyomi' => 'nullable|string',
+            
+            // --- TAMBAHAN UNTUK CONTOH KALIMAT (ARRAY) ---
+            'examples' => 'nullable|array',
+            'examples.*.japanese_text' => 'required_with:examples|string',
+            'examples.*.furigana_html' => 'nullable|string',
+            'examples.*.meaning' => 'required_with:examples|string',
         ]);
 
         $data = [
@@ -65,6 +71,26 @@ class KanjiController extends Controller
             ['character' => $request->character],
             $data
         );
+
+        // --- MULAI SIMPAN CONTOH KALIMAT ---
+        
+        // 1. Hapus contoh kalimat lama (Penting saat proses Update agar tidak duplikat)
+        $kanji->examples()->delete();
+
+        // 2. Simpan contoh kalimat baru dari request
+        if ($request->has('examples') && is_array($request->examples)) {
+            foreach ($request->examples as $example) {
+                // Pastikan datanya tidak kosong
+                if (!empty($example['japanese_text']) && !empty($example['meaning'])) {
+                    $kanji->examples()->create([
+                        'japanese_text' => $example['japanese_text'],
+                        'furigana_html' => $example['furigana_html'] ?? null,
+                        'meaning'       => $example['meaning'],
+                    ]);
+                }
+            }
+        }
+        // --- SELESAI SIMPAN CONTOH KALIMAT ---
 
         return response()->json([
             'message' => 'Data Kanji Berhasil Disimpan!',

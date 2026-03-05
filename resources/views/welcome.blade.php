@@ -67,12 +67,17 @@
             </div>
         </div>
 
-        <div class="flex justify-center gap-4 mb-6">
-            <button onclick="clearCanvas()" class="flex-1 sm:flex-none sm:w-32 px-5 py-3 text-sm font-semibold rounded-xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 transition-all">
+        <div class="flex flex-wrap justify-center gap-3 mb-6">
+            <button onclick="clearCanvas()" class="flex-1 sm:flex-none sm:w-28 px-4 py-3 text-sm font-semibold rounded-xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 transition-all">
                 Reset
             </button>
 
-            <button onclick="validateStroke()" class="flex-1 sm:flex-none sm:w-40 px-5 py-3 text-sm font-bold rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 transition-all">
+            <button onclick="undoStroke()" class="flex-1 sm:flex-none sm:w-28 px-4 py-3 text-sm font-semibold rounded-xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800 transition-all flex items-center justify-center">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                Undo
+            </button>
+
+            <button onclick="validateStroke()" class="w-full sm:w-auto sm:flex-none px-6 py-3 text-sm font-bold rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 transition-all">
                 Periksa Tulisan
             </button>
         </div>
@@ -189,7 +194,7 @@
         }
 
         // --- 4. LOGIKA MENGGAMBAR DI CANVAS ---
-       function getPos(e) {
+        function getPos(e) {
             const rect = canvas.getBoundingClientRect();
             
             // Hitung skala (ukuran asli canvas dibagi ukuran tampilan di layar)
@@ -238,111 +243,178 @@
             statusMsg.style.color = "#333";
         }
 
-        // --- 5. LOGIKA VALIDASI STROKE ORDER ---
+        // --- FUNGSI MENGGAMBAR ULANG (DIBUTUHKAN UNTUK UNDO) ---
+        function redrawAllStrokes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            allStrokes.forEach(stroke => {
+                if (stroke.length === 0) return;
+                ctx.beginPath();
+                ctx.moveTo(stroke[0].x, stroke[0].y);
+                for (let i = 1; i < stroke.length; i++) {
+                    ctx.lineTo(stroke[i].x, stroke[i].y);
+                }
+                ctx.stroke();
+            });
+        }
+
+        // --- FUNGSI UNDO (HAPUS GORESAN TERAKHIR) ---
+        function undoStroke() {
+            if (allStrokes.length > 0) {
+                allStrokes.pop(); // Buang data goresan paling akhir dari array
+                redrawAllStrokes(); // Gambar ulang sisanya
+                
+                statusMsg.innerHTML = "Goresan terakhir dihapus.";
+                statusMsg.className = "text-center text-sm font-bold text-slate-500 min-h-[24px] px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 mt-4";
+            } else {
+                statusMsg.innerHTML = "Kanvas sudah kosong.";
+                statusMsg.className = "text-center text-sm font-bold text-amber-500 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 border border-amber-100 mt-4";
+            }
+        }
+
+        // --- 5. LOGIKA VALIDASI STROKE ORDER (AKURASI MAKSIMAL) ---
+        // --- 5. LOGIKA VALIDASI STROKE ORDER (DENGAN DETEKSI GORESAN SPESIFIK) ---
         function validateStroke() {
             if (allStrokes.length === 0) {
-                statusMsg.innerText = "⚠️ Tulis hurufnya dulu!";
-                statusMsg.style.color = "#e67e22"; return;
+                statusMsg.innerHTML = "⚠️ Tulis hurufnya dulu!";
+                statusMsg.className = "text-center text-sm font-bold text-amber-600 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 border border-amber-200";
+                return;
             }
 
-            // A. Cek Jumlah Goresan
-            if (allStrokes.length !== templateKanji.length) {
-                statusMsg.innerText = `❌ SALAH! Jumlah goresan tidak pas. (Kamu: ${allStrokes.length}, Target: ${templateKanji.length})`;
-                statusMsg.style.color = "#e74c3c"; return;
+            if (!templateKanji || templateKanji.length === 0) {
+                statusMsg.innerHTML = "⚠️ Data template belum siap!";
+                return;
             }
 
-            // B. Cek Arah & Bentuk per Goresan (Resampling ke 30 titik agar setara)
+            const templateCount = templateKanji.length;
+            const userCount = allStrokes.length;
+
+            const normUser = normalizeStrokes(allStrokes);
+            const normTemp = normalizeStrokes(templateKanji);
+
             const NUM_POINTS = 30; 
-            const TOLERANCE = 40; // Batas toleransi error pixel
+            const TOLERANCE_ERROR = 40; 
 
-            for (let i = 0; i < templateKanji.length; i++) {
-                const userPts = resample(allStrokes[i], NUM_POINTS);
-                const tempPts = resample(templateKanji[i], NUM_POINTS);
+            const matchedCount = Math.min(templateCount, userCount);
+            let totalScore = 0;
+            
+            // Array untuk menyimpan nomor goresan yang salah
+            let wrongStrokes = []; 
 
-                let totalError = 0;
-                for (let j = 0; j < NUM_POINTS; j++) {
-                    totalError += getDistance(userPts[j], tempPts[j]);
+            // Evaluasi Per-Goresan
+            for (let i = 0; i < matchedCount; i++) {
+                const userPts = resample(normUser[i], NUM_POINTS);
+                const tempPts = resample(normTemp[i], NUM_POINTS);
+
+                let cxU = 0, cyU = 0, cxT = 0, cyT = 0;
+                for(let j = 0; j < NUM_POINTS; j++) {
+                    cxU += userPts[j].x; cyU += userPts[j].y;
+                    cxT += tempPts[j].x; cyT += tempPts[j].y;
                 }
-                let avgError = totalError / NUM_POINTS;
+                cxU /= NUM_POINTS; cyU /= NUM_POINTS;
+                cxT /= NUM_POINTS; cyT /= NUM_POINTS;
 
-                if (avgError > TOLERANCE) {
-                    statusMsg.innerText = `❌ SALAH di Goresan ke-${i+1}! (Arah/Bentuk salah)`;
-                    statusMsg.style.color = "#e74c3c"; return;
+                const posError = getDistance({x: cxU, y: cyU}, {x: cxT, y: cyT});
+
+                let shapeError = 0;
+                for(let j = 0; j < NUM_POINTS; j++) {
+                    const shiftedUserPt = { 
+                        x: userPts[j].x - cxU + cxT, 
+                        y: userPts[j].y - cyU + cyT 
+                    };
+                    shapeError += getDistance(shiftedUserPt, tempPts[j]);
+                }
+                shapeError /= NUM_POINTS;
+
+                const totalError = shapeError + (posError * 0.4);
+
+                let strokePct = 100 - (totalError / TOLERANCE_ERROR) * 100;
+                strokePct = Math.max(0, Math.min(100, strokePct)); 
+                
+                totalScore += strokePct;
+
+                // JIKA NILAI GORESAN INI DI BAWAH 65%, KITA CATAT SEBAGAI "SALAH"
+                if (strokePct < 65) {
+                    wrongStrokes.push(i + 1); // i + 1 karena urutan manusia mulai dari 1
                 }
             }
 
-            statusMsg.innerText = "✅ BENAR! Tulisan Sempurna!";
-            statusMsg.style.color = "#27ae60";
-        }
-
-        // --- 5. LOGIKA VALIDASI STROKE ORDER WITH POINT ---
-        // function validateStroke() {
-        //     if (allStrokes.length === 0) {
-        //         statusMsg.innerText = "⚠️ Tulis hurufnya dulu!";
-        //         statusMsg.style.color = "#e67e22";
-        //         return;
-        //     }
-
-        //     // Parameter untuk evaluasi bentuk/goresan
-        //     const NUM_POINTS = 30;
-        //     const TOLERANCE = 35; // batas toleransi error pixel
-
-        //     const templateCount = templateKanji.length;
-        //     const userCount = allStrokes.length;
-        //     const matchedCount = Math.min(templateCount, userCount);
-
-        //     let totalScore = 0; // kumulatif skor per goresan
-
-        //     for (let i = 0; i < matchedCount; i++) {
-        //         const userPts = resample(allStrokes[i], NUM_POINTS);
-        //         const tempPts = resample(templateKanji[i], NUM_POINTS);
-
-        //         let totalError = 0;
-        //         for (let j = 0; j < NUM_POINTS; j++) {
-        //             totalError += getDistance(userPts[j], tempPts[j]);
-        //         }
-        //         const avgError = totalError / NUM_POINTS;
-
-        //         // hitung persentase untuk goresan ini (0‑100)
-        //         const strokePct = Math.max(0, 100 - (avgError / TOLERANCE) * 100);
-        //         totalScore += strokePct;
-        //     }
-
-        //     // jika jumlah goresan tidak sama, sisa goresan dihitung 0 (penalti otomatis)
-        //     const overallPct = totalScore / templateCount;
-        //     let msg = `Skor: ${overallPct.toFixed(1)}%`;
-
-        //     // tambahkan informasi jumlah goresan jika berbeda
-        //     if (userCount !== templateCount) {
-        //         msg += ` (Kamu: ${userCount}, Target: ${templateCount})`;
-        //     }
-
-        //     if (overallPct >= 100) {
-        //         statusMsg.innerText = "✅ BENAR! Tulisan Sempurna!";
-        //         statusMsg.style.color = "#27ae60";
-        //     } else if (overallPct >= 70) {
-        //         statusMsg.innerText = msg;
-        //         statusMsg.style.color = "#f39c12"; // oranye ketika mendekati benar
-        //     } else {
-        //         statusMsg.innerText = msg;
-        //         statusMsg.style.color = "#e74c3c"; // merah untuk skor rendah
-        //     }
-        // }
-
-        // --- FUNGSI MATEMATIKA UNTUK VALIDASI ---
-        function getDistance(p1, p2) {
-            return Math.hypot(p1.x - p2.x, p1.y - p2.y);
-        }
-
-        function pathLength(points) {
-            let d = 0;
-            for (let i = 1; i < points.length; i++) {
-                d += getDistance(points[i - 1], points[i]);
+            // Jika user menggambar kurang dari target, catat goresan sisanya sebagai "salah/kurang"
+            if (userCount < templateCount) {
+                for (let k = userCount + 1; k <= templateCount; k++) {
+                    wrongStrokes.push(k);
+                }
             }
-            return d;
+
+            const overallPct = totalScore / templateCount; 
+            
+            let msg = `Akurasi: ${overallPct.toFixed(1)}%`;
+            
+            // Tambahkan info jika kelebihan goresan
+            if (userCount > templateCount) {
+                msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">⚠️ Kelebihan ${userCount - templateCount} goresan!</span>`;
+            }
+
+            // Tampilkan nomor goresan yang salah jika ada
+            if (wrongStrokes.length > 0) {
+                msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">❌ Cek lagi goresan ke: ${wrongStrokes.join(', ')}</span>`;
+            }
+
+            // Tampilkan Hasil Akhir
+            if (overallPct >= 75 && userCount === templateCount && wrongStrokes.length === 0) {
+                statusMsg.innerHTML = `✅ Bagus Sekali!<br>${msg}`;
+                statusMsg.className = "text-center text-sm font-bold text-emerald-600 min-h-[24px] px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 mt-4";
+            } else if (overallPct >= 45 && userCount === templateCount) {
+                statusMsg.innerHTML = `⚠️ Hampir Benar!<br>${msg}`;
+                statusMsg.className = "text-center text-sm font-bold text-amber-600 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 mt-4";
+            } else {
+                statusMsg.innerHTML = `❌ Coba Perbaiki!<br>${msg}`;
+                statusMsg.className = "text-center text-sm font-bold text-rose-600 min-h-[24px] px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 mt-4";
+            }
+        }
+
+        // --- FUNGSI MATEMATIKA (JANGAN DIHAPUS) ---
+        function getBoundingBox(strokes) {
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            strokes.forEach(stroke => {
+                stroke.forEach(p => {
+                    if (p.x < minX) minX = p.x;
+                    if (p.y < minY) minY = p.y;
+                    if (p.x > maxX) maxX = p.x;
+                    if (p.y > maxY) maxY = p.y;
+                });
+            });
+            return { width: maxX - minX, height: maxY - minY };
+        }
+
+        function normalizeStrokes(strokes) {
+            if (!strokes || strokes.length === 0) return [];
+            const box = getBoundingBox(strokes);
+            const maxDim = Math.max(box.width, box.height) || 1;
+            const scale = 100 / maxDim; 
+
+            let cx = 0, cy = 0, pts = 0;
+            strokes.forEach(stroke => {
+                stroke.forEach(p => { cx += p.x; cy += p.y; pts++; });
+            });
+            if(pts === 0) return strokes;
+            cx /= pts; cy /= pts;
+
+            return strokes.map(stroke => stroke.map(p => ({
+                x: (p.x - cx) * scale,
+                y: (p.y - cy) * scale
+            })));
+        }
+
+        function getDistance(p1, p2) { return Math.hypot(p1.x - p2.x, p1.y - p2.y); }
+        
+        function pathLength(points) { 
+            let d = 0; 
+            for (let i = 1; i < points.length; i++) d += getDistance(points[i - 1], points[i]); 
+            return d; 
         }
 
         function resample(points, n) {
+            if (!points || points.length === 0) return points;
             let I = pathLength(points) / (n - 1);
             let D = 0; let newPoints = [points[0]];
             for (let i = 1; i < points.length; i++) {

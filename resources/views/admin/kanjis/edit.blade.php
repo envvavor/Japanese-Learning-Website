@@ -21,21 +21,18 @@
             @method('PUT')
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <!-- Karakter -->
                 <div>
                     <label for="character" class="block text-sm font-semibold text-gray-700 mb-2">Karakter *</label>
                     <input type="text" name="character" id="character" value="{{ old('character', $kanji->character) }}" required
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-2xl shadow-sm" placeholder="Contoh: 日">
                 </div>
                 
-                <!-- Arti -->
                 <div>
                     <label for="meaning" class="block text-sm font-semibold text-gray-700 mb-2">Arti (Meaning) *</label>
                     <input type="text" name="meaning" id="meaning" value="{{ old('meaning', $kanji->meaning) }}" required
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm" placeholder="Contoh: Matahari, Hari">
                 </div>
                 
-                <!-- Kategori -->
                 <div>
                     <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Kategori *</label>
                     <select name="category" id="category" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white shadow-sm">
@@ -45,7 +42,6 @@
                     </select>
                 </div>
                 
-                <!-- Level -->
                 <div>
                     <label for="level" class="block text-sm font-semibold text-gray-700 mb-2">Level (JLPT) <span class="text-gray-400 font-normal ml-1 text-xs bg-gray-100 px-2 py-1 rounded">Opsional</span></label>
                     <select name="level" id="level" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white shadow-sm">
@@ -58,21 +54,18 @@
                     </select>
                 </div>
 
-                <!-- Kunyomi -->
                 <div>
                     <label for="kunyomi" class="block text-sm font-semibold text-gray-700 mb-2">Kunyomi <span class="text-gray-400 font-normal ml-1 text-xs bg-gray-100 px-2 py-1 rounded">Opsional</span></label>
                     <input type="text" name="kunyomi" id="kunyomi" value="{{ old('kunyomi', $kanji->kunyomi) }}"
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm" placeholder="Contoh: ひ, -び, -か">
                 </div>
 
-                <!-- Onyomi -->
                 <div>
                     <label for="onyomi" class="block text-sm font-semibold text-gray-700 mb-2">Onyomi <span class="text-gray-400 font-normal ml-1 text-xs bg-gray-100 px-2 py-1 rounded">Opsional</span></label>
                     <input type="text" name="onyomi" id="onyomi" value="{{ old('onyomi', $kanji->onyomi) }}"
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm" placeholder="Contoh: ニチ, ジツ">
                 </div>
 
-                <!-- Stroke Order Image -->
                 <div class="md:col-span-2">
                     <label for="stroke_order_image" class="block text-sm font-semibold text-gray-700 mb-2">Gambar Urutan Stroke <span class="text-gray-400 font-normal ml-1 text-xs bg-gray-100 px-2 py-1 rounded">Opsional</span></label>
                     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg bg-white hover:bg-gray-50 transition-colors relative" x-data="{ fileName: null, previewUrl: '{{ $kanji->stroke_order_image ? asset('storage/' . $kanji->stroke_order_image) : '' }}' }">
@@ -95,17 +88,60 @@
                 </div>
             </div>
 
-            <!-- Canvas untuk Strokes -->
+            <div class="mb-8 p-6 bg-gray-50 border border-gray-200 rounded-xl">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800 flex items-center">
+                            <i class="fas fa-language text-indigo-500 mr-2"></i> Contoh Kalimat
+                        </h3>
+                        <p class="text-sm text-gray-500 mt-1">Tambahkan kalimat untuk mendemonstrasikan penggunaan kanji ini (Opsional).</p>
+                    </div>
+                    <button type="button" onclick="addExampleRow()" 
+                            class="px-4 py-2 bg-indigo-100 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-200 transition-colors text-sm flex items-center shadow-sm">
+                        <i class="fas fa-plus mr-2"></i> Tambah Kalimat
+                    </button>
+                </div>
+
+                <div id="examples-container" class="space-y-4">
+                    @if(isset($kanji->examples) && count($kanji->examples) > 0)
+                        @foreach($kanji->examples as $index => $example)
+                        <div class="flex flex-col sm:flex-row gap-4 bg-white p-5 border border-gray-200 rounded-xl shadow-sm relative group" id="example-row-{{ $index }}">
+                            <div class="flex-1 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Teks Jepang Murni <span class="text-red-500">*</span></label>
+                                    <input type="text" name="examples[{{ $index }}][japanese_text]" value="{{ $example->japanese_text }}" required
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Teks Furigana (HTML Tag &lt;ruby&gt;)</label>
+                                    <input type="text" name="examples[{{ $index }}][furigana_html]" value="{{ $example->furigana_html }}"
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm text-gray-600 shadow-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Arti (Bahasa Indonesia) <span class="text-red-500">*</span></label>
+                                    <input type="text" name="examples[{{ $index }}][meaning]" value="{{ $example->meaning }}" required
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
+                                </div>
+                            </div>
+                            <div class="flex items-start pt-8">
+                                <button type="button" onclick="removeExampleRow({{ $index }})" 
+                                        class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200" title="Hapus Kalimat">
+                                    <i class="fas fa-trash-alt text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
             <div class="mb-8">
                 <label class="block text-sm font-bold text-gray-800 mb-3 border-b border-gray-200 pb-2"><i class="fas fa-pen-nib mr-2 text-indigo-500"></i> Rekam Coretan (Strokes) *</label>
                 <div class="bg-gray-50 border border-t-0 border-x-0 border-b-4 border-indigo-100 p-5 rounded-xl shadow-sm">
                     <div class="flex flex-col md:flex-row gap-6 items-start">
-                        <!-- Area Canvas -->
                         <div class="bg-white p-2 rounded-xl shadow-sm inline-block border border-gray-200 relative">
                             <canvas id="drawingCanvas" width="300" height="300" class="border border-dashed border-indigo-200 rounded-lg cursor-crosshair bg-white" style="touch-action: none;"></canvas>
                         </div>
                         
-                        <!-- Canvas Controls -->
                         <div class="flex-1 space-y-4 w-full">
                             <div class="bg-indigo-50 text-indigo-900 justify-center p-4 rounded-lg text-sm border border-indigo-100 shadow-sm leading-relaxed">
                                 <i class="fas fa-info-circle mr-2 mb-2 text-indigo-600 block text-xl"></i>
@@ -131,10 +167,9 @@
                         </div>
                     </div>
                 </div>
-                <input type="hidden" name="strokes" id="strokesData" value="{{ old('strokes', json_encode($kanji->strokes)) }}">
+                <input type="hidden" name="strokes" id="strokesData" value="{{ old('strokes', is_string($kanji->strokes) ? $kanji->strokes : json_encode($kanji->strokes)) }}">
             </div>
 
-            <!-- Submit Button -->
             <div class="flex justify-end pt-5 mt-5 border-t border-gray-100">
                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all flex items-center text-lg transform hover:-translate-y-0.5">
                     <i class="fas fa-save mr-2"></i> Perbarui Data Kanji
@@ -148,6 +183,54 @@
 
 @push('scripts')
 <script>
+    // --- SCRIPT UNTUK FORM DINAMIS (CONTOH KALIMAT) ---
+    // Hitung berapa kalimat yang sudah ada agar ID-nya tidak tabrakan
+    let exampleIndex = {{ isset($kanji->examples) ? count($kanji->examples) : 0 }};
+
+    function addExampleRow() {
+        const container = document.getElementById('examples-container');
+        
+        const html = `
+            <div class="flex flex-col sm:flex-row gap-4 bg-white p-5 border border-gray-200 rounded-xl shadow-sm relative group" id="example-row-${exampleIndex}">
+                <div class="flex-1 space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Teks Jepang Murni <span class="text-red-500">*</span></label>
+                        <input type="text" name="examples[${exampleIndex}][japanese_text]" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" placeholder="Contoh: 日本の生活様式">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Teks Furigana (HTML Tag &lt;ruby&gt;)</label>
+                        <input type="text" name="examples[${exampleIndex}][furigana_html]" 
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm text-gray-600 shadow-sm" 
+                               placeholder="Contoh: <ruby>日本<rt>にほん</rt></ruby>の...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Arti (Bahasa Indonesia) <span class="text-red-500">*</span></label>
+                        <input type="text" name="examples[${exampleIndex}][meaning]" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" placeholder="Contoh: Gaya hidup Jepang...">
+                    </div>
+                </div>
+                <div class="flex items-start pt-8">
+                    <button type="button" onclick="removeExampleRow(${exampleIndex})" 
+                            class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200" title="Hapus Kalimat">
+                        <i class="fas fa-trash-alt text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', html);
+        exampleIndex++;
+    }
+
+    function removeExampleRow(index) {
+        const row = document.getElementById(`example-row-${index}`);
+        if(row) {
+            row.remove();
+        }
+    }
+
+    // --- SCRIPT CANVAS STROKES ---
     document.addEventListener('DOMContentLoaded', function() {
         const canvas = document.getElementById('drawingCanvas');
         const ctx = canvas.getContext('2d');
