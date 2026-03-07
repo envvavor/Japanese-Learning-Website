@@ -9,7 +9,7 @@ class KanjiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Kanji::select('id', 'character', 'meaning', 'category');
+        $query = Kanji::select('id', 'character', 'meaning', 'category', 'level');
 
         if ($request->filled('category')) {
             $query->where('category', $request->category);

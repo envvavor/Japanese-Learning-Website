@@ -4,15 +4,15 @@
 
 @section('content')
 <div class="mb-6">
-    <a href="{{ route('admin.kanjis.index') }}" class="text-indigo-600 hover:text-indigo-800 font-medium transition-colors flex items-center">
+    <a href="{{ route('admin.kanjis.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors flex items-center">
         <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar Kanji
     </a>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl">
-    <div class="border-b border-gray-100 px-6 py-5 bg-gray-50 flex justify-between items-center">
-        <h3 class="text-xl font-bold text-gray-800 flex items-center">
-            <i class="fas fa-edit text-indigo-500 mr-2 border bg-white rounded-full p-2 shadow-sm"></i> Edit Kanji: {{ $kanji->character }}
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-w-4xl">
+    <div class="border-b border-gray-100 dark:border-gray-700 px-6 py-5 bg-gray-50 dark:bg-gray-800/50 flex justify-between items-center">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+            <i class="fas fa-edit text-indigo-500 dark:text-indigo-400 mr-2 border dark:border-gray-600 bg-white dark:bg-gray-700 rounded-full p-2 shadow-sm"></i> Edit Kanji: {{ $kanji->character }}
         </h3>
     </div>
     <div class="p-6 md:p-8">
@@ -22,20 +22,20 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
-                    <label for="character" class="block text-sm font-semibold text-gray-700 mb-2">Karakter *</label>
+                    <label for="character" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Karakter *</label>
                     <input type="text" name="character" id="character" value="{{ old('character', $kanji->character) }}" required
-                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-2xl shadow-sm" placeholder="Contoh: 日">
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-2xl shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: 日">
                 </div>
                 
                 <div>
                     <label for="meaning" class="block text-sm font-semibold text-gray-700 mb-2">Arti (Meaning) *</label>
                     <input type="text" name="meaning" id="meaning" value="{{ old('meaning', $kanji->meaning) }}" required
-                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm" placeholder="Contoh: Matahari, Hari">
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: Matahari, Hari">
                 </div>
                 
                 <div>
                     <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Kategori *</label>
-                    <select name="category" id="category" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white shadow-sm">
+                    <select name="category" id="category" required class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm">
                         <option value="kanji" {{ old('category', $kanji->category) == 'kanji' ? 'selected' : '' }}>Kanji</option>
                         <option value="hiragana" {{ old('category', $kanji->category) == 'hiragana' ? 'selected' : '' }}>Hiragana</option>
                         <option value="katakana" {{ old('category', $kanji->category) == 'katakana' ? 'selected' : '' }}>Katakana</option>
@@ -43,32 +43,29 @@
                 </div>
                 
                 <div>
-                    <label for="level" class="block text-sm font-semibold text-gray-700 mb-2">Level (JLPT) <span class="text-gray-400 font-normal ml-1 text-xs bg-gray-100 px-2 py-1 rounded">Opsional</span></label>
-                    <select name="level" id="level" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white shadow-sm">
-                        <option value="">Pilih Level...</option>
-                        <option value="5" {{ old('level', $kanji->level) == '5' ? 'selected' : '' }}>N5</option>
-                        <option value="4" {{ old('level', $kanji->level) == '4' ? 'selected' : '' }}>N4</option>
-                        <option value="3" {{ old('level', $kanji->level) == '3' ? 'selected' : '' }}>N3</option>
-                        <option value="2" {{ old('level', $kanji->level) == '2' ? 'selected' : '' }}>N2</option>
-                        <option value="1" {{ old('level', $kanji->level) == '1' ? 'selected' : '' }}>N1</option>
-                    </select>
+                    <label for="level" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Bab <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Opsional</span>
+                    </label>
+                    <input type="number" name="level" id="level" min="1" step="1" value="{{ old('level', $kanji->level) }}" 
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm"
+                           placeholder="Contoh: 1, 2, 3...">
                 </div>
 
                 <div>
-                    <label for="kunyomi" class="block text-sm font-semibold text-gray-700 mb-2">Kunyomi <span class="text-gray-400 font-normal ml-1 text-xs bg-gray-100 px-2 py-1 rounded">Opsional</span></label>
+                    <label for="kunyomi" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Kunyomi <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Opsional</span></label>
                     <input type="text" name="kunyomi" id="kunyomi" value="{{ old('kunyomi', $kanji->kunyomi) }}"
-                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm" placeholder="Contoh: ひ, -び, -か">
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: ひ, -び, -か">
                 </div>
 
                 <div>
-                    <label for="onyomi" class="block text-sm font-semibold text-gray-700 mb-2">Onyomi <span class="text-gray-400 font-normal ml-1 text-xs bg-gray-100 px-2 py-1 rounded">Opsional</span></label>
+                    <label for="onyomi" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Onyomi <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Opsional</span></label>
                     <input type="text" name="onyomi" id="onyomi" value="{{ old('onyomi', $kanji->onyomi) }}"
-                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm" placeholder="Contoh: ニチ, ジツ">
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: ニチ, ジツ">
                 </div>
 
                 <div class="md:col-span-2">
-                    <label for="stroke_order_image" class="block text-sm font-semibold text-gray-700 mb-2">Gambar Urutan Stroke <span class="text-gray-400 font-normal ml-1 text-xs bg-gray-100 px-2 py-1 rounded">Opsional</span></label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg bg-white hover:bg-gray-50 transition-colors relative" x-data="{ fileName: null, previewUrl: '{{ $kanji->stroke_order_image ? asset('storage/' . $kanji->stroke_order_image) : '' }}' }">
+                    <label for="stroke_order_image" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Gambar Urutan Stroke <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Opsional</span></label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors relative" x-data="{ fileName: null, previewUrl: '{{ $kanji->stroke_order_image ? asset('storage/' . $kanji->stroke_order_image) : '' }}' }">
                         <div class="space-y-1 text-center w-full">
                             <template x-if="!previewUrl">
                                 <i class="fas fa-image mx-auto h-12 w-12 text-gray-400 mb-3"></i>
@@ -88,13 +85,13 @@
                 </div>
             </div>
 
-            <div class="mb-8 p-6 bg-gray-50 border border-gray-200 rounded-xl">
+            <div class="mb-8 p-6 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-800 flex items-center">
-                            <i class="fas fa-language text-indigo-500 mr-2"></i> Contoh Kalimat
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center">
+                            <i class="fas fa-language text-indigo-500 dark:text-indigo-400 mr-2"></i> Contoh Kalimat
                         </h3>
-                        <p class="text-sm text-gray-500 mt-1">Tambahkan kalimat untuk mendemonstrasikan penggunaan kanji ini (Opsional).</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tambahkan kalimat untuk mendemonstrasikan penggunaan kanji ini (Opsional).</p>
                     </div>
                     <button type="button" onclick="addExampleRow()" 
                             class="px-4 py-2 bg-indigo-100 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-200 transition-colors text-sm flex items-center shadow-sm">
@@ -135,34 +132,34 @@
                 </div>
             </div>
             <div class="mb-8">
-                <label class="block text-sm font-bold text-gray-800 mb-3 border-b border-gray-200 pb-2"><i class="fas fa-pen-nib mr-2 text-indigo-500"></i> Rekam Coretan (Strokes) *</label>
-                <div class="bg-gray-50 border border-t-0 border-x-0 border-b-4 border-indigo-100 p-5 rounded-xl shadow-sm">
+                <label class="block text-sm font-bold text-gray-800 dark:text-gray-100 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2"><i class="fas fa-pen-nib mr-2 text-indigo-500 dark:text-indigo-400"></i> Rekam Coretan (Strokes) *</label>
+                <div class="bg-gray-50 dark:bg-gray-800/50 border border-t-0 border-x-0 border-b-4 border-indigo-100 dark:border-indigo-800 p-5 rounded-xl shadow-sm">
                     <div class="flex flex-col md:flex-row gap-6 items-start">
-                        <div class="bg-white p-2 rounded-xl shadow-sm inline-block border border-gray-200 relative">
-                            <canvas id="drawingCanvas" width="300" height="300" class="border border-dashed border-indigo-200 rounded-lg cursor-crosshair bg-white" style="touch-action: none;"></canvas>
+                        <div class="bg-white dark:bg-gray-700 p-2 rounded-xl shadow-sm inline-block border border-gray-200 dark:border-gray-600 relative">
+                            <canvas id="drawingCanvas" width="300" height="300" class="border border-dashed border-indigo-200 dark:border-indigo-700 rounded-lg cursor-crosshair bg-white dark:bg-gray-800" style="touch-action: none;"></canvas>
                         </div>
                         
                         <div class="flex-1 space-y-4 w-full">
-                            <div class="bg-indigo-50 text-indigo-900 justify-center p-4 rounded-lg text-sm border border-indigo-100 shadow-sm leading-relaxed">
-                                <i class="fas fa-info-circle mr-2 mb-2 text-indigo-600 block text-xl"></i>
+                            <div class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-200 justify-center p-4 rounded-lg text-sm border border-indigo-100 dark:border-indigo-800 shadow-sm leading-relaxed">
+                                <i class="fas fa-info-circle mr-2 mb-2 text-indigo-600 dark:text-indigo-400 block text-xl"></i>
                                 <strong>Panduan merekam:</strong>
-                                <ul class="list-disc list-inside mt-2 space-y-1 text-indigo-800">
+                                <ul class="list-disc list-inside mt-2 space-y-1 text-indigo-800 dark:text-indigo-300">
                                     <li>Mulai menggambar di atas kotak border putus-putus.</li>
                                     <li>Setiap tarikan garis dihitung sebagai 1 stroke.</li>
                                     <li>Perhatikan urutan stroke Anda dengan cermat.</li>
                                 </ul>
                             </div>
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <button type="button" id="clearBtn" class="bg-white text-red-600 hover:bg-red-50 font-semibold py-2 px-4 rounded-lg border border-red-200 transition-colors flex items-center justify-center flex-1 shadow-sm">
+                                <button type="button" id="clearBtn" class="bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold py-2 px-4 rounded-lg border border-red-200 dark:border-red-800 transition-colors flex items-center justify-center flex-1 shadow-sm">
                                     <i class="fas fa-trash-alt mr-2"></i> Bersihkan Semua
                                 </button>
-                                <button type="button" id="undoBtn" class="bg-white text-gray-700 hover:bg-gray-50 font-semibold py-2 px-4 rounded-lg border border-gray-200 transition-colors flex items-center justify-center flex-1 shadow-sm">
+                                <button type="button" id="undoBtn" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 font-semibold py-2 px-4 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors flex items-center justify-center flex-1 shadow-sm">
                                     <i class="fas fa-undo mr-2"></i> Hapus Terakhir
                                 </button>
                             </div>
-                            <div class="mt-4 pt-4 border-t border-indigo-100/50 flex justify-between items-center">
-                                <span class="text-sm font-bold text-gray-600">Total Tarikan:</span>
-                                <span id="strokeCount" class="bg-indigo-100 text-indigo-800 font-black text-lg px-4 py-1 rounded-full shadow-inner">0</span>
+                            <div class="mt-4 pt-4 border-t border-indigo-100/50 dark:border-indigo-800/50 flex justify-between items-center">
+                                <span class="text-sm font-bold text-gray-600 dark:text-gray-400">Total Tarikan:</span>
+                                <span id="strokeCount" class="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 font-black text-lg px-4 py-1 rounded-full shadow-inner">0</span>
                             </div>
                         </div>
                     </div>
@@ -170,7 +167,7 @@
                 <input type="hidden" name="strokes" id="strokesData" value="{{ old('strokes', is_string($kanji->strokes) ? $kanji->strokes : json_encode($kanji->strokes)) }}">
             </div>
 
-            <div class="flex justify-end pt-5 mt-5 border-t border-gray-100">
+            <div class="flex justify-end pt-5 mt-5 border-t border-gray-100 dark:border-gray-700">
                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all flex items-center text-lg transform hover:-translate-y-0.5">
                     <i class="fas fa-save mr-2"></i> Perbarui Data Kanji
                 </button>

@@ -3,22 +3,30 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }">
+
+    {{-- Dark Mode Toggle (floating) --}}
+    <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode); document.documentElement.classList.toggle('dark', darkMode)" 
+            class="fixed top-5 right-5 z-50 w-11 h-11 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:scale-110"
+            :title="darkMode ? 'Light Mode' : 'Dark Mode'">
+        <i class="fas fa-sun text-amber-500" x-show="darkMode" x-transition></i>
+        <i class="fas fa-moon text-indigo-500" x-show="!darkMode" x-transition></i>
+    </button>
 
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800 tracking-tight">
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
                 Dashboard
             </h1>
-            <p class="text-base text-slate-500 mt-1">
-                Selamat datang kembali, <span class="font-semibold text-indigo-600">{{ Auth::user()->name }}</span>! Mari lanjutkan belajarmu.
+            <p class="text-base text-slate-500 dark:text-slate-400 mt-1">
+                Selamat datang kembali, <span class="font-semibold text-indigo-600 dark:text-indigo-400">{{ Auth::user()->name }}</span>! Mari lanjutkan belajarmu.
             </p>
         </div>
 
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit"
-                class="inline-flex items-center justify-center px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-medium text-slate-700 bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all shadow-sm">
+                class="inline-flex items-center justify-center px-5 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-gray-800 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-800 transition-all shadow-sm">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                 </svg>
@@ -28,11 +36,11 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-100 rounded-2xl p-6 shadow-sm">
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/40 dark:to-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-2xl p-6 shadow-sm">
             <div class="flex justify-between items-center">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1">Kanji Learned</p>
-                    <p class="text-4xl font-extrabold text-slate-800">0</p>
+                    <p class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1">Kanji Learned</p>
+                    <p class="text-4xl font-extrabold text-slate-800 dark:text-white">0</p>
                 </div>
                 <div class="p-3 bg-blue-500 text-white rounded-xl shadow-sm">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
@@ -40,11 +48,11 @@
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border border-emerald-100 rounded-2xl p-6 shadow-sm">
+        <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/40 dark:to-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50 rounded-2xl p-6 shadow-sm">
             <div class="flex justify-between items-center">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-1">Kanji Mastered</p>
-                    <p class="text-4xl font-extrabold text-slate-800">0</p>
+                    <p class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-1">Kanji Mastered</p>
+                    <p class="text-4xl font-extrabold text-slate-800 dark:text-white">0</p>
                 </div>
                 <div class="p-3 bg-emerald-500 text-white rounded-xl shadow-sm">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -52,12 +60,12 @@
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-100 rounded-2xl p-6 shadow-sm">
+        <div class="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/40 dark:to-amber-900/20 border border-amber-100 dark:border-amber-800/50 rounded-2xl p-6 shadow-sm">
             <div class="flex justify-between items-center">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-amber-600 mb-1">Daily Streak</p>
-                    <p class="text-4xl font-extrabold text-slate-800 flex items-baseline gap-1">
-                        0 <span class="text-lg font-medium text-amber-600">Hari</span>
+                    <p class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">Daily Streak</p>
+                    <p class="text-4xl font-extrabold text-slate-800 dark:text-white flex items-baseline gap-1">
+                        0 <span class="text-lg font-medium text-amber-600 dark:text-amber-400">Hari</span>
                     </p>
                 </div>
                 <div class="p-3 bg-amber-500 text-white rounded-xl shadow-sm">
@@ -68,9 +76,9 @@
     </div>
 
     <div>
-        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-6 flex items-center">
             Materi Pembelajaran
-            <span class="ml-3 h-px flex-1 bg-slate-200"></span>
+            <span class="ml-3 h-px flex-1 bg-slate-200 dark:bg-slate-700"></span>
         </h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -127,7 +135,7 @@
                 </div>
             </div>
 
-            <div class="group relative rounded-2xl h-56 overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ring-2 ring-indigo-500 ring-offset-2">
+            <div class="group relative rounded-2xl h-56 overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-900">
                 <div class="absolute top-4 left-4 z-30">
                     <span class="px-3 py-1 bg-indigo-500 text-white text-xs font-bold rounded-full shadow-lg">Rekomendasi</span>
                 </div>
@@ -152,6 +160,19 @@
                     <p class="text-sm text-gray-300 mb-4 line-clamp-2">Uji pemahaman Anda dengan kuis interaktif yang seru.</p>
                     <a href="#" class="inline-flex items-center text-sm font-semibold text-purple-400 hover:text-purple-300 w-max">
                         Mulai Kuis <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="group relative rounded-2xl h-56 overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                <img src="https://teamjapanese.com/wp-content/uploads/2018/10/how-to-read-japanese-768x576.jpg" alt="Materi Pembelajaran" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 z-0">
+                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent z-10"></div>
+                
+                <div class="absolute inset-0 z-20 p-6 flex flex-col justify-end">
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">Materi</h3>
+                    <p class="text-sm text-gray-300 mb-4 line-clamp-2">Baca materi pembelajaran bahasa Jepang secara lengkap.</p>
+                    <a href="{{ route('materi.index') }}" class="inline-flex items-center text-sm font-semibold text-cyan-400 hover:text-cyan-300 w-max">
+                        Lihat Materi <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </a>
                 </div>
             </div>
