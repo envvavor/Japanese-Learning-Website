@@ -30,5 +30,8 @@ class DatabaseSeeder extends Seeder
             'password' => 'password',
             'role' => 'user',
         ]);
+
+        // Seed Visual Novel data
+        $this->call(VisualNovelSeeder::class);
     }
 }

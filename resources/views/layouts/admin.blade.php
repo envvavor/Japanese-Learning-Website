@@ -77,6 +77,11 @@
                     </a>
                 </div>
             </div>
+
+            <a href="{{ route('admin.vn.scenes.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 {{ request()->is('admin/vn*') ? 'bg-indigo-700 dark:bg-indigo-600 text-white shadow-md' : 'text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white' }}">
+                <i class="fas fa-film w-5 text-center"></i>
+                <span class="font-medium">Visual Novel</span>
+            </a>
         </div>
     </aside>
 

@@ -177,6 +177,26 @@
                 </div>
             </div>
 
+            <div class="group relative rounded-2xl h-56 overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ring-2 ring-violet-500 ring-offset-2 dark:ring-offset-gray-900">
+                <div class="absolute top-4 left-4 z-30">
+                    <span class="px-3 py-1 bg-violet-500 text-white text-xs font-bold rounded-full shadow-lg">Baru</span>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-br from-violet-900 via-indigo-900 to-purple-900 z-0">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-20">
+                        <span class="text-9xl">🎮</span>
+                    </div>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent z-10"></div>
+                
+                <div class="absolute inset-0 z-20 p-6 flex flex-col justify-end">
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">Visual Novel</h3>
+                    <p class="text-sm text-gray-300 mb-4 line-clamp-2">Belajar bahasa Jepang melalui cerita interaktif dengan audio.</p>
+                    <a href="{{ route('vn.scenes') }}" class="inline-flex items-center text-sm font-semibold text-violet-400 hover:text-violet-300 w-max">
+                        Lihat Scene <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 

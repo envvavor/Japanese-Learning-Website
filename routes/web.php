@@ -73,3 +73,48 @@ Route::get('/materi', function () {
 Route::get('/materi/{materi:slug}', function (\App\Models\Materi $materi) {
     return view('materis.show', compact('materi'));
 })->name('materi.show')->middleware('auth');
+
+// =============================================
+// Visual Novel Engine Routes
+// =============================================
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\Admin\VnCharacterController;
+use App\Http\Controllers\Admin\VnBackgroundController;
+use App\Http\Controllers\Admin\VnDialogueController;
+use App\Http\Controllers\Admin\VnSceneController;
+
+// VN Player routes
+Route::prefix('vn')->name('vn.')->middleware('auth')->group(function () {
+    Route::get('/', [GameController::class, 'start'])->name('start');
+    Route::get('/play/{dialogue}', [GameController::class, 'play'])->name('play');
+    Route::get('/scenes', [GameController::class, 'scenes'])->name('scenes');
+});
+
+// VN Admin routes
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin/vn')
+    ->name('admin.vn.')
+    ->group(function () {
+        Route::resource('scenes', VnSceneController::class);
+
+        // Nested under scenes
+        Route::prefix('scenes/{scene}')->name('scenes.')->group(function () {
+            Route::get('characters/create', [VnCharacterController::class, 'create'])->name('characters.create');
+            Route::post('characters', [VnCharacterController::class, 'store'])->name('characters.store');
+            Route::get('characters/{character}/edit', [VnCharacterController::class, 'edit'])->name('characters.edit');
+            Route::put('characters/{character}', [VnCharacterController::class, 'update'])->name('characters.update');
+            Route::delete('characters/{character}', [VnCharacterController::class, 'destroy'])->name('characters.destroy');
+
+            Route::get('backgrounds/create', [VnBackgroundController::class, 'create'])->name('backgrounds.create');
+            Route::post('backgrounds', [VnBackgroundController::class, 'store'])->name('backgrounds.store');
+            Route::get('backgrounds/{background}/edit', [VnBackgroundController::class, 'edit'])->name('backgrounds.edit');
+            Route::put('backgrounds/{background}', [VnBackgroundController::class, 'update'])->name('backgrounds.update');
+            Route::delete('backgrounds/{background}', [VnBackgroundController::class, 'destroy'])->name('backgrounds.destroy');
+
+            Route::get('dialogues/create', [VnDialogueController::class, 'create'])->name('dialogues.create');
+            Route::post('dialogues', [VnDialogueController::class, 'store'])->name('dialogues.store');
+            Route::get('dialogues/{dialogue}/edit', [VnDialogueController::class, 'edit'])->name('dialogues.edit');
+            Route::put('dialogues/{dialogue}', [VnDialogueController::class, 'update'])->name('dialogues.update');
+            Route::delete('dialogues/{dialogue}', [VnDialogueController::class, 'destroy'])->name('dialogues.destroy');
+        });
+    });
