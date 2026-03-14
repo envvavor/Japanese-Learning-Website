@@ -27,6 +27,7 @@ export default defineConfig({
     server: {
         host: '0.0.0.0', // Membuka akses agar Vite bisa diakses dari HP
         port: 5173,
+        cors: true,
         hmr: {
             host: '192.168.1.233', // Wajib diganti dengan IP komputermu!
         },

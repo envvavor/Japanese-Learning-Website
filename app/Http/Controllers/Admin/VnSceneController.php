@@ -98,13 +98,57 @@ class VnSceneController extends Controller
 
     public function destroy(VnScene $scene)
     {
+        // CATAT SEMUA FILE SEBELUM ADA YANG DIHAPUS DARI DATABASE
+        $filesToDelete = [];
+
+        // Catat Thumbnail
         if ($scene->thumbnail_path) {
-            Storage::disk('public')->delete($scene->thumbnail_path);
+            $filesToDelete[] = str_replace('/storage/', '', $scene->thumbnail_path);
+        }
+
+        // Catat Sprite Karakter
+        foreach ($scene->characters()->get() as $char) {
+            if ($char->default_sprite_path) {
+                $filesToDelete[] = str_replace('/storage/', '', $char->default_sprite_path);
+            }
+        }
+
+        // Catat Gambar Background
+        foreach ($scene->backgrounds()->get() as $bg) {
+            if ($bg->image_path) {
+                $filesToDelete[] = str_replace('/storage/', '', $bg->image_path);
+            }
+        }
+
+        // Catat Audio Dialog
+        foreach ($scene->dialogues()->get() as $dialogue) {
+            if ($dialogue->audio_file_path) {
+                $filesToDelete[] = str_replace('/storage/', '', $dialogue->audio_file_path);
+            }
+        }
+
+        // EKSEKUSI PEMBANTAIAN FILE FISIK (MP3, PNG, JPG)
+        foreach ($filesToDelete as $path) {
+            Storage::disk('public')->delete($path);
+        }
+
+        // EKSEKUSI HAPUS DATABASE (Dari anak ke induk agar tidak error)
+        foreach ($scene->dialogues()->get() as $dialogue) {
+            $dialogue->choices()->delete(); 
+            $dialogue->delete();
+        }
+
+        foreach ($scene->characters()->get() as $char) {
+            $char->delete();
+        }
+
+        foreach ($scene->backgrounds()->get() as $bg) {
+            $bg->delete();
         }
 
         $scene->delete();
 
         return redirect()->route('admin.vn.scenes.index')
-            ->with('success', 'Scene deleted successfully.');
+            ->with('success', 'Scene Telah Dihapus');
     }
 }

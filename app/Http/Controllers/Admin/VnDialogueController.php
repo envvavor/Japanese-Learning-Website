@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\VnDialogue;
-use App\Models\VnScene;
+use App\Models\VnCharacter;
+use App\Services\ElevenLabsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Models\VnScene;
 
 class VnDialogueController extends Controller
 {
@@ -118,9 +121,81 @@ class VnDialogueController extends Controller
             $scene->update(['first_dialogue_id' => null]);
         }
 
+        // 🔥 LOGIKA HAPUS AUDIO
+        if ($dialogue->audio_file_path) {
+            $path = str_replace('/storage/', '', $dialogue->audio_file_path);
+            Storage::disk('public')->delete($path);
+        }
+
         $dialogue->delete();
 
         return redirect()->route('admin.vn.scenes.show', $scene)
-            ->with('success', 'Dialogue deleted successfully.');
+            ->with('success', 'Dialogue and audio deleted successfully.');
+    }
+
+    // Load service ElevenLabs ke dalam controller
+    protected ElevenLabsService $elevenLabs;
+
+    public function __construct(ElevenLabsService $elevenLabs)
+    {
+        $this->elevenLabs = $elevenLabs;
+    }
+
+    // ... (fungsi store, update, destroy lainnya biarkan saja) ...
+
+    /**
+     * 🔥 FUNGSI GENERATE AUDIO DARI VUE GRAPH
+     */
+    public function generateAudio(Request $request, VnDialogue $dialogue)
+    {
+        // 1. Validasi Input dari Vue Axios
+        $request->validate([
+            'text' => 'required|string',
+            'character_id' => 'required|exists:vn_characters,id',
+        ]);
+
+        // 2. Ambil Voice ID Karakter dari Database
+        $character = VnCharacter::find($request->character_id);
+        $voiceId = $character->elevenlabs_voice_id;
+
+        if (empty($voiceId)) {
+            return response()->json([
+                'message' => "Karakter '{$character->name}' belum memiliki Voice ID ElevenLabs."
+            ], 400); // 400 Bad Request
+        }
+
+        // 3. HAPUS AUDIO LAMA (Sangat Penting!)
+        // Karena service-mu pakai MD5 cache, kita harus hapus file lamanya dulu
+        // agar sistem dipaksa nge-hit API ElevenLabs lagi (Regenerate sejati).
+        if ($dialogue->audio_file_path) {
+            $oldPath = str_replace(['/storage/', 'storage/', 'public/', '/public/'], '', $dialogue->audio_file_path);
+            $oldPath = ltrim($oldPath, '/');
+            if (Storage::disk('public')->exists($oldPath)) {
+                Storage::disk('public')->delete($oldPath);
+            }
+        }
+
+        // 4. TEMBAK API ELEVENLABS MENGGUNAKAN SERVICE-MU
+        // Panggil fungsi yang ada di ElevenLabsService.php
+        $audioUrl = $this->elevenLabs->getOrGenerateAudio($request->text, $voiceId);
+
+        // Jika API gagal (kembalian null)
+        if (!$audioUrl) {
+            return response()->json([
+                'message' => 'Gagal men-generate audio. Periksa API Key ElevenLabs atau Kuota Karaktermu.'
+            ], 500); // 500 Internal Server Error
+        }
+
+        // 5. UPDATE DATABASE DENGAN PATH BARU
+        // Fungsi Storage::url() di service-mu otomatis menghasilkan "/storage/audio/xxx.mp3"
+        $dialogue->update([
+            'audio_file_path' => $audioUrl,
+        ]);
+
+        // 6. KIRIM JAWABAN SUKSES KE VUE
+        return response()->json([
+            'message' => 'Audio berhasil di-generate!',
+            'audio_file_path' => $audioUrl
+        ]);
     }
 }

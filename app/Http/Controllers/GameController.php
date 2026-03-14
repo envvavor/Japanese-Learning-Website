@@ -16,8 +16,6 @@ class GameController extends Controller
 
     /**
      * Start playing the visual novel from the entry dialogue.
-     * Finds the "root" dialogue — one that is not referenced as a
-     * next_dialogue_id or as a choice target_dialogue_id.
      */
     public function start()
     {
@@ -41,7 +39,8 @@ class GameController extends Controller
 
         if (!$firstDialogue) {
             return Inertia::render('Game/Play', [
-                'dialogue' => null,
+                'allDialogues' => [],
+                'startDialogueId' => null,
             ]);
         }
 
@@ -49,53 +48,70 @@ class GameController extends Controller
     }
 
     /**
-     * Play a specific dialogue.
+     * Play a specific dialogue scene.
+     * Auto-generate audio untuk semua dialog di scene ini, lalu kirim ke Vue.
      */
     public function play(VnDialogue $dialogue)
     {
-        $dialogue->load(['character', 'background', 'choices']);
+        $sceneId = $dialogue->scene_id;
 
-        // Generate TTS audio if needed
-        if (
-            !$dialogue->audio_file_path
-            && $dialogue->character_id
-            && $dialogue->character
-            && $dialogue->character->elevenlabs_voice_id
-        ) {
-            $audioUrl = $this->elevenLabsService->getOrGenerateAudio(
-                $dialogue->original_text,
-                $dialogue->character->elevenlabs_voice_id
-            );
+        // 1. Ambil SEMUA dialog di scene ini
+        $allDialoguesInScene = VnDialogue::with(['character', 'background', 'choices'])
+            ->where('scene_id', $sceneId)
+            ->get();
 
-            if ($audioUrl) {
-                $dialogue->update(['audio_file_path' => $audioUrl]);
-                $dialogue->audio_file_path = $audioUrl;
+        // 2. 🔥 AUTO-GENERATE AUDIO (ElevenLabs) UNTUK SEMUA DIALOG YANG KOSONG
+        foreach ($allDialoguesInScene as $d) {
+            if (
+                !$d->audio_file_path
+                && $d->character_id
+                && $d->character
+                && $d->character->elevenlabs_voice_id
+            ) {
+                // Generate TTS audio
+                $audioUrl = $this->elevenLabsService->getOrGenerateAudio(
+                    $d->original_text,
+                    $d->character->elevenlabs_voice_id
+                );
+
+                if ($audioUrl) {
+                    // Simpan ke database agar request berikutnya tidak generate lagi
+                    $d->update(['audio_file_path' => $audioUrl]);
+                    $d->audio_file_path = $audioUrl; 
+                }
             }
         }
 
-        return Inertia::render('Game/Play', [
-            'dialogue' => [
-                'id' => $dialogue->id,
-                'original_text' => $dialogue->original_text,
-                'translated_text' => $dialogue->translated_text,
-                'audio_file_path' => $dialogue->audio_file_path,
-                'next_dialogue_id' => $dialogue->next_dialogue_id,
-                'character' => $dialogue->character ? [
-                    'name' => $dialogue->character->name,
-                    'default_sprite_path' => $dialogue->character->default_sprite_path
-                        ? Storage::url($dialogue->character->default_sprite_path)
+        // 3. Format seluruh data tersebut menjadi array agar siap digunakan oleh Vue
+        $formattedDialogues = $allDialoguesInScene->map(function ($d) {
+            return [
+                'id' => $d->id,
+                'original_text' => $d->original_text,
+                'translated_text' => $d->translated_text,
+                'audio_file_path' => $d->audio_file_path, // Sekarang pasti terisi kalau karakternya punya voice_id
+                'next_dialogue_id' => $d->next_dialogue_id,
+                'character' => $d->character ? [
+                    'name' => $d->character->name,
+                    'default_sprite_path' => $d->character->default_sprite_path
+                        ? Storage::url($d->character->default_sprite_path)
                         : null,
                 ] : null,
-                'background' => [
-                    'name' => $dialogue->background->name,
-                    'image_url' => Storage::url($dialogue->background->image_path),
-                ],
-                'choices' => $dialogue->choices->map(fn ($choice) => [
+                'background' => $d->background ? [
+                    'name' => $d->background->name,
+                    'image_url' => Storage::url($d->background->image_path),
+                ] : null,
+                'choices' => $d->choices->map(fn ($choice) => [
                     'id' => $choice->id,
                     'choice_text' => $choice->choice_text,
                     'target_dialogue_id' => $choice->target_dialogue_id,
                 ]),
-            ],
+            ];
+        });
+
+        // 4. Kirim semua data ke Vue Player
+        return Inertia::render('Game/Play', [
+            'allDialogues' => $formattedDialogues,
+            'startDialogueId' => $dialogue->id,
         ]);
     }
 

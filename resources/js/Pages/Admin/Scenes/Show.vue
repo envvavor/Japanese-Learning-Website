@@ -11,6 +11,15 @@
           <p v-if="scene.description" class="text-gray-500 dark:text-gray-400 mt-2 text-sm">{{ scene.description }}</p>
         </div>
         <div class="flex items-center gap-3">
+          
+          <button
+            @click="deleteScene"
+            class="inline-flex items-center px-4 py-2 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg text-sm font-medium transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            Delete Scene
+          </button>
+
           <Link
             :href="`/admin/vn/scenes/${scene.id}/edit`"
             class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors"
@@ -18,6 +27,7 @@
             <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
             Edit Scene
           </Link>
+
           <Link
             v-if="scene.first_dialogue_id"
             :href="`/vn/play/${scene.first_dialogue_id}`"
@@ -55,7 +65,8 @@
           >
             <div class="flex items-center gap-4">
               <div class="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                <img v-if="char.default_sprite_path" :src="`/storage/${char.default_sprite_path}`" class="w-full h-full object-cover rounded-full" />
+                <svg v-else class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
               </div>
               <div>
                 <p class="font-medium text-gray-900 dark:text-white">{{ char.name }}</p>
@@ -124,12 +135,21 @@
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Story Script</h3>
             <span class="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium">{{ scene.dialogues?.length || 0 }}</span>
           </div>
-          <Link
-            :href="`/admin/vn/scenes/${scene.id}/dialogues/create`"
-            class="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >
-            + Add Dialogue
-          </Link>
+          <div class="flex items-center gap-3">
+            <Link
+              :href="`/admin/vn/scenes/${scene.id}/dialogues/create`"
+              class="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            >
+              + Add Dialogue
+            </Link>
+            <Link
+              :href="`/admin/vn/scenes/${scene.id}/graph`"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z" /></svg>
+              Open Story Graph
+            </Link>
+          </div>
         </div>
 
         <div v-if="!scene.dialogues?.length" class="text-center py-10 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
@@ -169,15 +189,18 @@
                 </div>
               </div>
 
-              <div class="flex items-center gap-2 shrink-0">
-                <Link :href="`/admin/vn/scenes/${scene.id}/dialogues/${dialogue.id}/edit`" class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-                  <span class="sr-only">Edit</span>
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                </Link>
-                <button @click="deleteItem('dialogues', dialogue.id)" class="p-2 text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors bg-red-50 dark:bg-red-500/10 rounded-lg">
-                  <span class="sr-only">Delete</span>
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                </button>
+              <div class="flex flex-col items-end gap-2 shrink-0">
+                <div class="flex items-center gap-2">
+                  <Link :href="`/admin/vn/scenes/${scene.id}/dialogues/${dialogue.id}/edit`" class="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+                    <span class="sr-only">Edit</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                  </Link>
+                  <button @click="deleteItem('dialogues', dialogue.id)" class="p-2 text-red-400 hover:text-red-600 dark:hover:text-red-400 transition-colors bg-red-50 dark:bg-red-500/10 rounded-lg">
+                    <span class="sr-only">Delete</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
+                <span v-if="dialogue.audio_file_path" class="text-[10px] font-bold px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded">Audio Ready</span>
               </div>
             </div>
           </div>
@@ -189,7 +212,7 @@
 
 <script setup>
 import { router } from '@inertiajs/vue3';
-import { Link } from '@inertiajs/vue3'; // Import komponen Link agar perpindahan halamannya instan (SPA)
+import { Link } from '@inertiajs/vue3';
 import VnAdminLayout from '../../../Layouts/VnAdminLayout.vue';
 
 const isDark = document.documentElement.classList.contains('dark');
@@ -202,8 +225,17 @@ function deleteItem(type, id) {
   const labels = { characters: 'character', backgrounds: 'background', dialogues: 'dialogue' };
   if (confirm(`Are you sure you want to delete this ${labels[type]}? This action cannot be undone.`)) {
     router.delete(`/admin/vn/scenes/${props.scene.id}/${type}/${id}`, {
-      preserveScroll: true // Menjaga posisi scroll setelah menghapus data
+      preserveScroll: true
     });
+  }
+}
+
+// 🔥 FUNGSI HAPUS SCENE BESAR-BESARAN
+function deleteScene() {
+  const message = `PERINGATAN KERAS:\n\nApakah kamu yakin ingin menghapus Scene "${props.scene.title}"?\n\nIni akan menghapus SEMUA Dialog, Karakter, Background, dan File Fisik (Gambar/Audio) yang ada di dalamnya. Tindakan ini TIDAK BISA dibatalkan!`;
+  
+  if (confirm(message)) {
+    router.delete(`/admin/vn/scenes/${props.scene.id}`);
   }
 }
 </script>

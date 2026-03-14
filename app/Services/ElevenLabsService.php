@@ -72,10 +72,12 @@ class ElevenLabsService
                 'Accept' => 'audio/mpeg',
             ])->post("{$this->baseUrl}/text-to-speech/{$voiceId}", [
                 'text' => $text,
-                'model_id' => 'eleven_multilingual_v2',
+                'model_id' => 'eleven_turbo_v2_5',
                 'voice_settings' => [
-                    'stability' => 0.5,
-                    'similarity_boost' => 0.75,
+                    'stability' => 0.55,
+                    'similarity_boost' => 0.80,
+                    'style' => 0.40,
+                    'use_speaker_boost' => true
                 ],
             ]);
 

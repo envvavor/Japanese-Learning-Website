@@ -27,13 +27,13 @@
                 </div>
                 
                 <div>
-                    <label for="meaning" class="block text-sm font-semibold text-gray-700 mb-2">Arti (Meaning) *</label>
+                    <label for="meaning" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Arti (Meaning) *</label>
                     <input type="text" name="meaning" id="meaning" value="{{ old('meaning') }}" required
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: Matahari, Hari">
                 </div>
                 
                 <div>
-                    <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Kategori *</label>
+                    <label for="category" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Kategori *</label>
                     <select name="category" id="category" required class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm">
                         <option value="kanji" {{ old('category') == 'kanji' ? 'selected' : '' }}>Kanji</option>
                         <option value="hiragana" {{ old('category') == 'hiragana' ? 'selected' : '' }}>Hiragana</option>
@@ -62,7 +62,7 @@
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: ニチ, ジツ">
                 </div>
 
-                <div class="md:col-span-2">
+                <!-- <div class="md:col-span-2">
                     <label for="stroke_order_image" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Gambar Urutan Stroke <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Opsional</span></label>
                     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors relative" x-data="{ fileName: null, previewUrl: null }">
                         <div class="space-y-1 text-center w-full">
@@ -74,7 +74,7 @@
                             </template>
                             <div class="flex text-sm text-gray-600 justify-center">
                                 <label for="stroke_order_image" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                    <span>Upload file gambar</span>
+                                    <span class="dark:bg-gray-700">Upload file gambar</span>
                                     <input id="stroke_order_image" name="stroke_order_image" type="file" class="sr-only" accept="image/*" @change="if($refs.fileInput.files.length > 0) { fileName = $refs.fileInput.files[0].name; previewUrl = URL.createObjectURL($refs.fileInput.files[0]); }" x-ref="fileInput">
                                 </label>
                                 <p class="pl-1">atau drag and drop</p>
@@ -83,7 +83,7 @@
                             <p class="text-xs text-gray-500 mt-2"><a href="https://www.japanesejlpt.com/tools/kanji-gif-generator/" class="text-indigo-600 hover:text-indigo-800 font-medium transition-colors inline-flex items-center group" target="_blank">Untuk membuat gambar stroke, kunjungi link ini</a></p>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <div class="mb-8">
@@ -174,11 +174,11 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Teks Furigana (HTML Tag &lt;ruby&gt;)</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Teks Jepang dengan Furigana</label>
                         <input type="text" name="examples[${exampleIndex}][furigana_html]" 
                                class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm font-mono text-sm" 
-                               placeholder="Contoh: <ruby>日本<rt>にほん</rt></ruby>の<ruby>生活様式<rt>せいかつようしき</rt></ruby>">
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Gunakan tag ruby untuk memunculkan hiragana kecil di atas kanji.</p>
+                               placeholder="Contoh: 日本(にほん)の生活様式(せいかつようしき)">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Ketik Kanji lalu langsung beri kurung. Contoh: <b>私(わたし)</b> atau <b>食(た)べる</b>.</p>
                     </div>
 
                     <div>

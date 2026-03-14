@@ -18,6 +18,8 @@ class VnDialogue extends Model
         'translated_text',
         'audio_file_path',
         'next_dialogue_id',
+        'position_x',
+        'position_y',
     ];
 
     public function character(): BelongsTo

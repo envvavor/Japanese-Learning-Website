@@ -28,13 +28,15 @@
                 </div>
                 
                 <div>
-                    <label for="meaning" class="block text-sm font-semibold text-gray-700 mb-2">Arti (Meaning) *</label>
+                    {{-- Fix 1: Added dark:text-gray-300 --}}
+                    <label for="meaning" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Arti (Meaning) *</label>
                     <input type="text" name="meaning" id="meaning" value="{{ old('meaning', $kanji->meaning) }}" required
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: Matahari, Hari">
                 </div>
                 
                 <div>
-                    <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Kategori *</label>
+                    {{-- Fix 2: Added dark:text-gray-300 --}}
+                    <label for="category" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Kategori *</label>
                     <select name="category" id="category" required class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm">
                         <option value="kanji" {{ old('category', $kanji->category) == 'kanji' ? 'selected' : '' }}>Kanji</option>
                         <option value="hiragana" {{ old('category', $kanji->category) == 'hiragana' ? 'selected' : '' }}>Hiragana</option>
@@ -63,80 +65,37 @@
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: ニチ, ジツ">
                 </div>
 
-                <div class="md:col-span-2">
+                <!-- <div class="md:col-span-2">
                     <label for="stroke_order_image" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Gambar Urutan Stroke <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Opsional</span></label>
+                    {{-- Fix 3: Added dark mode classes to upload area --}}
                     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors relative" x-data="{ fileName: null, previewUrl: '{{ $kanji->stroke_order_image ? asset('storage/' . $kanji->stroke_order_image) : '' }}' }">
                         <div class="space-y-1 text-center w-full">
                             <template x-if="!previewUrl">
-                                <i class="fas fa-image mx-auto h-12 w-12 text-gray-400 mb-3"></i>
+                                <i class="fas fa-image mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-3"></i>
                             </template>
                             <template x-if="previewUrl">
-                                <img :src="previewUrl" class="mx-auto h-32 object-contain mb-4 rounded border border-gray-200 shadow-sm" alt="Preview">
+                                <img :src="previewUrl" class="mx-auto h-32 object-contain mb-4 rounded border border-gray-200 dark:border-gray-600 shadow-sm" alt="Preview">
                             </template>
-                            <div class="flex text-sm text-gray-600 justify-center">
-                                <label for="stroke_order_image" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                            {{-- Fix 4: Added dark mode to upload label and text --}}
+                            <div class="flex text-sm text-gray-600 dark:text-gray-300 justify-center">
+                                <label for="stroke_order_image" class="relative cursor-pointer bg-white dark:bg-gray-600 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                                     <span>Upload gambar baru</span>
                                     <input id="stroke_order_image" name="stroke_order_image" type="file" class="sr-only" accept="image/*" @change="if($refs.fileInput.files.length > 0) { fileName = $refs.fileInput.files[0].name; previewUrl = URL.createObjectURL($refs.fileInput.files[0]); }" x-ref="fileInput">
                                 </label>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2" x-text="fileName ? fileName : 'PNG, JPG, GIF up to 2MB (Akan menggantikan gambar lama)'"></p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2" x-text="fileName ? fileName : 'PNG, JPG, GIF up to 2MB (Akan menggantikan gambar lama)'"></p>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
-            <div class="mb-8 p-6 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center">
-                            <i class="fas fa-language text-indigo-500 dark:text-indigo-400 mr-2"></i> Contoh Kalimat
-                        </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tambahkan kalimat untuk mendemonstrasikan penggunaan kanji ini (Opsional).</p>
-                    </div>
-                    <button type="button" onclick="addExampleRow()" 
-                            class="px-4 py-2 bg-indigo-100 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-200 transition-colors text-sm flex items-center shadow-sm">
-                        <i class="fas fa-plus mr-2"></i> Tambah Kalimat
-                    </button>
-                </div>
-
-                <div id="examples-container" class="space-y-4">
-                    @if(isset($kanji->examples) && count($kanji->examples) > 0)
-                        @foreach($kanji->examples as $index => $example)
-                        <div class="flex flex-col sm:flex-row gap-4 bg-white p-5 border border-gray-200 rounded-xl shadow-sm relative group" id="example-row-{{ $index }}">
-                            <div class="flex-1 space-y-4">
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Teks Jepang Murni <span class="text-red-500">*</span></label>
-                                    <input type="text" name="examples[{{ $index }}][japanese_text]" value="{{ $example->japanese_text }}" required
-                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Teks Furigana (HTML Tag &lt;ruby&gt;)</label>
-                                    <input type="text" name="examples[{{ $index }}][furigana_html]" value="{{ $example->furigana_html }}"
-                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm text-gray-600 shadow-sm">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Arti (Bahasa Indonesia) <span class="text-red-500">*</span></label>
-                                    <input type="text" name="examples[{{ $index }}][meaning]" value="{{ $example->meaning }}" required
-                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
-                                </div>
-                            </div>
-                            <div class="flex items-start pt-8">
-                                <button type="button" onclick="removeExampleRow({{ $index }})" 
-                                        class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200" title="Hapus Kalimat">
-                                    <i class="fas fa-trash-alt text-lg"></i>
-                                </button>
-                            </div>
-                        </div>
-                        @endforeach
-                    @endif
-                </div>
-            </div>
             <div class="mb-8">
                 <label class="block text-sm font-bold text-gray-800 dark:text-gray-100 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2"><i class="fas fa-pen-nib mr-2 text-indigo-500 dark:text-indigo-400"></i> Rekam Coretan (Strokes) *</label>
                 <div class="bg-gray-50 dark:bg-gray-800/50 border border-t-0 border-x-0 border-b-4 border-indigo-100 dark:border-indigo-800 p-5 rounded-xl shadow-sm">
                     <div class="flex flex-col md:flex-row gap-6 items-start">
                         <div class="bg-white dark:bg-gray-700 p-2 rounded-xl shadow-sm inline-block border border-gray-200 dark:border-gray-600 relative">
-                            <canvas id="drawingCanvas" width="300" height="300" class="border border-dashed border-indigo-200 dark:border-indigo-700 rounded-lg cursor-crosshair bg-white dark:bg-gray-800" style="touch-action: none;"></canvas>
+                            {{-- Fix 7: Canvas bg should be transparent (not bg-white) so dark bg-gray-700 wrapper shows --}}
+                            <canvas id="drawingCanvas" width="300" height="300" class="border border-dashed border-indigo-200 dark:border-indigo-700 rounded-lg cursor-crosshair bg-transparent" style="touch-action: none;"></canvas>
                         </div>
                         
                         <div class="flex-1 space-y-4 w-full">
@@ -167,8 +126,58 @@
                 <input type="hidden" name="strokes" id="strokesData" value="{{ old('strokes', is_string($kanji->strokes) ? $kanji->strokes : json_encode($kanji->strokes)) }}">
             </div>
 
+            <div class="mb-8 p-6 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center">
+                            <i class="fas fa-language text-indigo-500 dark:text-indigo-400 mr-2"></i> Contoh Kalimat
+                        </h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tambahkan kalimat untuk mendemonstrasikan penggunaan kanji ini (Opsional).</p>
+                    </div>
+                    {{-- Fix 5: Added dark mode to "Tambah Kalimat" button --}}
+                    <button type="button" onclick="addExampleRow()" 
+                            class="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-semibold rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors text-sm flex items-center shadow-sm">
+                        <i class="fas fa-plus mr-2"></i> Tambah Kalimat
+                    </button>
+                </div>
+
+                <div id="examples-container" class="space-y-4">
+                    @if(isset($kanji->examples) && count($kanji->examples) > 0)
+                        @foreach($kanji->examples as $index => $example)
+                        {{-- Fix 6: Added dark mode to existing example rows (server-rendered) --}}
+                        <div class="flex flex-col sm:flex-row gap-4 bg-white dark:bg-gray-800 p-5 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm relative group" id="example-row-{{ $index }}">
+                            <div class="flex-1 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Teks Jepang Murni <span class="text-red-500">*</span></label>
+                                    <input type="text" name="examples[{{ $index }}][japanese_text]" value="{{ $example->japanese_text }}" required
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm placeholder-gray-400 dark:placeholder-gray-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Teks Furigana (HTML Tag &lt;ruby&gt;)</label>
+                                    <input type="text" name="examples[{{ $index }}][furigana_html]" value="{{ $example->furigana_html }}"
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm shadow-sm placeholder-gray-400 dark:placeholder-gray-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Arti (Bahasa Indonesia) <span class="text-red-500">*</span></label>
+                                    <input type="text" name="examples[{{ $index }}][meaning]" value="{{ $example->meaning }}" required
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm placeholder-gray-400 dark:placeholder-gray-500">
+                                </div>
+                            </div>
+                            <div class="flex items-start pt-8">
+                                <button type="button" onclick="removeExampleRow({{ $index }})" 
+                                        class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-800" title="Hapus Kalimat">
+                                    <i class="fas fa-trash-alt text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
+
+
             <div class="flex justify-end pt-5 mt-5 border-t border-gray-100 dark:border-gray-700">
-                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all flex items-center text-lg transform hover:-translate-y-0.5">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all flex items-center text-lg transform hover:-translate-y-0.5">
                     <i class="fas fa-save mr-2"></i> Perbarui Data Kanji
                 </button>
             </div>
@@ -181,35 +190,36 @@
 @push('scripts')
 <script>
     // --- SCRIPT UNTUK FORM DINAMIS (CONTOH KALIMAT) ---
-    // Hitung berapa kalimat yang sudah ada agar ID-nya tidak tabrakan
     let exampleIndex = {{ isset($kanji->examples) ? count($kanji->examples) : 0 }};
 
     function addExampleRow() {
         const container = document.getElementById('examples-container');
         
+        // Fix 8: Added dark mode classes to JS-generated example rows
         const html = `
-            <div class="flex flex-col sm:flex-row gap-4 bg-white p-5 border border-gray-200 rounded-xl shadow-sm relative group" id="example-row-${exampleIndex}">
+            <div class="flex flex-col sm:flex-row gap-4 bg-white dark:bg-gray-800 p-5 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm relative group" id="example-row-${exampleIndex}">
                 <div class="flex-1 space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Teks Jepang Murni <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Teks Jepang Murni <span class="text-red-500">*</span></label>
                         <input type="text" name="examples[${exampleIndex}][japanese_text]" required
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" placeholder="Contoh: 日本の生活様式">
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" placeholder="Contoh: 日本の生活様式">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Teks Furigana (HTML Tag &lt;ruby&gt;)</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Teks Jepang dengan Furigana</label>
                         <input type="text" name="examples[${exampleIndex}][furigana_html]" 
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm text-gray-600 shadow-sm" 
-                               placeholder="Contoh: <ruby>日本<rt>にほん</rt></ruby>の...">
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm font-mono text-sm" 
+                               placeholder="Contoh: 日本(にほん)の生活様式(せいかつようしき)">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Ketik Kanji lalu langsung beri kurung. Contoh: <b>私(わたし)</b> atau <b>食(た)べる</b>.</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Arti (Bahasa Indonesia) <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Arti (Bahasa Indonesia) <span class="text-red-500">*</span></label>
                         <input type="text" name="examples[${exampleIndex}][meaning]" required
-                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" placeholder="Contoh: Gaya hidup Jepang...">
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm" placeholder="Contoh: Gaya hidup Jepang...">
                     </div>
                 </div>
                 <div class="flex items-start pt-8">
                     <button type="button" onclick="removeExampleRow(${exampleIndex})" 
-                            class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-200" title="Hapus Kalimat">
+                            class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-800" title="Hapus Kalimat">
                         <i class="fas fa-trash-alt text-lg"></i>
                     </button>
                 </div>
@@ -240,7 +250,27 @@
         ctx.lineWidth = 4;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.strokeStyle = '#2d3748';
+
+        // Fix 9: Dynamic stroke color based on dark mode (same as create.blade.php)
+        function updateStrokeColor() {
+            if (document.documentElement.classList.contains('dark')) {
+                ctx.strokeStyle = '#f8fafc'; // Slate-50
+            } else {
+                ctx.strokeStyle = '#2d3748'; // Gray-800
+            }
+        }
+
+        updateStrokeColor();
+
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === "class") {
+                    updateStrokeColor();
+                    redrawCanvas();
+                }
+            });
+        });
+        observer.observe(document.documentElement, { attributes: true });
 
         let isDrawing = false;
         let currentStroke = [];

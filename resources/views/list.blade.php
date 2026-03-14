@@ -91,7 +91,7 @@
 </div>
 
 <script>
-    // --- 1. INISIALISASI VARIABEL GLOBAL ---
+    // --- グローバル変数の初期化 ---
     let templateKanji = []; 
     let currentStroke = [];
     let allStrokes = [];
@@ -108,7 +108,7 @@
 
     let currentCategory = "{{ $category ?? '' }}";
 
-    // --- 2. FUNGSI LOAD DATA KARTU DARI API (DENGAN GROUPING) ---
+    // --- APIからのカードデータロード機能（グループ化機能付き） ---
     async function loadKanjiList() {
         try {
             let url = '/api/kanjis';
@@ -125,12 +125,12 @@
                 return;
             }
 
-            // FILTER KATEGORI
+            // カテゴリーフィルター
             const hiragana = kanjis.filter(k => k.category === 'hiragana');
             const katakana = kanjis.filter(k => k.category === 'katakana');
             const kanjiList = kanjis.filter(k => k.category === 'kanji');
 
-            // GROUPING KANJI
+            // グループ化
             const kanjiGroups = {};
             kanjiList.forEach(k => {
                 const lvl = k.level ? k.level : 'Lainnya';
@@ -148,7 +148,7 @@
                             <div class="text-4xl sm:text-5xl font-semibold text-slate-800 dark:text-white mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                 ${k.character}
                             </div>
-                            <div class="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-gray-700 py-1.5 rounded-lg border border-slate-100 dark:border-gray-600 whitespace-nowrap overflow-hidden text-ellipsis px-2">
+                            <div class="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-white bg-slate-50 dark:bg-gray-700 py-1.5 rounded-lg border border-slate-100 dark:border-gray-600 whitespace-nowrap overflow-hidden text-ellipsis px-2">
                                 ${k.meaning}
                             </div>
                         </div>
@@ -237,8 +237,7 @@
         if (char) startPractice(char);
     }
 
-    // --- 3. FUNGSI MEMULAI LATIHAN ---
-    // --- 3. FUNGSI MEMULAI LATIHAN ---
+    // ---  FUNGSI MEMULAI LATIHAN ---
     async function startPractice(char) {
         try {
             statusMsg.innerText = "Memuat template...";
@@ -247,7 +246,7 @@
 
             if (response.ok && data.strokes) {
                 
-                // 🔥 FIX BUG: Deteksi kategori otomatis jika kosong 🔥
+                // Deteksi kategori otomatis jika kosong 
                 if (!currentCategory && data.category) {
                     currentCategory = data.category; // Set kategori sesuai karakter
                     loadKanjiList(); // Render ulang menu grid di belakang layar
@@ -348,7 +347,10 @@
         }
     }
 
-    // --- 5. LOGIKA VALIDASI STROKE ORDER ---
+    // trueに変えたらdebugmodeが表示される
+    window.DEBUG_MODE = false;
+
+    // --- LOGIKA VALIDASI STROKE ORDER ---
     function validateStroke() {
         if (allStrokes.length === 0) {
             statusMsg.innerHTML = "⚠️ Tulis hurufnya dulu!";
@@ -364,6 +366,12 @@
         const templateCount = templateKanji.length;
         const userCount = allStrokes.length;
 
+        // [DEBUG LOG]
+        if (window.DEBUG_MODE) {
+            console.log("%c=== MEMULAI VALIDASI STROKE ===", "color: white; background: #4f46e5; font-size: 14px; padding: 4px; border-radius: 4px;");
+            console.log(`Jumlah Goresan Template: ${templateCount} | Pengguna: ${userCount}`);
+        }
+
         const normUser = normalizeStrokes(allStrokes);
         const normTemp = normalizeStrokes(templateKanji);
 
@@ -375,6 +383,8 @@
         let wrongStrokes = []; 
 
         for (let i = 0; i < matchedCount; i++) {
+            if (window.DEBUG_MODE) console.log(`\n%c--- Evaluasi Goresan ke-${i + 1} ---`, "color: #4f46e5; font-weight: bold;");
+            
             const userPts = resample(normUser[i], NUM_POINTS);
             const tempPts = resample(normTemp[i], NUM_POINTS);
 
@@ -387,6 +397,7 @@
             cxT /= NUM_POINTS; cyT /= NUM_POINTS;
 
             const posError = getDistance({x: cxU, y: cyU}, {x: cxT, y: cyT});
+            if (window.DEBUG_MODE) console.log(`> Position Error: ${posError.toFixed(2)}`);
 
             let shapeError = 0;
             for(let j = 0; j < NUM_POINTS; j++) {
@@ -397,15 +408,19 @@
                 shapeError += getDistance(shiftedUserPt, tempPts[j]);
             }
             shapeError /= NUM_POINTS;
+            if (window.DEBUG_MODE) console.log(`> Shape Error: ${shapeError.toFixed(2)}`);
 
             const totalError = shapeError + (posError * 0.4);
-
+            
             let strokePct = 100 - (totalError / TOLERANCE_ERROR) * 100;
             strokePct = Math.max(0, Math.min(100, strokePct)); 
+            
+            if (window.DEBUG_MODE) console.log(`> Skor Akhir Goresan ke-${i + 1}: ${strokePct.toFixed(2)}%`);
             
             totalScore += strokePct;
 
             if (strokePct < 65) {
+                if (window.DEBUG_MODE) console.warn(`❌ Goresan ke-${i + 1} SALAH`);
                 wrongStrokes.push(i + 1); 
             }
         }
@@ -417,24 +432,29 @@
         }
 
         const overallPct = totalScore / templateCount; 
+        
+        if (window.DEBUG_MODE) {
+            console.log(`\n%c=== HASIL AKHIR: ${overallPct.toFixed(2)}% ===`, "color: white; background: #059669; font-size: 14px; padding: 4px; border-radius: 4px;");
+        }
+
         let msg = `Akurasi: ${overallPct.toFixed(1)}%`;
         
         if (userCount > templateCount) {
-            msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">⚠️ Kelebihan ${userCount - templateCount} goresan!</span>`;
+            msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Kelebihan ${userCount - templateCount} goresan!</span>`;
         }
 
         if (wrongStrokes.length > 0) {
-            msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">❌ Cek lagi goresan ke: ${wrongStrokes.join(', ')}</span>`;
+            msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Cek lagi goresan ke: ${wrongStrokes.join(', ')}</span>`;
         }
 
         if (overallPct >= 75 && userCount === templateCount && wrongStrokes.length === 0) {
-            statusMsg.innerHTML = `✅ Bagus Sekali!<br>${msg}`;
+            statusMsg.innerHTML = `Bagus Sekali!<br>${msg}`;
             statusMsg.className = "text-center text-sm font-bold text-emerald-600 dark:text-emerald-400 min-h-[24px] px-4 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 mt-4";
         } else if (overallPct >= 45 && userCount === templateCount) {
-            statusMsg.innerHTML = `⚠️ Hampir Benar!<br>${msg}`;
+            statusMsg.innerHTML = `Hampir Benar!<br>${msg}`;
             statusMsg.className = "text-center text-sm font-bold text-amber-600 dark:text-amber-400 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mt-4";
         } else {
-            statusMsg.innerHTML = `❌ Coba Perbaiki!<br>${msg}`;
+            statusMsg.innerHTML = `Coba Perbaiki!<br>${msg}`;
             statusMsg.className = "text-center text-sm font-bold text-rose-600 dark:text-rose-400 min-h-[24px] px-4 py-3 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 mt-4";
         }
     }
@@ -494,5 +514,46 @@
         while (newPoints.length < n) { newPoints.push(points[points.length - 1]); }
         return newPoints;
     }
+
+    let isDebugVisible = false;
+
+    window.drawDebugPoints = function() {
+        if (!window.DEBUG_MODE || allStrokes.length === 0) return;
+        
+        const NUM_POINTS = 30; 
+        const previousFillStyle = ctx.fillStyle;
+        const previousFont = ctx.font;
+        
+        ctx.fillStyle = '#ef4444'; 
+        ctx.font = "bold 10px sans-serif";
+        
+        allStrokes.forEach((stroke, index) => {
+            const resampledPoints = resample(stroke, NUM_POINTS);
+            resampledPoints.forEach((pt, ptIndex) => {
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                if (ptIndex === 0) ctx.fillText("Start", pt.x + 8, pt.y + 4);
+                else if (ptIndex === NUM_POINTS - 1) ctx.fillText("End", pt.x + 8, pt.y + 4);
+            });
+        });
+        
+        ctx.fillStyle = previousFillStyle;
+        ctx.font = previousFont;
+    };
+
+    // Tombol Cepat: Shift + D (Khusus saat Debug Mode nyala)
+    document.addEventListener('keydown', function(e) {
+        // Saya ubah ke Shift + D agar lebih aman dan tidak bentrok dengan VS Code / Browser
+        if (window.DEBUG_MODE && e.shiftKey && e.key.toLowerCase() === 'd') {
+            e.preventDefault(); 
+            isDebugVisible = !isDebugVisible; 
+            if (isDebugVisible) {
+                window.drawDebugPoints();
+            } else {
+                redrawAllStrokes(); // Hapus titik merah
+            }
+        }
+    });
 </script>
 @endsection

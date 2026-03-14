@@ -214,9 +214,18 @@
 
                     let examplesHTML = '';
                     data.examples.forEach((ex, index) => {
-                        // Hilangkan semua tanda kutip saat dilempar ke fungsi onclick agar HTML tidak pecah
+                        // Hilangkan tanda kutip agar HTML tidak error
                         const safeTextForTTS = ex.japanese_text.replace(/['"]/g, ''); 
-                        const displayText = ex.furigana_html ? ex.furigana_html : ex.japanese_text;
+                        
+                        // FUNGSI MAGIC FURIGANA: Mencari Kanji yang diikuti kurung ()
+                        let displayText = ex.japanese_text; 
+                        
+                        if (ex.furigana_html) {
+                            // Regex ini mencari: 
+                            // 1. Karakter Kanji Jepang ([\u4e00-\u9faf]+)
+                            // 2. Yang diikuti oleh kurung biasa berisi teks \(([^)]+)\)
+                            displayText = ex.furigana_html.replace(/([\u4e00-\u9faf]+)\(([^)]+)\)/g, '<ruby>$1<rt>$2</rt></ruby>');
+                        }
                         const number = index + 1;
                         
                         examplesHTML += `

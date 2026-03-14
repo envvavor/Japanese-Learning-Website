@@ -135,10 +135,12 @@
                 </div>
             </div>
 
-            <div class="group relative rounded-2xl h-56 overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-900">
-                <div class="absolute top-4 left-4 z-30">
+            <!-- ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-900 tambah ini kalau mau outer ring -->
+
+            <div class="group relative rounded-2xl h-56 overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ">
+                <!-- <div class="absolute top-4 left-4 z-30">
                     <span class="px-3 py-1 bg-indigo-500 text-white text-xs font-bold rounded-full shadow-lg">Rekomendasi</span>
-                </div>
+                </div> -->
                 <img src="https://teamjapanese.com/wp-content/uploads/2018/10/how-to-read-japanese-768x576.jpg" alt="Practice Writing" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 z-0">
                 <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-gray-900/30 z-10"></div>
                 
@@ -177,10 +179,7 @@
                 </div>
             </div>
 
-            <div class="group relative rounded-2xl h-56 overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ring-2 ring-violet-500 ring-offset-2 dark:ring-offset-gray-900">
-                <div class="absolute top-4 left-4 z-30">
-                    <span class="px-3 py-1 bg-violet-500 text-white text-xs font-bold rounded-full shadow-lg">Baru</span>
-                </div>
+            <div class="group relative rounded-2xl h-56 overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                 <div class="absolute inset-0 bg-gradient-to-br from-violet-900 via-indigo-900 to-purple-900 z-0">
                     <div class="absolute inset-0 flex items-center justify-center opacity-20">
                         <span class="text-9xl">🎮</span>
@@ -196,7 +195,6 @@
                     </a>
                 </div>
             </div>
-
         </div>
     </div>
 

@@ -3,6 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\MateriController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\Admin\VnCharacterController;
+use App\Http\Controllers\Admin\VnBackgroundController;
+use App\Http\Controllers\Admin\VnDialogueController;
+use App\Http\Controllers\Admin\VnSceneController;
+use App\Http\Controllers\Admin\VnGraphController;
+
 
 // Public routes
 Route::get('/', function () {
@@ -74,15 +81,8 @@ Route::get('/materi/{materi:slug}', function (\App\Models\Materi $materi) {
     return view('materis.show', compact('materi'));
 })->name('materi.show')->middleware('auth');
 
-// =============================================
-// Visual Novel Engine Routes
-// =============================================
-use App\Http\Controllers\GameController;
-use App\Http\Controllers\Admin\VnCharacterController;
-use App\Http\Controllers\Admin\VnBackgroundController;
-use App\Http\Controllers\Admin\VnDialogueController;
-use App\Http\Controllers\Admin\VnSceneController;
 
+// Visual Novel Engine Routes
 // VN Player routes
 Route::prefix('vn')->name('vn.')->middleware('auth')->group(function () {
     Route::get('/', [GameController::class, 'start'])->name('start');
@@ -116,5 +116,13 @@ Route::middleware(['auth', 'admin'])
             Route::get('dialogues/{dialogue}/edit', [VnDialogueController::class, 'edit'])->name('dialogues.edit');
             Route::put('dialogues/{dialogue}', [VnDialogueController::class, 'update'])->name('dialogues.update');
             Route::delete('dialogues/{dialogue}', [VnDialogueController::class, 'destroy'])->name('dialogues.destroy');
+
+            // Graph Editor
+            Route::get('graph', [VnGraphController::class, 'show'])->name('graph');
+            Route::post('graph/save', [VnGraphController::class, 'save'])->name('graph.save');
         });
     });
+
+    Route::post('/admin/vn/dialogues/{dialogue}/generate-audio', [\App\Http\Controllers\Admin\VnDialogueController::class, 'generateAudio'])
+    ->name('admin.vn.dialogues.generate-audio');
+

@@ -6,7 +6,7 @@
 <div class="mb-6 flex space-x-4 items-center justify-between">
     <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Daftar Kanji</h3>
     <a href="{{ route('admin.kanjis.create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center">
-        <i class="fas fa-plus mr-2"></i> Tambah Kanji
+        <i class="fas fa-plus mr-2"></i> Tambah Huruf
     </a>
 </div>
 
