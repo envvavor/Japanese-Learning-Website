@@ -281,7 +281,7 @@
         window.history.replaceState({}, document.title, newUrl);
     }
 
-    // --- 4. LOGIKA MENGGAMBAR DI CANVAS ---
+    // --- LOGIKA MENGGAMBAR DI CANVAS ---
     function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -348,9 +348,9 @@
     }
 
     // trueに変えたらdebugmodeが表示される
-    window.DEBUG_MODE = false;
+    window.DEBUG_MODE = true;
 
-    // --- LOGIKA VALIDASI STROKE ORDER ---
+    // --- LOGIKA VALIDASI STROKE ORDER + AI HYBRID ---
     function validateStroke() {
         if (allStrokes.length === 0) {
             statusMsg.innerHTML = "⚠️ Tulis hurufnya dulu!";
@@ -366,7 +366,6 @@
         const templateCount = templateKanji.length;
         const userCount = allStrokes.length;
 
-        // [DEBUG LOG]
         if (window.DEBUG_MODE) {
             console.log("%c=== MEMULAI VALIDASI STROKE ===", "color: white; background: #4f46e5; font-size: 14px; padding: 4px; border-radius: 4px;");
             console.log(`Jumlah Goresan Template: ${templateCount} | Pengguna: ${userCount}`);
@@ -383,8 +382,6 @@
         let wrongStrokes = []; 
 
         for (let i = 0; i < matchedCount; i++) {
-            if (window.DEBUG_MODE) console.log(`\n%c--- Evaluasi Goresan ke-${i + 1} ---`, "color: #4f46e5; font-weight: bold;");
-            
             const userPts = resample(normUser[i], NUM_POINTS);
             const tempPts = resample(normTemp[i], NUM_POINTS);
 
@@ -397,7 +394,6 @@
             cxT /= NUM_POINTS; cyT /= NUM_POINTS;
 
             const posError = getDistance({x: cxU, y: cyU}, {x: cxT, y: cyT});
-            if (window.DEBUG_MODE) console.log(`> Position Error: ${posError.toFixed(2)}`);
 
             let shapeError = 0;
             for(let j = 0; j < NUM_POINTS; j++) {
@@ -408,19 +404,14 @@
                 shapeError += getDistance(shiftedUserPt, tempPts[j]);
             }
             shapeError /= NUM_POINTS;
-            if (window.DEBUG_MODE) console.log(`> Shape Error: ${shapeError.toFixed(2)}`);
 
             const totalError = shapeError + (posError * 0.4);
-            
             let strokePct = 100 - (totalError / TOLERANCE_ERROR) * 100;
             strokePct = Math.max(0, Math.min(100, strokePct)); 
-            
-            if (window.DEBUG_MODE) console.log(`> Skor Akhir Goresan ke-${i + 1}: ${strokePct.toFixed(2)}%`);
             
             totalScore += strokePct;
 
             if (strokePct < 65) {
-                if (window.DEBUG_MODE) console.warn(`❌ Goresan ke-${i + 1} SALAH`);
                 wrongStrokes.push(i + 1); 
             }
         }
@@ -432,30 +423,164 @@
         }
 
         const overallPct = totalScore / templateCount; 
-        
-        if (window.DEBUG_MODE) {
-            console.log(`\n%c=== HASIL AKHIR: ${overallPct.toFixed(2)}% ===`, "color: white; background: #059669; font-size: 14px; padding: 4px; border-radius: 4px;");
-        }
-
-        let msg = `Akurasi: ${overallPct.toFixed(1)}%`;
+        let msg = `Akurasi Urutan: ${overallPct.toFixed(1)}%`;
         
         if (userCount > templateCount) {
             msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Kelebihan ${userCount - templateCount} goresan!</span>`;
         }
-
         if (wrongStrokes.length > 0) {
             msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Cek lagi goresan ke: ${wrongStrokes.join(', ')}</span>`;
         }
 
+        // SISTEM HYBRID: KALO URUTAN BENAR, PANGGIL AI/SIMPAN KE DATASET
         if (overallPct >= 75 && userCount === templateCount && wrongStrokes.length === 0) {
-            statusMsg.innerHTML = `Bagus Sekali!<br>${msg}`;
-            statusMsg.className = "text-center text-sm font-bold text-emerald-600 dark:text-emerald-400 min-h-[24px] px-4 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 mt-4";
+            
+            // Tampilan pesan Loading AI
+            statusMsg.innerHTML = `<div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600 mr-2 mb-[-3px]"></div> Mengirim ke AI...`;
+            statusMsg.className = "text-center text-sm font-bold text-indigo-600 dark:text-indigo-400 min-h-[24px] px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 mt-4";
+            
+            //-------------------------------------------------------
+            // Kumpulkan Dataset (jalan di belakang layar)
+            // autoSaveToDataset();
+            //-------------------------------------------------------
+
+            // Buat kanvas bayangan untuk dikirim ke AI (64x64, background hitam)
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 64;  
+            tempCanvas.height = 64;
+            const tCtx = tempCanvas.getContext('2d');
+            tCtx.fillStyle = "#000000";
+            tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            tCtx.lineWidth = 3; 
+            tCtx.lineCap = 'round';
+            tCtx.strokeStyle = '#ffffff';
+
+            const scaleRatio = 64 / 320;
+            allStrokes.forEach(stroke => {
+                if (stroke.length === 0) return;
+                tCtx.beginPath();
+                tCtx.moveTo(stroke[0].x * scaleRatio, stroke[0].y * scaleRatio);
+                for (let i = 1; i < stroke.length; i++) {
+                    tCtx.lineTo(stroke[i].x * scaleRatio, stroke[i].y * scaleRatio);
+                }
+                tCtx.stroke();
+            });
+
+            const imageData = tempCanvas.toDataURL("image/png");
+            const targetChar = document.getElementById('targetTitle').innerText.split(' ')[1]; // Mengambil huruf dari judul
+
+            // Proses Fetch ke Laravel -> Python
+            fetch('/api/validate-ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : ''
+                },
+                body: JSON.stringify({ character: targetChar, image_base64: imageData })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Buat elemen Diagram Batang (Bar Chart) dari data Top 3
+                    let chartHtml = `<div class="mt-4 pt-3 border-t border-slate-200 dark:border-gray-600 text-left">
+                                        <p class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Analisis Probabilitas AI:</p>`;
+                    
+                    data.top_3.forEach((item, index) => {
+                        // Warnai batang: Hijau untuk tebakan ke-1, abu-abu/kuning untuk sisanya
+                        let barColor = index === 0 ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-600';
+                        chartHtml += `
+                            <div class="flex items-center mb-1.5">
+                                <span class="w-6 text-sm font-bold text-slate-700 dark:text-slate-300">${item.char}</span>
+                                <div class="flex-1 bg-slate-100 dark:bg-gray-800 h-2.5 rounded-full mx-2 overflow-hidden border border-slate-200 dark:border-gray-700">
+                                    <div class="${barColor} h-2.5 rounded-full transition-all duration-700" style="width: ${item.prob}%"></div>
+                                </div>
+                                <span class="text-xs w-10 text-right font-mono text-slate-500">${item.prob}%</span>
+                            </div>`;
+                    });
+                    chartHtml += `</div>`;
+
+                    // Tampilkan Hasil Utama + Diagramnya
+                    if (data.is_match) {
+                        statusMsg.innerHTML = `✅ <b>SEMPURNA!</b><br>Urutan goresan benar (${overallPct.toFixed(1)}%).<br>AI yakin ini huruf <b>${data.predicted_char}</b>. ${chartHtml}`;
+                        statusMsg.className = "text-center text-sm font-bold text-emerald-600 dark:text-emerald-400 min-h-[24px] px-4 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 mt-4";
+                    } else {
+                        statusMsg.innerHTML = `⚠️ <b>HAMPIR!</b><br>Urutan benar, tapi AI menebak ini huruf <b>${data.predicted_char}</b>.<br>Coba perbaiki proporsi garisnya! ${chartHtml}`;
+                        statusMsg.className = "text-center text-sm font-bold text-amber-600 dark:text-amber-400 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mt-4";
+                    }
+                } else {
+                    statusMsg.innerHTML = `✅ Urutan Benar (${overallPct.toFixed(1)}%)!<br><span class="text-xs font-normal text-rose-500">Server AI sedang offline.</span>`;
+                }
+            })
+
+        // JIKA URUTAN MASIH SALAH, JANGAN PANGGIL AI
         } else if (overallPct >= 45 && userCount === templateCount) {
             statusMsg.innerHTML = `Hampir Benar!<br>${msg}`;
             statusMsg.className = "text-center text-sm font-bold text-amber-600 dark:text-amber-400 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mt-4";
         } else {
             statusMsg.innerHTML = `Coba Perbaiki!<br>${msg}`;
             statusMsg.className = "text-center text-sm font-bold text-rose-600 dark:text-rose-400 min-h-[24px] px-4 py-3 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 mt-4";
+        }
+    }
+    
+    // --- FUNGSI AUTO-SAVE (MENGUMPULKAN DATASET UNTUK AI) ---
+    function autoSaveToDataset() {
+        try {
+            // 1. Ekstrak huruf dari judul
+            const titleText = document.getElementById('targetTitle').innerText;
+            const currentCharacter = titleText.split(' ')[1]; 
+            
+            if(!currentCharacter) return;
+
+            // 2. Siapkan kanvas tersembunyi (64x64, latar hitam, garis putih)
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 64;  
+            tempCanvas.height = 64;
+            const tCtx = tempCanvas.getContext('2d');
+
+            tCtx.fillStyle = "#000000";
+            tCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+            tCtx.lineWidth = 3; 
+            tCtx.lineCap = 'round';
+            tCtx.lineJoin = 'round';
+            tCtx.strokeStyle = '#ffffff';
+
+            const scaleRatio = 64 / 320;
+
+            allStrokes.forEach(stroke => {
+                if (stroke.length === 0) return;
+                tCtx.beginPath();
+                tCtx.moveTo(stroke[0].x * scaleRatio, stroke[0].y * scaleRatio);
+                for (let i = 1; i < stroke.length; i++) {
+                    tCtx.lineTo(stroke[i].x * scaleRatio, stroke[i].y * scaleRatio);
+                }
+                tCtx.stroke();
+            });
+
+            // 3. Konversi jadi teks Base64
+            const imageData = tempCanvas.toDataURL("image/png");
+            
+            // 4. Kirim diam-diam ke Backend Laravel
+            fetch('/api/dataset/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : ''
+                },
+                body: JSON.stringify({
+                    character: currentCharacter,
+                    image_base64: imageData
+                })
+            })
+            .then(response => {
+                if(window.DEBUG_MODE) console.log("✅ Auto-Save berhasil: Gambar dikirim ke server untuk Dataset DIY.");
+            })
+            .catch(error => {
+                if(window.DEBUG_MODE) console.error('Auto-Save gagal:', error);
+            });
+
+        } catch (err) {
+             if(window.DEBUG_MODE) console.error('Error pada fungsi Auto-Save:', err);
         }
     }
 
@@ -544,7 +669,6 @@
 
     // Tombol Cepat: Shift + D (Khusus saat Debug Mode nyala)
     document.addEventListener('keydown', function(e) {
-        // Saya ubah ke Shift + D agar lebih aman dan tidak bentrok dengan VS Code / Browser
         if (window.DEBUG_MODE && e.shiftKey && e.key.toLowerCase() === 'd') {
             e.preventDefault(); 
             isDebugVisible = !isDebugVisible; 

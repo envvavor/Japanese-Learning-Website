@@ -149,8 +149,8 @@
 <body>
     <div class="register-container">
         <div class="logo">
-            <h1>漢字</h1>
-            <p>Belajar Kanji JLPT N5</p>
+            <!-- <h1>漢字</h1>
+            <p>Belajar Kanji JLPT N5</p> -->
         </div>
 
         @if ($errors->any())

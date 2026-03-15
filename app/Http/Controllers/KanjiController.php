@@ -15,9 +15,10 @@ class KanjiController extends Controller
             $query->where('category', $request->category);
         }
 
-        $kanjis = $query->orderBy('created_at', 'desc')->get();
+        $kanjis = $query->orderBy('created_at', 'asc')->get();
         return response()->json($kanjis, 200);
     }
+
 
     public function show($character)
     {
