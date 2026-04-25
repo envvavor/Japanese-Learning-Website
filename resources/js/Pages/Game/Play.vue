@@ -156,16 +156,17 @@ const audioMuted = ref(false);
 const hasChoices = computed(() => currentDialogue.value?.choices && currentDialogue.value.choices.length > 0);
 const displayedOriginal = computed(() => currentDialogue.value?.original_text?.split('') || []);
 
+// TODO: maybe buat biar lebih ringan lagi
 // PRELOADER
 onMounted(async () => {
   const assetUrls = new Set();
   
-  // 1. Kumpulkan semua alamat file (Gambar + Audio)
+  // Kumpulkan semua alamat file (Gambar + Audio)
   props.allDialogues.forEach(d => {
     if (d.background?.image_url) assetUrls.add(d.background.image_url);
     if (d.character?.default_sprite_path) assetUrls.add(d.character.default_sprite_path);
     
-    // 🔥 TAMBAHKAN AUDIO KE DAFTAR SEDOTAN
+    // TAMBAHKAN AUDIO KE DAFTAR SEDOTAN
     if (d.audio_file_path) assetUrls.add(d.audio_file_path);
   });
 
@@ -183,16 +184,16 @@ onMounted(async () => {
     loadingProgress.value = (loadedCount / urlsToLoad.length) * 100;
   };
 
-  // 2. Proses Download Semua Aset
+  //  Proses Download Semua Aset
   const loadPromises = urlsToLoad.map(url => {
-    // A. Jika file adalah Audio (Cek dari ekstensi)
+    //  Jika file adalah Audio (Cek dari ekstensi)
     if (url.includes('.mp3') || url.includes('.wav') || url.includes('.ogg')) {
       return fetch(url)
         .then(response => response.blob()) // Sedot file ke cache browser
         .then(() => { updateProgress(); })
         .catch(() => { updateProgress(); }); // Kalau error tetep lanjut biar gak stuck
     } 
-    // B. Jika file adalah Gambar
+    // Jika file adalah Gambar
     else {
       return new Promise((resolve) => {
         const img = new Image();

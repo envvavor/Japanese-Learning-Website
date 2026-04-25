@@ -46,8 +46,6 @@ class KanjiController extends Controller
             'stroke_order_image' => 'nullable|file|image',
             'kunyomi' => 'nullable|string',
             'onyomi' => 'nullable|string',
-            
-            // --- TAMBAHAN UNTUK CONTOH KALIMAT (ARRAY) ---
             'examples' => 'nullable|array',
             'examples.*.japanese_text' => 'required_with:examples|string',
             'examples.*.furigana_html' => 'nullable|string',
@@ -73,12 +71,12 @@ class KanjiController extends Controller
             $data
         );
 
-        // --- MULAI SIMPAN CONTOH KALIMAT ---
+        // SIMPAN CONTOH KALIMAT
         
-        // 1. Hapus contoh kalimat lama (Penting saat proses Update agar tidak duplikat)
+        // Hapus contoh kalimat lama (Penting saat proses Update agar tidak duplikat)
         $kanji->examples()->delete();
 
-        // 2. Simpan contoh kalimat baru dari request
+        // Simpan contoh kalimat baru dari request
         if ($request->has('examples') && is_array($request->examples)) {
             foreach ($request->examples as $example) {
                 // Pastikan datanya tidak kosong
@@ -91,7 +89,6 @@ class KanjiController extends Controller
                 }
             }
         }
-        // --- SELESAI SIMPAN CONTOH KALIMAT ---
 
         return response()->json([
             'message' => 'Data Kanji Berhasil Disimpan!',

@@ -72,11 +72,8 @@ class ElevenLabsService
                 'Accept' => 'audio/mpeg',
             ])->post("{$this->baseUrl}/text-to-speech/{$voiceId}", [
                 'text' => $text,
-                'model_id' => 'eleven_turbo_v2_5',
+                'model_id' => 'eleven_v3',
                 'voice_settings' => [
-                    'stability' => 0.55,
-                    'similarity_boost' => 0.80,
-                    'style' => 0.40,
                     'use_speaker_boost' => true
                 ],
             ]);
@@ -92,4 +89,35 @@ class ElevenLabsService
             return null;
         }
     }
+
+    public function remainingTokens()
+{
+    if (empty($this->apiKey) || $this->apiKey === '<your_api_key_here>') {
+        return ['remaining' => 0, 'limit' => 0, 'used' => 0];
+    }
+
+    try {
+        $response = Http::withHeaders([
+            'xi-api-key' => $this->apiKey,
+        ])->get("{$this->baseUrl}/user/subscription");
+
+        if ($response->successful()) {
+            $limit = $response->json('character_limit', 0);
+            $used = $response->json('character_count', 0);
+            $remaining = max(0, $limit - $used); 
+            
+            // Return array biar bisa diproses JS
+            return [
+                'remaining' => $remaining,
+                'limit' => $limit,
+                'used' => $used
+            ];
+        }
+
+        return ['remaining' => 0, 'limit' => 0, 'used' => 0];
+    } catch (\Exception $e) {
+        report($e);
+        return ['remaining' => 0, 'limit' => 0, 'used' => 0];
+    }
+}
 }

@@ -28,6 +28,7 @@
         <div class="field">
           <label class="field-label">Original Text (Japanese)</label>
           <textarea v-model="node.data.originalText" rows="3" class="field-input" placeholder="日本語のテキスト..."></textarea>
+          <p class="text-xs text-gray-500 dark:text-gray-400">bisa ditambahkan expression contoh: [excited] こんにちは, [sad] さようなら</p>
         </div>
 
         <div class="field">
@@ -110,7 +111,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'toggle-start', 'delete-node', 'update-labels', 'regenerate-audio']);
 
-// 🔥 FUNGSI PEMUTAR AUDIO
+// FUNGSI PEMUTAR AUDIO
 const currentAudio = ref(null);
 const isPlaying = ref(false);
 
@@ -180,6 +181,7 @@ function removeChoice(index) {
 }
 </script>
 
+<!-- TODO: refactor style biar lebih bagus -->
 <style scoped>
 .sidebar { position: absolute; top: 0; right: 0; bottom: 0; width: 340px; background: white; border-left: 1px solid #e5e7eb; z-index: 100; display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,0.05); overflow: hidden; }
 :root.dark .sidebar, .dark .sidebar { background: #111827; border-color: #1f2937; box-shadow: -4px 0 20px rgba(0,0,0,0.3); }

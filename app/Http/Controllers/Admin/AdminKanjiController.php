@@ -8,9 +8,29 @@ use Illuminate\Http\Request;
 
 class AdminKanjiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kanjis = Kanji::latest()->paginate(10);
+        $query = Kanji::query();
+
+        // Logika Pencarian Teks
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('character', 'LIKE', "%{$search}%")
+                ->orWhere('meaning', 'LIKE', "%{$search}%")
+                ->orWhere('kunyomi', 'LIKE', "%{$search}%")
+                ->orWhere('onyomi', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Logika Filter Kategori
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        // Ambil data dengan Pagination & Bawa Query String agar URL tidak terhapus saat klik halaman 2
+        $kanjis = $query->latest()->paginate(10)->withQueryString();
+
         return view('admin.kanjis.index', compact('kanjis'));
     }
 

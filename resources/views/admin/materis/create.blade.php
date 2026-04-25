@@ -60,16 +60,16 @@
         skin: isDark ? 'oxide-dark' : 'oxide',
         content_css: isDark ? 'dark' : 'default',
         
-        // 1. TAMBAH 'autosave' DI PLUGINS
+        // TAMBAH 'autosave' DI PLUGINS
         plugins: 'autosave image lists link table code wordcount fullscreen',
         
-        // 2. TAMBAH 'restoredraft' DI TOOLBAR PALING DEPAN
+        // TAMBAH 'restoredraft' DI TOOLBAR PALING DEPAN
         toolbar: 'restoredraft | undo redo | blocks | bold italic underline strikethrough | add_furigana | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | code fullscreen | removeformat',
         
-        // 3. KONFIGURASI AUTOSAVE
+        // KONFIGURASI AUTOSAVE
         autosave_interval: '15s', // Simpan setiap 15 detik
         autosave_restore_when_empty: true, // Pulihkan otomatis jika kosong saat refresh
-        autosave_retention: '60m', // Simpan di browser selama 60 menit
+        autosave_retention: '120m', // Simpan di browser selama 120 menit
         
         menubar: 'file edit view insert format tools table',
         height: 500,
@@ -111,7 +111,7 @@
                         onSubmit: function (api) {
                             var data = api.getData();
                             if (data.kanji && data.furigana) {
-                                editor.insertContent('<ruby>' + data.kanji + '<rt>' + data.furigana + '</rt></ruby>&nbsp;');
+                                editor.insertContent('<ruby>' + data.kanji + '<rt>' + data.furigana + '</rt></ruby>&#8203;');
                             }
                             api.close();
                         }

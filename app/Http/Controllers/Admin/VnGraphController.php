@@ -114,7 +114,7 @@ class VnGraphController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $scene) {
-            // 1. 🔥 PERBAIKAN: Delete removed nodes DAN audionya
+            // PERBAIKAN: Delete removed nodes DAN audionya
             if (!empty($request->deletedNodeIds)) {
                 // Ambil data dialognya dulu sebelum dihapus
                 $dialoguesToDelete = VnDialogue::whereIn('id', $request->deletedNodeIds)
@@ -138,7 +138,7 @@ class VnGraphController extends Controller
                 }
             }
 
-            // 2. Upsert nodes (create new ones, update existing)
+            // Upsert nodes (create new ones, update existing)
             $idMap = []; // maps temp ids (negative) to real DB ids
             foreach ($request->nodes as $node) {
                 $data = [
@@ -169,15 +169,15 @@ class VnGraphController extends Controller
                 }
             }
 
-            // 3. Clear all existing choices for this scene's dialogues
+            // Clear all existing choices for this scene's dialogues
             VnChoice::whereIn('dialogue_id', function ($q) use ($scene) {
                 $q->select('id')->from('vn_dialogues')->where('scene_id', $scene->id);
             })->delete();
 
-            // 4. Reset all next_dialogue_id
+            // Reset all next_dialogue_id
             VnDialogue::where('scene_id', $scene->id)->update(['next_dialogue_id' => null]);
 
-            // 5. Process edges
+            // Process edges
             foreach ($request->edges ?? [] as $edge) {
                 $sourceId = $idMap[$edge['source']] ?? null;
                 $targetId = $idMap[$edge['target']] ?? null;
@@ -200,7 +200,7 @@ class VnGraphController extends Controller
                 }
             }
 
-            // 6. Update first dialogue
+            // Update first dialogue
             $firstId = $request->firstDialogueId;
             if ($firstId && isset($idMap[$firstId])) {
                 $scene->update(['first_dialogue_id' => $idMap[$firstId]]);

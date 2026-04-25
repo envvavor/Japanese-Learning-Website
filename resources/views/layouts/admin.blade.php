@@ -6,6 +6,7 @@
     <title>Admin Panel - @yield('title', 'Dashboard')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('storage/images/logo_manabu.png') }}" type="image/png">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -32,8 +33,9 @@
     <!-- Sidebar -->
     <aside class="flex-shrink-0 w-64 bg-indigo-900 dark:bg-gray-950 text-white transition-transform transform md:translate-x-0 md:static fixed inset-y-0 left-0 z-30"
            :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}">
+        
         <div class="h-16 flex items-center justify-center bg-indigo-950 dark:bg-black font-bold text-xl tracking-wider shadow-md">
-            <i class="fas fa-layer-group mr-2"></i> Admin Panel
+            <img src="{{ asset('storage/images/logo_manabu.png') }}" alt="" class="w-8 h-8 object-contain drop-shadow-[0_0_15px_rgba(45,212,191,0.2)] mr-2"> Admin Panel
         </div>
         <div class="p-4 space-y-2 mt-4">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-700 dark:bg-indigo-600 text-white shadow-md' : 'text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white' }}">
@@ -78,6 +80,11 @@
                     </a>
                 </div>
             </div>
+
+            <a href="{{ route('admin.dataset.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.dataset.*') ? 'bg-indigo-700 dark:bg-indigo-600 text-white shadow-md' : 'text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white' }}">
+                <i class="fas fa-database w-5 text-center"></i>
+                <span class="font-medium">Dataset Gambar</span>
+            </a>
 
             <a href="{{ route('admin.vn.scenes.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 {{ request()->is('admin/vn*') ? 'bg-indigo-700 dark:bg-indigo-600 text-white shadow-md' : 'text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white' }}">
                 <i class="fas fa-film w-5 text-center"></i>

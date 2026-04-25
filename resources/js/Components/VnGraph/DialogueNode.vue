@@ -8,6 +8,13 @@
     <div class="node-header">
       <span class="node-id">#{{ data.dialogueId || 'NEW' }}</span>
       <span v-if="isStart" class="start-badge">START</span>
+
+      <span 
+        v-if="data.audioFilePath" 
+        class="text-[10px] font-bold px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded ml-auto"
+      >
+        Audio Ready
+      </span>
     </div>
 
     <div class="node-character">
@@ -68,6 +75,7 @@ function truncate(text, len) {
 }
 </script>
 
+<!-- TODO: refactor style biar lebih bagus -->
 <style scoped>
 .dialogue-node { min-width: 220px; max-width: 280px; background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: all 0.2s ease; cursor: pointer; }
 :root.dark .dialogue-node, .dark .dialogue-node { background: #1f2937; border-color: #374151; color: #e5e7eb; }

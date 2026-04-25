@@ -3,222 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Daftar - 学ぶ Manabu</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-        .register-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            padding: 40px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2dd4bf', 
+                        primaryHover: '#14b8a6',
+                        darkBg: '#050505',
+                        panelBg: '#0f0f11',
+                        inputBg: '#18181b',
+                    }
+                }
             }
         }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo h1 {
-            color: #667eea;
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
-
-        .logo p {
-            color: #999;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn-register {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-register:active {
-            transform: translateY(0);
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .login-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border: 1px solid #f5c6cb;
-            font-size: 14px;
-        }
-
-        .error-list {
-            list-style: none;
-        }
-
-        .error-list li {
-            margin: 5px 0;
-        }
-    </style>
+    </script>
 </head>
-<body>
-    <div class="register-container">
-        <div class="logo">
-            <!-- <h1>漢字</h1>
-            <p>Belajar Kanji JLPT N5</p> -->
-        </div>
 
-        @if ($errors->any())
-            <div class="error-message">
-                <ul class="error-list">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+<body class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-darkBg text-gray-800 dark:text-gray-200 font-sans p-4 sm:p-6 transition-colors duration-300"
+      x-data="{ darkMode: localStorage.getItem('darkMode') !== 'false' }" 
+      x-init="if(darkMode) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark')">
 
-        <form action="{{ route('register') }}" method="POST">
-            @csrf
+    {{-- Dark Mode Toggle --}}
+    <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode); document.documentElement.classList.toggle('dark', darkMode)" 
+            class="fixed top-5 right-5 z-50 w-11 h-11 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 bg-white dark:bg-inputBg border border-gray-200 dark:border-gray-800 hover:shadow-[0_0_15px_rgba(45,212,191,0.3)] hover:scale-110 group"
+            :title="darkMode ? 'Light Mode' : 'Dark Mode'">
+        <i class="fas fa-sun text-amber-500 group-hover:rotate-90 transition-transform duration-500" x-show="darkMode" x-cloak></i>
+        <i class="fas fa-moon text-teal-500 group-hover:-rotate-12 transition-transform duration-500" x-show="!darkMode" x-cloak></i>
+    </button>
+
+    <div class="relative w-full max-w-md group mt-8 mb-8">
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-teal-500 rounded-[2rem] blur opacity-20 group-hover:opacity-30 transition duration-1000 group-hover:duration-200"></div>
+
+        <div class="relative w-full bg-white dark:bg-panelBg rounded-[2rem] shadow-2xl border border-gray-200 dark:border-gray-800 p-8 sm:p-10 flex flex-col items-center">
             
-            <div class="form-group">
-                <label for="name">Nama Lengkap</label>
-                <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    value="{{ old('name') }}"
-                    required 
-                    autofocus
-                    placeholder="Masukkan nama Anda"
-                >
+            <div class="w-full flex justify-start mb-2">
+                <a href="/" class="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-teal-500 transition-colors flex items-center gap-1.5">
+                    <i class="fas fa-arrow-left"></i> Beranda
+                </a>
             </div>
 
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    value="{{ old('email') }}"
-                    required 
-                    placeholder="Masukkan email Anda"
-                >
-            </div>
+            <img src="{{ asset('storage/images/logo_manabu.png') }}" alt="Manabu Logo" class="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(45,212,191,0.2)] mb-3">
+            
+            <h1 class="text-2xl font-bold tracking-tight mb-1 text-slate-800 dark:text-white text-center">
+                Buat Akun <span class="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-blue-500">Manabu</span>
+            </h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 text-center">Mulai perjalanan belajar bahasa Jepang Anda.</p>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required
-                    placeholder="Minimal 8 karakter"
-                >
-            </div>
+            @if ($errors->any())
+                <div class="w-full mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl text-sm flex items-start gap-3">
+                    <i class="fas fa-exclamation-circle mt-0.5"></i>
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-            <div class="form-group">
-                <label for="password_confirmation">Konfirmasi Password</label>
-                <input 
-                    type="password" 
-                    id="password_confirmation" 
-                    name="password_confirmation" 
-                    required
-                    placeholder="Konfirmasi password Anda"
-                >
-            </div>
+            <form action="{{ route('register') }}" method="POST" class="w-full space-y-4">
+                @csrf
 
-            <button type="submit" class="btn-register">Daftar</button>
-        </form>
+                <div>
+                    <label class="block text-xs font-bold tracking-wide text-gray-700 dark:text-gray-400 mb-1.5 uppercase" for="name">Nama Lengkap</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400 dark:text-gray-500"></i>
+                        </div>
+                        <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                            class="w-full bg-gray-50 dark:bg-inputBg border border-gray-300 dark:border-gray-700/50 text-gray-900 dark:text-white rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-gray-600"
+                            placeholder="Taro Yamada">
+                    </div>
+                </div>
 
-        <div class="login-link">
-            Sudah punya akun? <a href="{{ route('login') }}">Masuk di sini</a>
+                <div>
+                    <label class="block text-xs font-bold tracking-wide text-gray-700 dark:text-gray-400 mb-1.5 uppercase" for="email">Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400 dark:text-gray-500"></i>
+                        </div>
+                        <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                            class="w-full bg-gray-50 dark:bg-inputBg border border-gray-300 dark:border-gray-700/50 text-gray-900 dark:text-white rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-gray-600"
+                            placeholder="nama@email.com">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold tracking-wide text-gray-700 dark:text-gray-400 mb-1.5 uppercase" for="password">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400 dark:text-gray-500"></i>
+                        </div>
+                        <input type="password" id="password" name="password" required
+                            class="w-full bg-gray-50 dark:bg-inputBg border border-gray-300 dark:border-gray-700/50 text-gray-900 dark:text-white rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-gray-600"
+                            placeholder="Minimal 8 karakter">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold tracking-wide text-gray-700 dark:text-gray-400 mb-1.5 uppercase" for="password_confirmation">Konfirmasi Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-check-circle text-gray-400 dark:text-gray-500"></i>
+                        </div>
+                        <input type="password" id="password_confirmation" name="password_confirmation" required
+                            class="w-full bg-gray-50 dark:bg-inputBg border border-gray-300 dark:border-gray-700/50 text-gray-900 dark:text-white rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all placeholder-gray-400 dark:placeholder-gray-600"
+                            placeholder="Ulangi password">
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-slate-900 dark:bg-gradient-to-r dark:from-teal-500 dark:to-teal-400 text-white dark:text-black transition-all py-3.5 rounded-xl font-bold hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:-translate-y-0.5 mt-6">
+                    Daftar Sekarang
+                </button>
+            </form>
+
+            <p class="mt-8 text-sm text-gray-600 dark:text-gray-400">
+                Sudah punya akun? 
+                <a href="{{ route('login') }}" class="text-teal-600 dark:text-teal-400 hover:text-teal-500 font-bold transition-colors">Masuk di sini</a>
+            </p>
         </div>
     </div>
+
 </body>
 </html>

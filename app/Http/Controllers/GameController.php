@@ -55,12 +55,12 @@ class GameController extends Controller
     {
         $sceneId = $dialogue->scene_id;
 
-        // 1. Ambil SEMUA dialog di scene ini
+        // Ambil SEMUA dialog di scene ini
         $allDialoguesInScene = VnDialogue::with(['character', 'background', 'choices'])
             ->where('scene_id', $sceneId)
             ->get();
 
-        // 2. 🔥 AUTO-GENERATE AUDIO (ElevenLabs) UNTUK SEMUA DIALOG YANG KOSONG
+        // AUTO-GENERATE AUDIO (ElevenLabs) UNTUK SEMUA DIALOG YANG KOSONG
         foreach ($allDialoguesInScene as $d) {
             if (
                 !$d->audio_file_path
@@ -82,13 +82,13 @@ class GameController extends Controller
             }
         }
 
-        // 3. Format seluruh data tersebut menjadi array agar siap digunakan oleh Vue
+        // Format seluruh data tersebut menjadi array agar siap digunakan oleh Vue
         $formattedDialogues = $allDialoguesInScene->map(function ($d) {
             return [
                 'id' => $d->id,
                 'original_text' => $d->original_text,
                 'translated_text' => $d->translated_text,
-                'audio_file_path' => $d->audio_file_path, // Sekarang pasti terisi kalau karakternya punya voice_id
+                'audio_file_path' => $d->audio_file_path,
                 'next_dialogue_id' => $d->next_dialogue_id,
                 'character' => $d->character ? [
                     'name' => $d->character->name,
@@ -108,7 +108,7 @@ class GameController extends Controller
             ];
         });
 
-        // 4. Kirim semua data ke Vue Player
+        // Kirim semua data ke Vue Player
         return Inertia::render('Game/Play', [
             'allDialogues' => $formattedDialogues,
             'startDialogueId' => $dialogue->id,

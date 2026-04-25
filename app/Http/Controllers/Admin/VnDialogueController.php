@@ -148,13 +148,13 @@ class VnDialogueController extends Controller
      */
     public function generateAudio(Request $request, VnDialogue $dialogue)
     {
-        // 1. Validasi Input dari Vue Axios
+        // Validasi Input dari Vue Axios
         $request->validate([
             'text' => 'required|string',
             'character_id' => 'required|exists:vn_characters,id',
         ]);
 
-        // 2. Ambil Voice ID Karakter dari Database
+        // Ambil Voice ID Karakter dari Database
         $character = VnCharacter::find($request->character_id);
         $voiceId = $character->elevenlabs_voice_id;
 
@@ -164,7 +164,7 @@ class VnDialogueController extends Controller
             ], 400); // 400 Bad Request
         }
 
-        // 3. HAPUS AUDIO LAMA (Sangat Penting!)
+        // HAPUS AUDIO LAMA (Sangat Penting!)
         // Karena service-mu pakai MD5 cache, kita harus hapus file lamanya dulu
         // agar sistem dipaksa nge-hit API ElevenLabs lagi (Regenerate sejati).
         if ($dialogue->audio_file_path) {
@@ -175,7 +175,7 @@ class VnDialogueController extends Controller
             }
         }
 
-        // 4. TEMBAK API ELEVENLABS MENGGUNAKAN SERVICE-MU
+        // TEMBAK API ELEVENLABS MENGGUNAKAN SERVICE-MU
         // Panggil fungsi yang ada di ElevenLabsService.php
         $audioUrl = $this->elevenLabs->getOrGenerateAudio($request->text, $voiceId);
 
@@ -186,13 +186,13 @@ class VnDialogueController extends Controller
             ], 500); // 500 Internal Server Error
         }
 
-        // 5. UPDATE DATABASE DENGAN PATH BARU
+        // UPDATE DATABASE DENGAN PATH BARU
         // Fungsi Storage::url() di service-mu otomatis menghasilkan "/storage/audio/xxx.mp3"
         $dialogue->update([
             'audio_file_path' => $audioUrl,
         ]);
 
-        // 6. KIRIM JAWABAN SUKSES KE VUE
+        // KIRIM JAWABAN SUKSES KE VUE
         return response()->json([
             'message' => 'Audio berhasil di-generate!',
             'audio_file_path' => $audioUrl

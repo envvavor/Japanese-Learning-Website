@@ -25,17 +25,32 @@
     </div>
 
     <div id="menuArea" class="transition-all duration-500">
-        <div id="kanjiContainer" class="space-y-4">
-            <div class="text-center py-10">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-indigo-400 mb-4"></div>
-                <p class="text-slate-400 dark:text-slate-500 font-medium">Memuat data karakter...</p>
+        <div id="kanjiContainer" class="space-y-8">
+            {{-- Skeleton Loading Group --}}
+            <div class="animate-pulse mb-12">
+                {{-- Skeleton Header --}}
+                <div class="flex items-center border-b border-slate-200 dark:border-gray-700 pb-3 mb-6">
+                    <div class="w-8 h-8 bg-slate-200 dark:bg-gray-700 rounded-lg mr-3"></div>
+                    <div class="h-6 w-48 bg-slate-200 dark:bg-gray-700 rounded-md"></div>
+                </div>
+                {{-- Skeleton Grid Cards (Dibuat 10 kotak sebagai placeholder) --}}
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+                    @for ($i = 0; $i < 10; $i++)
+                        <div class="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col items-center justify-center">
+                            {{-- Placeholder untuk huruf besar --}}
+                            <div class="w-12 h-14 bg-slate-200 dark:bg-gray-700 rounded-md mb-4"></div>
+                            {{-- Placeholder untuk label arti --}}
+                            <div class="w-20 h-5 bg-slate-100 dark:bg-gray-600 rounded-lg"></div>
+                        </div>
+                    @endfor
+                </div>
             </div>
         </div>
     </div>
 
     <div id="practiceArea" class="hidden mt-6 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-3xl shadow-2xl p-8 sm:p-10 max-w-2xl mx-auto relative overflow-hidden transition-all duration-500">
         
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+        <div class="absolute top-0 left-0 w-full h-2 bg-blue-500"></div>
 
         <div class="flex justify-between items-center mb-8 mt-2">
             <h2 id="targetTitle" class="text-2xl font-bold text-slate-800 dark:text-white">
@@ -50,18 +65,35 @@
             </button>
         </div>
 
-        <p class="text-sm text-slate-500 dark:text-slate-400 mb-8 text-center bg-slate-50 dark:bg-gray-700 p-3 rounded-lg border border-slate-100 dark:border-gray-600">
-            Ikuti urutan dan arah goresan sesuai standar penulisan Jepang.
-        </p>
+        <div class="flex items-center gap-3 mb-8">
+            <p class="text-sm text-slate-500 dark:text-slate-400 flex-1 bg-slate-50 dark:bg-gray-700 p-3 rounded-lg border border-slate-100 dark:border-gray-600">
+                Ikuti urutan dan arah goresan sesuai standar penulisan Jepang.
+            </p>
+            <label class="flex flex-col items-center gap-1 cursor-pointer select-none shrink-0">
+                <span class="text-xs font-medium text-slate-400 dark:text-slate-500">Panduan</span>
+                <div class="relative w-10 h-6">
+                    <input type="checkbox" id="guideToggle" class="sr-only" checked onchange="toggleGuide(this.checked)">
+                    <div id="guideTrack" class="w-10 h-6 bg-indigo-500 rounded-full transition-colors duration-200"></div>
+                    <div id="guideThumb" class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 translate-x-4"></div>
+                </div>
+            </label>
+        </div>
 
        <div class="flex justify-center mb-8">
-            <div class="relative bg-white dark:bg-gray-900 border-4 border-slate-700 dark:border-slate-500 rounded-lg shadow-inner overflow-hidden w-full max-w-[320px] aspect-square">
+            <div class="relative bg-white dark:bg-gray-900 border-4 border-slate-700 dark:border-slate-500 rounded-lg shadow-inner overflow-hidden w-full max-w-[300px] aspect-square">
                 <div class="absolute pointer-events-none border-l-2 border-dashed border-red-300 h-full left-1/2 opacity-60"></div>
                 <div class="absolute pointer-events-none border-t-2 border-dashed border-red-300 w-full top-1/2 opacity-60"></div>
-                
+
+                {{-- Guide canvas: layer paling bawah, tidak bisa diklik --}}
+                <canvas id="guideCanvas"
+                        width="300"
+                        height="300"
+                        class="block w-full h-full absolute top-0 left-0 z-0 pointer-events-none transition-opacity duration-300">
+                </canvas>
+
                 <canvas id="kanjiCanvas"
-                        width="320"
-                        height="320"
+                        width="300"
+                        height="300"
                         class="block w-full h-full touch-none relative z-10 cursor-crosshair">
                 </canvas>
             </div>
@@ -91,15 +123,22 @@
 </div>
 
 <script>
-    // --- グローバル変数の初期化 ---
+    // グローバル変数の初期化
     let templateKanji = []; 
     let currentStroke = [];
     let allStrokes = [];
     let isDrawing = false;
+
+    // State toggle panduan — baca dari localStorage agar persisten
+    let isGuideVisible = localStorage.getItem('kanjiGuideVisible') !== 'false';
     
     const canvas = document.getElementById('kanjiCanvas');
     const ctx = canvas.getContext('2d');
     const statusMsg = document.getElementById('statusMsg');
+
+    // Guide canvas context
+    const guideCanvas = document.getElementById('guideCanvas');
+    const gCtx = guideCanvas.getContext('2d');
 
     ctx.lineWidth = 14;
     ctx.lineCap = 'round';
@@ -108,7 +147,7 @@
 
     let currentCategory = "{{ $category ?? '' }}";
 
-    // --- APIからのカードデータロード機能（グループ化機能付き） ---
+    // APIからのカードデータロード機能（グループ化機能付き
     async function loadKanjiList() {
         try {
             let url = '/api/kanjis';
@@ -237,7 +276,7 @@
         if (char) startPractice(char);
     }
 
-    // ---  FUNGSI MEMULAI LATIHAN ---
+    // FUNGSI MEMULAI LATIHAN
     async function startPractice(char) {
         try {
             statusMsg.innerText = "Memuat template...";
@@ -293,6 +332,10 @@
 
     function startDrawing(e) {
         e.preventDefault(); isDrawing = true; currentStroke = [];
+        
+        const isDark = document.documentElement.classList.contains('dark');
+        ctx.strokeStyle = isDark ? '#f8fafc' : '#2c3e50';
+
         const pos = getPos(e); currentStroke.push(pos);
         ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
     }
@@ -315,9 +358,131 @@
     canvas.addEventListener('touchstart', startDrawing, {passive: false}); canvas.addEventListener('touchmove', draw, {passive: false});
     canvas.addEventListener('touchend', stopDrawing);
 
+    // ============================================================
+    //  FUNGSI GUIDE CANVAS
+    // ============================================================
+
+    // Gambar template samar di guideCanvas — dipanggil saat karakter dimuat & saat toggle
+    function drawTemplateGuide() {
+        gCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
+
+        if (!isGuideVisible || !templateKanji || templateKanji.length === 0) return;
+
+        // Warna berbeda tiap goresan agar urutan terlihat jelas
+        const strokeColors = [
+            'rgba(99,102,241,0.18)',   // indigo  – goresan 1
+            'rgba(234,179,8,0.18)',    // yellow  – goresan 2
+            'rgba(239,68,68,0.18)',    // red     – goresan 3
+            'rgba(16,185,129,0.18)',   // green   – goresan 4
+            'rgba(249,115,22,0.18)',   // orange  – goresan 5
+            'rgba(168,85,247,0.18)',   // purple  – goresan 6+
+        ];
+
+        templateKanji.forEach((stroke, index) => {
+            if (!stroke || stroke.length === 0) return;
+
+            // Garis panduan
+            gCtx.beginPath();
+            gCtx.lineWidth = 22;
+            gCtx.lineCap = 'round';
+            gCtx.lineJoin = 'round';
+            gCtx.strokeStyle = strokeColors[index % strokeColors.length];
+            gCtx.moveTo(stroke[0].x, stroke[0].y);
+            for (let i = 1; i < stroke.length; i++) {
+                gCtx.lineTo(stroke[i].x, stroke[i].y);
+            }
+            gCtx.stroke();
+
+            // Lingkaran + angka urutan di titik awal setiap goresan
+            gCtx.fillStyle = 'rgba(99,102,241,0.45)';
+            gCtx.beginPath();
+            gCtx.arc(stroke[0].x, stroke[0].y, 8, 0, Math.PI * 2);
+            gCtx.fill();
+
+            gCtx.fillStyle = 'rgba(255,255,255,0.95)';
+            gCtx.font = 'bold 9px sans-serif';
+            gCtx.textAlign = 'center';
+            gCtx.textBaseline = 'middle';
+            gCtx.fillText(index + 1, stroke[0].x, stroke[0].y);
+        });
+    }
+
+    // Toggle panduan on/off via checkbox
+    function toggleGuide(visible) {
+        isGuideVisible = visible;
+        localStorage.setItem('kanjiGuideVisible', visible); // simpan ke localStorage
+        const thumb = document.getElementById('guideThumb');
+        const track = document.getElementById('guideTrack');
+        thumb.style.transform = visible ? 'translateX(16px)' : 'translateX(0)';
+        track.style.backgroundColor = visible ? '#6366f1' : '#94a3b8';
+        drawTemplateGuide();
+    }
+
+    // Sinkronkan tampilan toggle dengan state yang tersimpan saat halaman pertama dimuat
+    (function syncGuideToggleUI() {
+        const checkbox = document.getElementById('guideToggle');
+        const thumb    = document.getElementById('guideThumb');
+        const track    = document.getElementById('guideTrack');
+        if (!checkbox) return;
+        checkbox.checked           = isGuideVisible;
+        thumb.style.transform      = isGuideVisible ? 'translateX(16px)' : 'translateX(0)';
+        track.style.backgroundColor = isGuideVisible ? '#6366f1' : '#94a3b8';
+    })();
+
+    function highlightWrongStrokes(wrongStrokeIndices) {
+        redrawAllStrokes(); // gambar ulang dulu supaya bersih
+
+        const prevStyle    = ctx.strokeStyle;
+        const prevWidth    = ctx.lineWidth;
+        const prevFont     = ctx.font;
+        const prevFill     = ctx.fillStyle;
+        const prevAlign    = ctx.textAlign;
+        const prevBaseline = ctx.textBaseline;
+
+        wrongStrokeIndices.forEach(strokeNum => {
+            const stroke = allStrokes[strokeNum - 1];
+            if (!stroke || stroke.length === 0) return;
+
+            // Overlay merah semi-transparan di atas goresan yang salah
+            ctx.strokeStyle = 'rgba(239,68,68,0.75)';
+            ctx.lineWidth = 18;
+            ctx.beginPath();
+            ctx.moveTo(stroke[0].x, stroke[0].y);
+            for (let i = 1; i < stroke.length; i++) {
+                ctx.lineTo(stroke[i].x, stroke[i].y);
+            }
+            ctx.stroke();
+
+            // Badge lingkaran merah berisi nomor goresan di titik awalnya
+            const bx = stroke[0].x;
+            const by = Math.max(stroke[0].y - 16, 12); // jangan sampai keluar canvas atas
+
+            ctx.fillStyle = 'rgba(239,68,68,0.9)';
+            ctx.beginPath();
+            ctx.arc(bx, by, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(strokeNum, bx, by);
+        });
+
+        // Restore semua style supaya tidak merusak gambar berikutnya
+        ctx.strokeStyle   = prevStyle;
+        ctx.lineWidth     = prevWidth;
+        ctx.font          = prevFont;
+        ctx.fillStyle     = prevFill;
+        ctx.textAlign     = prevAlign;
+        ctx.textBaseline  = prevBaseline;
+    }
+
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         allStrokes = [];
+        // Refresh guide setiap kali reset
+        drawTemplateGuide();
         statusMsg.innerText = "Canvas Bersih";
         statusMsg.className = "text-center text-sm font-bold text-slate-600 dark:text-slate-300 min-h-[24px] px-4 py-3 rounded-xl bg-slate-50 dark:bg-gray-700 border border-slate-100 dark:border-gray-600 mt-4";
     }
@@ -347,19 +512,20 @@
         }
     }
 
-    // trueに変えたらdebugmodeが表示される
+    // NOTE: trueに変えたらdebugmodeが表示される
     window.DEBUG_MODE = true;
 
-    // --- LOGIKA VALIDASI STROKE ORDER + AI HYBRID ---
+    // TODO: refactor semua fungsi biar rapih
+    // LOGIKA VALIDASI STROKE ORDER + AI HYBRID
     function validateStroke() {
         if (allStrokes.length === 0) {
-            statusMsg.innerHTML = "⚠️ Tulis hurufnya dulu!";
+            statusMsg.innerHTML = "Tulis hurufnya dulu!";
             statusMsg.className = "text-center text-sm font-bold text-amber-600 dark:text-amber-400 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mt-4";
             return;
         }
 
         if (!templateKanji || templateKanji.length === 0) {
-            statusMsg.innerHTML = "⚠️ Data template dari Admin belum siap!";
+            statusMsg.innerHTML = "Data template dari Admin belum siap!";
             return;
         }
 
@@ -375,7 +541,7 @@
         const normTemp = normalizeStrokes(templateKanji);
 
         const NUM_POINTS = 30;
-        const TOLERANCE_ERROR = 40;
+        const TOLERANCE_ERROR = 35;
 
         const matchedCount = Math.min(templateCount, userCount);
         let totalScore = 0;
@@ -409,6 +575,12 @@
             let strokePct = 100 - (totalError / TOLERANCE_ERROR) * 100;
             strokePct = Math.max(0, Math.min(100, strokePct)); 
             
+            // --- TAMBAHAN DEBUG SCORE PER STROKE ---
+            if (window.DEBUG_MODE) {
+                console.log(`[DEBUG] Goresan ke-${i + 1} | Akurasi: ${strokePct.toFixed(2)}% (Bentuk: ${shapeError.toFixed(2)}, Posisi: ${posError.toFixed(2)})`);
+            }
+            // ---------------------------------------
+
             totalScore += strokePct;
 
             if (strokePct < 65) {
@@ -424,24 +596,31 @@
 
         const overallPct = totalScore / templateCount; 
         let msg = `Akurasi Urutan: ${overallPct.toFixed(1)}%`;
-        
+        // kelebihan goresan
         if (userCount > templateCount) {
             msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Kelebihan ${userCount - templateCount} goresan!</span>`;
         }
+        // kekurangan goresan
+        if (userCount < templateCount) {
+            msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Kekurangan ${templateCount - userCount} goresan!</span>`;
+        }
+        // kalau ada goresan yang salah
         if (wrongStrokes.length > 0) {
             msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Cek lagi goresan ke: ${wrongStrokes.join(', ')}</span>`;
+            // Tampilkan highlight di kanvas untuk goresan yang salah
+            highlightWrongStrokes(wrongStrokes);
         }
 
-        // SISTEM HYBRID: KALO URUTAN BENAR, PANGGIL AI/SIMPAN KE DATASET
+        // KALO URUTAN BENAR, PANGGIL CNN DAN SIMPAN KE DATASET
         if (overallPct >= 75 && userCount === templateCount && wrongStrokes.length === 0) {
             
-            // Tampilan pesan Loading AI
-            statusMsg.innerHTML = `<div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600 mr-2 mb-[-3px]"></div> Mengirim ke AI...`;
+            // Loading
+            statusMsg.innerHTML = `<div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600 mr-2 mb-[-3px]"></div> Validating...`;
             statusMsg.className = "text-center text-sm font-bold text-indigo-600 dark:text-indigo-400 min-h-[24px] px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 mt-4";
             
             //-------------------------------------------------------
-            // Kumpulkan Dataset (jalan di belakang layar)
-            // autoSaveToDataset();
+            // Kumpulkan Dataset. apus // biar nyala
+            autoSaveToDataset();
             //-------------------------------------------------------
 
             // Buat kanvas bayangan untuk dikirim ke AI (64x64, background hitam)
@@ -455,13 +634,18 @@
             tCtx.lineCap = 'round';
             tCtx.strokeStyle = '#ffffff';
 
-            const scaleRatio = 64 / 320;
-            allStrokes.forEach(stroke => {
+            normUser.forEach(stroke => {
                 if (stroke.length === 0) return;
                 tCtx.beginPath();
-                tCtx.moveTo(stroke[0].x * scaleRatio, stroke[0].y * scaleRatio);
+                
+                let startX = (stroke[0].x * 0.45) + 32;
+                let startY = (stroke[0].y * 0.45) + 32;
+                tCtx.moveTo(startX, startY);
+                
                 for (let i = 1; i < stroke.length; i++) {
-                    tCtx.lineTo(stroke[i].x * scaleRatio, stroke[i].y * scaleRatio);
+                    let currX = (stroke[i].x * 0.45) + 32;
+                    let currY = (stroke[i].y * 0.45) + 32;
+                    tCtx.lineTo(currX, currY);
                 }
                 tCtx.stroke();
             });
@@ -481,6 +665,12 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
+                    if (data.is_supported === false) {
+                        statusMsg.innerHTML = `<b>SEMPURNA!</b><br>Urutan goresan benar (${overallPct.toFixed(1)}%).<br><span class="text-xs text-indigo-600 dark:text-indigo-400 font-normal">Sistem AI belum dilatih untuk menilai bentuk huruf ini, namun urutan goresan Anda sudah tepat!</span>`;
+                        statusMsg.className = "text-center text-sm font-bold text-emerald-600 dark:text-emerald-400 min-h-[24px] px-4 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 mt-4";
+                        return;
+                    }
+                    
                     // Buat elemen Diagram Batang (Bar Chart) dari data Top 3
                     let chartHtml = `<div class="mt-4 pt-3 border-t border-slate-200 dark:border-gray-600 text-left">
                                         <p class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Analisis Probabilitas AI:</p>`;
@@ -501,14 +691,14 @@
 
                     // Tampilkan Hasil Utama + Diagramnya
                     if (data.is_match) {
-                        statusMsg.innerHTML = `✅ <b>SEMPURNA!</b><br>Urutan goresan benar (${overallPct.toFixed(1)}%).<br>AI yakin ini huruf <b>${data.predicted_char}</b>. ${chartHtml}`;
+                        statusMsg.innerHTML = `<b>SEMPURNA!</b><br>Urutan goresan benar (${overallPct.toFixed(1)}%).<br>AI yakin ini huruf <b>${data.predicted_char}</b>. ${chartHtml}`;
                         statusMsg.className = "text-center text-sm font-bold text-emerald-600 dark:text-emerald-400 min-h-[24px] px-4 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 mt-4";
                     } else {
-                        statusMsg.innerHTML = `⚠️ <b>HAMPIR!</b><br>Urutan benar, tapi AI menebak ini huruf <b>${data.predicted_char}</b>.<br>Coba perbaiki proporsi garisnya! ${chartHtml}`;
+                        statusMsg.innerHTML = `<b>HAMPIR!</b><br>Urutan benar, tapi AI menebak ini huruf <b>${data.predicted_char}</b>.<br>Coba perbaiki proporsi garisnya! ${chartHtml}`;
                         statusMsg.className = "text-center text-sm font-bold text-amber-600 dark:text-amber-400 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mt-4";
                     }
                 } else {
-                    statusMsg.innerHTML = `✅ Urutan Benar (${overallPct.toFixed(1)}%)!<br><span class="text-xs font-normal text-rose-500">Server AI sedang offline.</span>`;
+                    statusMsg.innerHTML = `Urutan Benar (${overallPct.toFixed(1)}%)!<br><span class="text-xs font-normal text-rose-500">Server AI sedang offline.</span>`;
                 }
             })
 
@@ -522,16 +712,16 @@
         }
     }
     
-    // --- FUNGSI AUTO-SAVE (MENGUMPULKAN DATASET UNTUK AI) ---
+    // FUNGSI AUTO-SAVE (MENGUMPULKAN DATASET UNTUK AI)
     function autoSaveToDataset() {
         try {
-            // 1. Ekstrak huruf dari judul
+            // Ekstrak huruf dari judul
             const titleText = document.getElementById('targetTitle').innerText;
             const currentCharacter = titleText.split(' ')[1]; 
             
             if(!currentCharacter) return;
 
-            // 2. Siapkan kanvas tersembunyi (64x64, latar hitam, garis putih)
+            // Siapkan kanvas tersembunyi (64x64, latar hitam, garis putih)
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = 64;  
             tempCanvas.height = 64;
@@ -545,22 +735,29 @@
             tCtx.lineJoin = 'round';
             tCtx.strokeStyle = '#ffffff';
 
-            const scaleRatio = 64 / 320;
+            const normUser = normalizeStrokes(allStrokes);
 
-            allStrokes.forEach(stroke => {
+            normUser.forEach(stroke => {
                 if (stroke.length === 0) return;
                 tCtx.beginPath();
-                tCtx.moveTo(stroke[0].x * scaleRatio, stroke[0].y * scaleRatio);
+                
+                // Dikali 0.45 (skala) dan ditambah 32 (geser ke titik tengah kanvas 64x64)
+                let startX = (stroke[0].x * 0.45) + 32;
+                let startY = (stroke[0].y * 0.45) + 32;
+                tCtx.moveTo(startX, startY);
+                
                 for (let i = 1; i < stroke.length; i++) {
-                    tCtx.lineTo(stroke[i].x * scaleRatio, stroke[i].y * scaleRatio);
+                    let currX = (stroke[i].x * 0.45) + 32;
+                    let currY = (stroke[i].y * 0.45) + 32;
+                    tCtx.lineTo(currX, currY);
                 }
                 tCtx.stroke();
             });
 
-            // 3. Konversi jadi teks Base64
+            // Konversi jadi teks Base64
             const imageData = tempCanvas.toDataURL("image/png");
             
-            // 4. Kirim diam-diam ke Backend Laravel
+            // Kirim ke Backend Laravel
             fetch('/api/dataset/save', {
                 method: 'POST',
                 headers: {
@@ -573,7 +770,7 @@
                 })
             })
             .then(response => {
-                if(window.DEBUG_MODE) console.log("✅ Auto-Save berhasil: Gambar dikirim ke server untuk Dataset DIY.");
+                if(window.DEBUG_MODE) console.log("Auto-Save berhasil");
             })
             .catch(error => {
                 if(window.DEBUG_MODE) console.error('Auto-Save gagal:', error);
@@ -584,7 +781,7 @@
         }
     }
 
-    // --- FUNGSI MATEMATIKA ---
+    // FUNGSI MATEMATIKA
     function getBoundingBox(strokes) {
         let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         strokes.forEach(stroke => {
@@ -647,26 +844,94 @@
         
         const NUM_POINTS = 30; 
         const previousFillStyle = ctx.fillStyle;
+        const previousStrokeStyle = ctx.strokeStyle;
+        const previousLineWidth = ctx.lineWidth;
         const previousFont = ctx.font;
+        const previousLineDash = ctx.getLineDash();
         
+        // HITUNG POSISI & SKALA USER
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        let cx = 0, cy = 0, pts = 0;
+
+        allStrokes.forEach(stroke => {
+            stroke.forEach(p => {
+                if (p.x < minX) minX = p.x; if (p.y < minY) minY = p.y;
+                if (p.x > maxX) maxX = p.x; if (p.y > maxY) maxY = p.y;
+                cx += p.x; cy += p.y; pts++;
+            });
+        });
+
+        // Hitung skala terpanjang dari coretan User (untuk jadi patokan)
+        const maxDim = Math.max(maxX - minX, maxY - minY) || 1;
+
+        // Gambar Kotak Batas & Center User
+        ctx.strokeStyle = '#10b981'; 
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 6]); 
+        ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+
+        if (pts > 0) {
+            cx /= pts; cy /= pts;
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = "bold 12px sans-serif";
+            ctx.fillText("Center", cx + 10, cy - 10);
+        }
+
+        // Gambar Titik Resampling User
+        ctx.setLineDash([]);
         ctx.fillStyle = '#ef4444'; 
         ctx.font = "bold 10px sans-serif";
         
-        allStrokes.forEach((stroke, index) => {
+        allStrokes.forEach((stroke) => {
             const resampledPoints = resample(stroke, NUM_POINTS);
             resampledPoints.forEach((pt, ptIndex) => {
                 ctx.beginPath();
                 ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
                 ctx.fill();
-                if (ptIndex === 0) ctx.fillText("Start", pt.x + 8, pt.y + 4);
-                else if (ptIndex === NUM_POINTS - 1) ctx.fillText("End", pt.x + 8, pt.y + 4);
+                if (ptIndex === 0) ctx.fillText("U-Start", pt.x + 8, pt.y + 4);
+                else if (ptIndex === NUM_POINTS - 1) ctx.fillText("U-End", pt.x + 8, pt.y + 4);
             });
         });
-        
-        ctx.fillStyle = previousFillStyle;
-        ctx.font = previousFont;
-    };
 
+        // TEMPLATE MENGIKUTI USER
+        if (templateKanji && templateKanji.length > 0) {
+            
+            // Panggil fungsi normalisasi milik Anda (Skala 100, Pusat 0,0)
+            const normTemp = normalizeStrokes(templateKanji);
+
+            // PROYEKSI BALIK: Ubah skala 100 jadi skala User, dan geser ke Titik Tengah User
+            const mappedTemp = normTemp.map(stroke => stroke.map(p => ({
+                x: p.x * (maxDim / 100) + cx,
+                y: p.y * (maxDim / 100) + cy
+            })));
+
+            // Gambar Titik Template yang sudah menempel dengan User
+            ctx.fillStyle = '#3b82f6'; // Warna Biru
+            ctx.font = "bold 10px sans-serif";
+            
+            mappedTemp.forEach((stroke) => {
+                // Lakukan resampling 30 titik untuk Template yang sudah diproyeksikan
+                const resampledPoints = resample(stroke, NUM_POINTS);
+                resampledPoints.forEach((pt, ptIndex) => {
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (ptIndex === 0) ctx.fillText("T-Start", pt.x + 8, pt.y + 4);
+                    else if (ptIndex === NUM_POINTS - 1) ctx.fillText("T-End", pt.x + 8, pt.y + 4);
+                });
+            });
+        }
+        
+        // Restore style
+        ctx.fillStyle = previousFillStyle;
+        ctx.strokeStyle = previousStrokeStyle;
+        ctx.lineWidth = previousLineWidth;
+        ctx.font = previousFont;
+        ctx.setLineDash(previousLineDash);
+    };
     // Tombol Cepat: Shift + D (Khusus saat Debug Mode nyala)
     document.addEventListener('keydown', function(e) {
         if (window.DEBUG_MODE && e.shiftKey && e.key.toLowerCase() === 'd') {

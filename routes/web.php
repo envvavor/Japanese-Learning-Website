@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\VnBackgroundController;
 use App\Http\Controllers\Admin\VnDialogueController;
 use App\Http\Controllers\Admin\VnSceneController;
 use App\Http\Controllers\Admin\VnGraphController;
+use App\Services\ElevenLabsService;
+use App\Http\Controllers\DatasetController;
 
 
 // Public routes
@@ -123,6 +125,16 @@ Route::middleware(['auth', 'admin'])
         });
     });
 
-    Route::post('/admin/vn/dialogues/{dialogue}/generate-audio', [\App\Http\Controllers\Admin\VnDialogueController::class, 'generateAudio'])
+    Route::post('/admin/vn/dialogues/{dialogue}/generate-audio', [VnDialogueController::class, 'generateAudio'])
     ->name('admin.vn.dialogues.generate-audio');
 
+Route::get('/admin/api/elevenlabs-quota', function (ElevenLabsService $elevenLabs) {
+    return response()->json($elevenLabs->remainingTokens());
+})->name('admin.elevenlabs.quota');
+
+Route::prefix('admin/dataset')->name('admin.dataset.')->middleware(['auth'])->group(function () {
+    Route::get('/', [DatasetController::class, 'index'])->name('index');
+    Route::delete('/destroy', [DatasetController::class, 'destroy'])->name('destroy');
+    Route::get('/download-all', [DatasetController::class, 'downloadAllZip'])->name('download.all');
+    Route::get('/download/{character}', [DatasetController::class, 'downloadZip'])->name('download');
+});

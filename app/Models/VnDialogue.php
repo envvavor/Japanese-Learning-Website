@@ -10,6 +10,7 @@ class VnDialogue extends Model
 {
     protected $table = 'vn_dialogues';
 
+    // TODO: tambahin furigana ke database
     protected $fillable = [
         'scene_id',
         'character_id',

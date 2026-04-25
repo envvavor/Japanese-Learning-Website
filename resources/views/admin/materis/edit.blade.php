@@ -107,7 +107,7 @@
                             var data = api.getData();
                             if (data.kanji && data.furigana) {
                                 // Masukkan tag ruby ke posisi kursor
-                                editor.insertContent('<ruby>' + data.kanji + '<rt>' + data.furigana + '</rt></ruby>&nbsp;');
+                                editor.insertContent('<ruby>' + data.kanji + '<rt>' + data.furigana + '</rt></ruby>&#8203;');
                             }
                             api.close();
                         }

@@ -12,9 +12,12 @@
         <i class="fas fa-sun text-amber-500" x-show="darkMode" x-transition></i>
         <i class="fas fa-moon text-indigo-500" x-show="!darkMode" x-transition></i>
     </button>
-
+    
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
         <div>
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-white tracking-tight flex items-center text-blue-500">
+                <img src="{{ asset('storage/images/logo_manabu.png') }}" alt="" class="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(45,212,191,0.2)] mr-2"> 学ぶ
+            </h1>
             <h1 class="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
                 Dashboard
             </h1>
@@ -146,7 +149,7 @@
                 
                 <div class="absolute inset-0 z-20 p-6 flex flex-col justify-end">
                     <h3 class="text-xl font-bold text-white mb-2 group-hover:text-indigo-300 transition-colors">Vocabulary</h3>
-                    <p class="text-sm text-gray-300 mb-4 line-clamp-2">Tingkatkan akurasi goresan dan otot memori tulisan Anda.</p>
+                    <p class="text-sm text-gray-300 mb-4 line-clamp-2">Latihan kosakata bahasa Jepang</p>
                     <a href="#" class="inline-flex items-center text-sm font-semibold text-indigo-400 hover:text-indigo-300 w-max">
                         Mulai Latihan <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </a>

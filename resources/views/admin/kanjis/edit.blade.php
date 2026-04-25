@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Kanji')
+@section('title', 'Edit Huruf')
 
 @section('content')
 <div class="mb-6">
     <a href="{{ route('admin.kanjis.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors flex items-center">
-        <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar Kanji
+        <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar Huruf
     </a>
 </div>
 
@@ -28,14 +28,12 @@
                 </div>
                 
                 <div>
-                    {{-- Fix 1: Added dark:text-gray-300 --}}
                     <label for="meaning" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Arti (Meaning) *</label>
                     <input type="text" name="meaning" id="meaning" value="{{ old('meaning', $kanji->meaning) }}" required
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: Matahari, Hari">
                 </div>
                 
                 <div>
-                    {{-- Fix 2: Added dark:text-gray-300 --}}
                     <label for="category" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Kategori *</label>
                     <select name="category" id="category" required class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm">
                         <option value="kanji" {{ old('category', $kanji->category) == 'kanji' ? 'selected' : '' }}>Kanji</option>
@@ -64,38 +62,25 @@
                     <input type="text" name="onyomi" id="onyomi" value="{{ old('onyomi', $kanji->onyomi) }}"
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Contoh: ニチ, ジツ">
                 </div>
-
-                <!-- <div class="md:col-span-2">
-                    <label for="stroke_order_image" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Gambar Urutan Stroke <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Opsional</span></label>
-                    {{-- Fix 3: Added dark mode classes to upload area --}}
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors relative" x-data="{ fileName: null, previewUrl: '{{ $kanji->stroke_order_image ? asset('storage/' . $kanji->stroke_order_image) : '' }}' }">
-                        <div class="space-y-1 text-center w-full">
-                            <template x-if="!previewUrl">
-                                <i class="fas fa-image mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-3"></i>
-                            </template>
-                            <template x-if="previewUrl">
-                                <img :src="previewUrl" class="mx-auto h-32 object-contain mb-4 rounded border border-gray-200 dark:border-gray-600 shadow-sm" alt="Preview">
-                            </template>
-                            {{-- Fix 4: Added dark mode to upload label and text --}}
-                            <div class="flex text-sm text-gray-600 dark:text-gray-300 justify-center">
-                                <label for="stroke_order_image" class="relative cursor-pointer bg-white dark:bg-gray-600 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                    <span>Upload gambar baru</span>
-                                    <input id="stroke_order_image" name="stroke_order_image" type="file" class="sr-only" accept="image/*" @change="if($refs.fileInput.files.length > 0) { fileName = $refs.fileInput.files[0].name; previewUrl = URL.createObjectURL($refs.fileInput.files[0]); }" x-ref="fileInput">
-                                </label>
-                            </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2" x-text="fileName ? fileName : 'PNG, JPG, GIF up to 2MB (Akan menggantikan gambar lama)'"></p>
-                        </div>
-                    </div>
-                </div> -->
             </div>
 
             <div class="mb-8">
                 <label class="block text-sm font-bold text-gray-800 dark:text-gray-100 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2"><i class="fas fa-pen-nib mr-2 text-indigo-500 dark:text-indigo-400"></i> Rekam Coretan (Strokes) *</label>
-                <div class="bg-gray-50 dark:bg-gray-800/50 border border-t-0 border-x-0 border-b-4 border-indigo-100 dark:border-indigo-800 p-5 rounded-xl shadow-sm">
-                    <div class="flex flex-col md:flex-row gap-6 items-start">
-                        <div class="bg-white dark:bg-gray-700 p-2 rounded-xl shadow-sm inline-block border border-gray-200 dark:border-gray-600 relative">
-                            {{-- Fix 7: Canvas bg should be transparent (not bg-white) so dark bg-gray-700 wrapper shows --}}
-                            <canvas id="drawingCanvas" width="300" height="300" class="border border-dashed border-indigo-200 dark:border-indigo-700 rounded-lg cursor-crosshair bg-transparent" style="touch-action: none;"></canvas>
+                <div class="bg-gray-50 dark:bg-gray-800/50 border border-t-0 border-x-0 border-b-4 border-indigo-100 dark:border-indigo-800 p-4 sm:p-5 rounded-xl shadow-sm">
+                    <div class="flex flex-col lg:flex-row gap-6 items-center lg:items-start">
+
+                        {{-- Canvas wrapper --}}
+                        <div class="bg-white dark:bg-gray-700 p-2 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 relative flex-shrink-0 mx-auto lg:mx-0 w-full max-w-[320px] flex justify-center">
+                            <canvas id="drawingCanvas" width="300" height="300"
+                                    class="border border-dashed border-indigo-200 dark:border-indigo-700 rounded-lg cursor-crosshair bg-transparent w-full max-w-[300px] h-auto aspect-square"
+                                    style="touch-action: none;"></canvas>
+                            {{-- Fullscreen button --}}
+                            <button type="button" id="openFullscreenBtn"
+                                    class="absolute top-3 right-3 z-10 bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white rounded-lg px-2.5 py-1.5 text-xs font-semibold flex items-center gap-1.5 shadow-md transition-all hover:shadow-lg"
+                                    title="Buka mode fullscreen">
+                                <i class="fas fa-expand-alt text-xs"></i>
+                                <span class="hidden sm:inline">Fullscreen</span>
+                            </button>
                         </div>
                         
                         <div class="flex-1 space-y-4 w-full">
@@ -106,13 +91,14 @@
                                     <li>Mulai menggambar di atas kotak border putus-putus.</li>
                                     <li>Setiap tarikan garis dihitung sebagai 1 stroke.</li>
                                     <li>Perhatikan urutan stroke Anda dengan cermat.</li>
+                                    <li>Gunakan <strong>Fullscreen</strong> untuk area gambar lebih besar.</li>
                                 </ul>
                             </div>
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <button type="button" id="clearBtn" class="bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold py-2 px-4 rounded-lg border border-red-200 dark:border-red-800 transition-colors flex items-center justify-center flex-1 shadow-sm">
+                                <button type="button" id="clearBtn" class="bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold py-2.5 px-4 rounded-lg border border-red-200 dark:border-red-800 transition-colors flex items-center justify-center flex-1 shadow-sm">
                                     <i class="fas fa-trash-alt mr-2"></i> Bersihkan Semua
                                 </button>
-                                <button type="button" id="undoBtn" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 font-semibold py-2 px-4 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors flex items-center justify-center flex-1 shadow-sm">
+                                <button type="button" id="undoBtn" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 font-semibold py-2.5 px-4 rounded-lg border border-gray-200 dark:border-gray-600 transition-colors flex items-center justify-center flex-1 shadow-sm">
                                     <i class="fas fa-undo mr-2"></i> Hapus Terakhir
                                 </button>
                             </div>
@@ -134,7 +120,6 @@
                         </h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tambahkan kalimat untuk mendemonstrasikan penggunaan kanji ini (Opsional).</p>
                     </div>
-                    {{-- Fix 5: Added dark mode to "Tambah Kalimat" button --}}
                     <button type="button" onclick="addExampleRow()" 
                             class="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-semibold rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-900/60 transition-colors text-sm flex items-center shadow-sm">
                         <i class="fas fa-plus mr-2"></i> Tambah Kalimat
@@ -144,7 +129,6 @@
                 <div id="examples-container" class="space-y-4">
                     @if(isset($kanji->examples) && count($kanji->examples) > 0)
                         @foreach($kanji->examples as $index => $example)
-                        {{-- Fix 6: Added dark mode to existing example rows (server-rendered) --}}
                         <div class="flex flex-col sm:flex-row gap-4 bg-white dark:bg-gray-800 p-5 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm relative group" id="example-row-{{ $index }}">
                             <div class="flex-1 space-y-4">
                                 <div>
@@ -175,13 +159,77 @@
                 </div>
             </div>
 
-
             <div class="flex justify-end pt-5 mt-5 border-t border-gray-100 dark:border-gray-700">
                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all flex items-center text-lg transform hover:-translate-y-0.5">
-                    <i class="fas fa-save mr-2"></i> Perbarui Data Kanji
+                    <i class="fas fa-save mr-2"></i> Perbarui Data Huruf
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+{{-- ===== FULLSCREEN CANVAS MODAL ===== --}}
+<div id="fullscreenModal" 
+     class="hidden fixed inset-0 z-[999] flex flex-col bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm transition-colors duration-300">
+
+    {{-- Top bar --}}
+    <div class="flex items-center justify-between px-4 sm:px-6 py-3 flex-shrink-0 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                <i class="fas fa-pen-nib text-indigo-600 dark:text-indigo-400 text-sm"></i>
+            </div>
+            <div>
+                <p class="text-gray-800 dark:text-white font-bold text-sm leading-none">Mode Fullscreen</p>
+                <p class="text-gray-500 dark:text-gray-400 text-xs mt-0.5">Gambar lebih bebas & presisi</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800">
+                <i class="fas fa-layer-group text-indigo-500 dark:text-indigo-400 text-xs"></i>
+                <span class="text-indigo-600 dark:text-indigo-300 text-xs font-medium">Stroke</span>
+                <span id="fsStrokeCount" class="text-indigo-800 dark:text-indigo-100 font-black text-sm">0</span>
+            </div>
+            <button id="closeFullscreenBtn" type="button"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-600 text-sm font-semibold transition-all">
+                <i class="fas fa-compress-alt text-xs"></i>
+                <span>Keluar</span>
+            </button>
+        </div>
+    </div>
+
+    {{-- Canvas area --}}
+    <div class="flex-1 flex items-center justify-center p-4 overflow-hidden">
+        <div class="relative bg-white dark:bg-gray-800 shadow-lg rounded-2xl" id="fsCanvasContainer">
+            {{-- Grid reference lines --}}
+            <div class="absolute inset-0 pointer-events-none rounded-2xl overflow-hidden" style="background-image: linear-gradient(rgba(99,102,241,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.1) 1px, transparent 1px); background-size: 25% 25%;"></div>
+            {{-- Center crosshair --}}
+            <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div style="width: 1px; height: 100%; background: rgba(99,102,241,0.15);"></div>
+            </div>
+            <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div style="height: 1px; width: 100%; background: rgba(99,102,241,0.15);"></div>
+            </div>
+            <canvas id="fullscreenCanvas" width="300" height="300"
+                    class="relative z-10 rounded-2xl cursor-crosshair block border-2 border-dashed border-indigo-300 dark:border-indigo-700"
+                    style="touch-action: none;"></canvas>
+        </div>
+    </div>
+
+    {{-- Bottom action bar --}}
+    <div class="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-center gap-3 max-w-lg mx-auto">
+            <button id="fsUndoBtn" type="button"
+                    class="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl font-semibold text-sm sm:text-base transition-all active:scale-95 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 shadow-sm">
+                <i class="fas fa-undo"></i>
+                <span>Hapus Terakhir</span>
+            </button>
+            <button id="fsClearBtn" type="button"
+                    class="flex-1 flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl font-semibold text-sm sm:text-base transition-all active:scale-95 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800 shadow-sm">
+                <i class="fas fa-trash-alt"></i>
+                <span>Bersihkan Semua</span>
+            </button>
+        </div>
+        <p class="text-center text-gray-500 dark:text-gray-400 text-xs mt-3">Tekan <kbd class="px-1.5 py-0.5 rounded text-xs bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600">Esc</kbd> untuk keluar</p>
     </div>
 </div>
 
@@ -195,7 +243,6 @@
     function addExampleRow() {
         const container = document.getElementById('examples-container');
         
-        // Fix 8: Added dark mode classes to JS-generated example rows
         const html = `
             <div class="flex flex-col sm:flex-row gap-4 bg-white dark:bg-gray-800 p-5 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm relative group" id="example-row-${exampleIndex}">
                 <div class="flex-1 space-y-4">
@@ -232,172 +279,192 @@
 
     function removeExampleRow(index) {
         const row = document.getElementById(`example-row-${index}`);
-        if(row) {
-            row.remove();
-        }
+        if(row) row.remove();
     }
 
     // --- SCRIPT CANVAS STROKES ---
     document.addEventListener('DOMContentLoaded', function() {
-        const canvas = document.getElementById('drawingCanvas');
-        const ctx = canvas.getContext('2d');
-        const strokesDataInput = document.getElementById('strokesData');
-        const clearBtn = document.getElementById('clearBtn');
-        const undoBtn = document.getElementById('undoBtn');
-        const strokeCountDisplay = document.getElementById('strokeCount');
-        const form = document.getElementById('kanjiForm');
-        
-        ctx.lineWidth = 4;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
+        // ── Elements ──────────────────────────────────────────────
+        const canvas        = document.getElementById('drawingCanvas');
+        const ctx           = canvas.getContext('2d');
+        const fsCanvas      = document.getElementById('fullscreenCanvas');
+        const fsCtx         = fsCanvas.getContext('2d');
+        const strokesInput  = document.getElementById('strokesData');
+        const strokeCountEl = document.getElementById('strokeCount');
+        const fsStrokeEl    = document.getElementById('fsStrokeCount');
+        const modal         = document.getElementById('fullscreenModal');
+        const form          = document.getElementById('kanjiForm');
 
-        // Fix 9: Dynamic stroke color based on dark mode (same as create.blade.php)
-        function updateStrokeColor() {
-            if (document.documentElement.classList.contains('dark')) {
-                ctx.strokeStyle = '#f8fafc'; // Slate-50
-            } else {
-                ctx.strokeStyle = '#2d3748'; // Gray-800
-            }
+        // ── Shared state ──────────────────────────────────────────
+        let allStrokes    = [];
+        let isDrawing     = false;
+        let currentStroke = [];
+        let activeCtx     = ctx;
+        let activeCanvas  = canvas;
+
+        // ── Context setup ─────────────────────────────────────────
+        function setupCtx(c) {
+            c.lineWidth = 4;
+            c.lineCap   = 'round';
+            c.lineJoin  = 'round';
         }
+        setupCtx(ctx);
+        setupCtx(fsCtx);
 
+        function updateStrokeColor() {
+            // Cek apakah class 'dark' aktif di elemen root (html)
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            // Jika dark mode, warna tinta putih-abu (#f8fafc). Jika light mode, biru gelap (#2d3748)
+            const inkColor = isDark ? '#f8fafc' : '#2d3748';
+            
+            // Terapkan ke kanvas kecil dan kanvas fullscreen sekaligus
+            ctx.strokeStyle   = inkColor;
+            fsCtx.strokeStyle = inkColor;
+        }
         updateStrokeColor();
 
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.attributeName === "class") {
-                    updateStrokeColor();
-                    redrawCanvas();
-                }
-            });
-        });
+        const observer = new MutationObserver(() => { updateStrokeColor(); redrawBoth(); });
         observer.observe(document.documentElement, { attributes: true });
 
-        let isDrawing = false;
-        let currentStroke = [];
-        let allStrokes = [];
+        // ── Resize fullscreen canvas to fit viewport ───────────────
+        function resizeFsCanvas() {
+            const topBar    = document.querySelector('#fullscreenModal > div:first-child').offsetHeight;
+            const bottomBar = document.querySelector('#fullscreenModal > div:last-child').offsetHeight;
+            const padding   = 32;
+            const availH    = window.innerHeight - topBar - bottomBar - padding;
+            const availW    = window.innerWidth  - padding;
+            const size      = Math.min(availH, availW, 720);
+            fsCanvas.style.width  = size + 'px';
+            fsCanvas.style.height = size + 'px';
+        }
+        window.addEventListener('resize', () => { resizeFsCanvas(); redrawFsCanvas(); });
 
-        try {
-            const initialStrokes = JSON.parse(strokesDataInput.value);
-            if (Array.isArray(initialStrokes) && initialStrokes.length > 0) {
-                allStrokes = initialStrokes;
-                redrawCanvas();
-            }
-        } catch (e) {
-            console.error('Invalid initial strokes data');
+        // ── Draw helpers ──────────────────────────────────────────
+        function redrawSingle(c, context) {
+            context.clearRect(0, 0, c.width, c.height);
+            allStrokes.forEach(stroke => {
+                if (!stroke.length) return;
+                context.beginPath();
+                context.moveTo(stroke[0].x, stroke[0].y);
+                for (let i = 1; i < stroke.length; i++) context.lineTo(stroke[i].x, stroke[i].y);
+                context.stroke();
+            });
         }
 
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', endDrawing);
-        canvas.addEventListener('mouseout', endDrawing);
+        function redrawCanvas()   { redrawSingle(canvas,   ctx);   }
+        function redrawFsCanvas() { redrawSingle(fsCanvas, fsCtx); }
 
-        canvas.addEventListener('touchstart', handleTouchStart, {passive: false});
-        canvas.addEventListener('touchmove', handleTouchMove, {passive: false});
-        canvas.addEventListener('touchend', endDrawing);
+        function redrawBoth() {
+            redrawCanvas();
+            redrawFsCanvas();
+            syncData();
+        }
 
-        function getMousePos(evt) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
+        function syncData() {
+            strokesInput.value        = JSON.stringify(allStrokes);
+            strokeCountEl.textContent = allStrokes.length;
+            fsStrokeEl.textContent    = allStrokes.length;
+        }
+
+        // ── Initial load (existing strokes for edit page) ─────────
+        try {
+            const parsed = JSON.parse(strokesInput.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                allStrokes = parsed;
+                redrawCanvas();
+                syncData();
+            }
+        } catch(e) {}
+
+        // ── Pointer helpers ───────────────────────────────────────
+        function getPos(evt, targetCanvas) {
+            const rect   = targetCanvas.getBoundingClientRect();
+            const scaleX = targetCanvas.width  / rect.width;
+            const scaleY = targetCanvas.height / rect.height;
             return {
                 x: (evt.clientX - rect.left) * scaleX,
-                y: (evt.clientY - rect.top) * scaleY
+                y: (evt.clientY - rect.top)  * scaleY
             };
         }
-
-        function getTouchPos(evt) {
-            if (!evt.touches || evt.touches.length === 0) return null;
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            return {
-                x: (evt.touches[0].clientX - rect.left) * scaleX,
-                y: (evt.touches[0].clientY - rect.top) * scaleY
-            };
+        function getTouchPos(evt, targetCanvas) {
+            if (!evt.touches || !evt.touches.length) return null;
+            return getPos(evt.touches[0], targetCanvas);
         }
 
-        function startDrawing(e) {
-            isDrawing = true;
-            currentStroke = [];
-            const pos = getMousePos(e);
-            currentStroke.push(pos);
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
+        // ── Generic draw handlers ─────────────────────────────────
+        function startDraw(pos) {
+            isDrawing     = true;
+            currentStroke = [pos];
+            activeCtx.beginPath();
+            activeCtx.moveTo(pos.x, pos.y);
         }
-
-        function handleTouchStart(e) {
-            e.preventDefault();
-            const pos = getTouchPos(e);
-            if (pos) {
-                isDrawing = true;
-                currentStroke = [];
-                currentStroke.push(pos);
-                ctx.beginPath();
-                ctx.moveTo(pos.x, pos.y);
-            }
-        }
-
-        function draw(e) {
+        function continueDraw(pos) {
             if (!isDrawing) return;
-            const pos = getMousePos(e);
             currentStroke.push(pos);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
+            activeCtx.lineTo(pos.x, pos.y);
+            activeCtx.stroke();
         }
-
-        function handleTouchMove(e) {
+        function endDraw() {
             if (!isDrawing) return;
-            e.preventDefault();
-            const pos = getTouchPos(e);
-            if (pos) {
-                currentStroke.push(pos);
-                ctx.lineTo(pos.x, pos.y);
-                ctx.stroke();
+            isDrawing = false;
+            if (currentStroke.length > 0) {
+                allStrokes.push(currentStroke);
+                if (activeCanvas === canvas) redrawFsCanvas();
+                else                         redrawCanvas();
+                syncData();
             }
         }
 
-        function endDrawing() {
-            if (isDrawing) {
-                isDrawing = false;
-                if (currentStroke.length > 0) {
-                    allStrokes.push(currentStroke);
-                    updateStrokesData();
-                }
-            }
-        }
+        // ── Normal canvas events ───────────────────────────────────
+        canvas.addEventListener('mousedown', e => { activeCtx = ctx; activeCanvas = canvas; startDraw(getPos(e, canvas)); });
+        canvas.addEventListener('mousemove', e => { if (activeCanvas === canvas) continueDraw(getPos(e, canvas)); });
+        canvas.addEventListener('mouseup',   endDraw);
+        canvas.addEventListener('mouseout',  endDraw);
 
-        function updateStrokesData() {
-            strokesDataInput.value = JSON.stringify(allStrokes);
-            strokeCountDisplay.textContent = allStrokes.length;
-        }
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); activeCtx = ctx; activeCanvas = canvas; const p = getTouchPos(e, canvas); if(p) startDraw(p); }, {passive:false});
+        canvas.addEventListener('touchmove',  e => { e.preventDefault(); if(activeCanvas===canvas){ const p = getTouchPos(e, canvas); if(p) continueDraw(p); } }, {passive:false});
+        canvas.addEventListener('touchend',   endDraw);
 
-        function redrawCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            allStrokes.forEach(stroke => {
-                if (stroke.length === 0) return;
-                ctx.beginPath();
-                ctx.moveTo(stroke[0].x, stroke[0].y);
-                for (let i = 1; i < stroke.length; i++) {
-                    ctx.lineTo(stroke[i].x, stroke[i].y);
-                }
-                ctx.stroke();
-            });
-            updateStrokesData();
-        }
+        // ── Fullscreen canvas events ───────────────────────────────
+        fsCanvas.addEventListener('mousedown', e => { activeCtx = fsCtx; activeCanvas = fsCanvas; startDraw(getPos(e, fsCanvas)); });
+        fsCanvas.addEventListener('mousemove', e => { if (activeCanvas === fsCanvas) continueDraw(getPos(e, fsCanvas)); });
+        fsCanvas.addEventListener('mouseup',   endDraw);
+        fsCanvas.addEventListener('mouseout',  endDraw);
 
-        clearBtn.addEventListener('click', () => {
-            allStrokes = [];
+        fsCanvas.addEventListener('touchstart', e => { e.preventDefault(); activeCtx = fsCtx; activeCanvas = fsCanvas; const p = getTouchPos(e, fsCanvas); if(p) startDraw(p); }, {passive:false});
+        fsCanvas.addEventListener('touchmove',  e => { e.preventDefault(); if(activeCanvas===fsCanvas){ const p = getTouchPos(e, fsCanvas); if(p) continueDraw(p); } }, {passive:false});
+        fsCanvas.addEventListener('touchend',   endDraw);
+
+        // ── Undo / Clear (shared, works from both views) ──────────
+        function doUndo()  { if (allStrokes.length > 0) { allStrokes.pop(); redrawBoth(); } }
+        function doClear() { allStrokes = []; redrawBoth(); }
+
+        document.getElementById('clearBtn').addEventListener('click', doClear);
+        document.getElementById('undoBtn').addEventListener('click', doUndo);
+        document.getElementById('fsClearBtn').addEventListener('click', doClear);
+        document.getElementById('fsUndoBtn').addEventListener('click', doUndo);
+
+        // ── Fullscreen open / close ───────────────────────────────
+        document.getElementById('openFullscreenBtn').addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            resizeFsCanvas();
+            redrawFsCanvas();
+            syncData();
+        });
+
+        function closeFullscreen() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
             redrawCanvas();
-        });
+        }
 
-        undoBtn.addEventListener('click', () => {
-            if (allStrokes.length > 0) {
-                allStrokes.pop();
-                redrawCanvas();
-            }
-        });
+        document.getElementById('closeFullscreenBtn').addEventListener('click', closeFullscreen);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFullscreen(); });
 
-        form.addEventListener('submit', function(e) {
+        // ── Form submit validation ────────────────────────────────
+        form.addEventListener('submit', e => {
             if (allStrokes.length === 0) {
                 e.preventDefault();
                 alert('Tolong rekam minimal 1 coretan (stroke) kanji.');
