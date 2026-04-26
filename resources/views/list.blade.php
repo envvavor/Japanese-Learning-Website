@@ -1,142 +1,157 @@
 @extends('layouts.app')
 
-@section('title', 'Belajar Kanji')
+@section('title', 'Belajar ' . ($category ? ucfirst($category) : 'Huruf') . ' — Manabu')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }">
+{{-- BLADE LOGIC UNTUK ICON DINAMIS --}}
+@php
+    $cat = strtolower($category ?? '');
+    $iconText = '';
+    $iconClass = 'fas fa-font text-3xl';
+    $bgClass = 'bg-[#1cb0f6]/10 dark:bg-[#1899d6]/20 text-[#1cb0f6] dark:text-[#1899d6] border-[#1cb0f6]/20';
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
-        <div>
-            <h1 class="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
-                Belajar {{ $category ? ucfirst($category) : 'Huruf' }}
-            </h1>
-            <p class="text-base text-slate-500 dark:text-slate-400 mt-1">
-                Pilih karakter untuk mulai latihan penulisan.
-            </p>
+    if ($cat === 'hiragana') {
+        $iconText = 'あ';
+        $iconClass = 'text-4xl font-black';
+        $bgClass = 'bg-rose-100 text-rose-500 border-rose-200 dark:bg-rose-900/30 dark:border-rose-800';
+    } elseif ($cat === 'katakana') {
+        $iconText = 'ア';
+        $iconClass = 'text-4xl font-black';
+        $bgClass = 'bg-blue-100 text-blue-500 border-blue-200 dark:bg-blue-900/30 dark:border-blue-800';
+    } elseif ($cat === 'kanji') {
+        $iconText = '漢';
+        $iconClass = 'text-4xl font-black';
+        $bgClass = 'bg-emerald-100 text-emerald-500 border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800';
+    }
+@endphp
+
+<div class="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-900 font-sans pb-20" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        {{-- Header Section Dinamis --}}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 {{ $bgClass }} rounded-2xl flex items-center justify-center border-2 shrink-0 shadow-sm">
+                    @if($iconText)
+                        <span class="{{ $iconClass }}">{{ $iconText }}</span>
+                    @else
+                        <i class="{{ $iconClass }}"></i>
+                    @endif
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black text-slate-800 dark:text-white uppercase tracking-wider mb-1">
+                        Belajar {{ $category ? ucfirst($category) : 'Semua Huruf' }}
+                    </h1>
+                    <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Pilih karakter untuk mulai latihan penulisan.</p>
+                </div>
+            </div>
+
+            <a href="{{ route('dashboard') }}"
+                class="inline-flex items-center justify-center px-6 py-3 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl text-sm font-black text-slate-600 dark:text-slate-300 bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 active:border-b-2 active:translate-y-1 transition-all uppercase tracking-widest shrink-0">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali
+            </a>
         </div>
 
-        <a href="{{ route('dashboard') }}"
-            class="inline-flex items-center justify-center px-5 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-700 transition-all shadow-sm">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Kembali
-        </a>
-    </div>
-
-    <div id="menuArea" class="transition-all duration-500">
-        <div id="kanjiContainer" class="space-y-8">
-            {{-- Skeleton Loading Group --}}
-            <div class="animate-pulse mb-12">
-                {{-- Skeleton Header --}}
-                <div class="flex items-center border-b border-slate-200 dark:border-gray-700 pb-3 mb-6">
-                    <div class="w-8 h-8 bg-slate-200 dark:bg-gray-700 rounded-lg mr-3"></div>
-                    <div class="h-6 w-48 bg-slate-200 dark:bg-gray-700 rounded-md"></div>
-                </div>
-                {{-- Skeleton Grid Cards (Dibuat 10 kotak sebagai placeholder) --}}
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-                    @for ($i = 0; $i < 10; $i++)
-                        <div class="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl p-6 flex flex-col items-center justify-center">
-                            {{-- Placeholder untuk huruf besar --}}
-                            <div class="w-12 h-14 bg-slate-200 dark:bg-gray-700 rounded-md mb-4"></div>
-                            {{-- Placeholder untuk label arti --}}
-                            <div class="w-20 h-5 bg-slate-100 dark:bg-gray-600 rounded-lg"></div>
-                        </div>
-                    @endfor
+        {{-- Main Menu Area --}}
+        <div id="menuArea" class="transition-all duration-500">
+            <div id="kanjiContainer" class="space-y-12">
+                {{-- Skeleton Loading Group --}}
+                <div class="animate-pulse mb-12">
+                    <div class="flex items-center border-b-4 border-slate-200 dark:border-gray-700 pb-3 mb-6">
+                        <div class="w-10 h-10 bg-slate-200 dark:bg-gray-700 rounded-xl mr-3"></div>
+                        <div class="h-6 w-48 bg-slate-200 dark:bg-gray-700 rounded-xl"></div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+                        @for ($i = 0; $i < 10; $i++)
+                            <div class="bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-[1.5rem] p-6 flex flex-col items-center justify-center h-36">
+                                <div class="w-12 h-14 bg-slate-200 dark:bg-gray-700 rounded-xl mb-4"></div>
+                                <div class="w-20 h-6 bg-slate-100 dark:bg-gray-600 rounded-lg"></div>
+                            </div>
+                        @endfor
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="practiceArea" class="hidden mt-6 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-3xl shadow-2xl p-8 sm:p-10 max-w-2xl mx-auto relative overflow-hidden transition-all duration-500">
-        
-        <div class="absolute top-0 left-0 w-full h-2 bg-blue-500"></div>
+        {{-- Practice Area --}}
+        <div id="practiceArea" class="hidden mt-6 bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 sm:p-10 max-w-2xl mx-auto relative overflow-hidden transition-all duration-500 shadow-sm">
+            
+            <div class="absolute top-0 left-0 w-full h-3 bg-[#1cb0f6]"></div>
 
-        <div class="flex justify-between items-center mb-8 mt-2">
-            <h2 id="targetTitle" class="text-2xl font-bold text-slate-800 dark:text-white">
-                Latihan
-            </h2>
+            <div class="flex justify-between items-center mb-8 mt-2">
+                <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fas fa-paint-brush text-[#1cb0f6]"></i> 
+                    {{-- SPAN ini yang akan diisi JS agar pemisahan Teks tetap akurat --}}
+                    <span id="targetTitle">Latihan</span>
+                </h2>
 
-            <button onclick="backToMenu()" class="inline-flex items-center text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors bg-slate-50 dark:bg-gray-700 hover:bg-rose-50 dark:hover:bg-rose-900/30 px-4 py-2 rounded-xl">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-                Tutup
-            </button>
-        </div>
-
-        <div class="flex items-center gap-3 mb-8">
-            <p class="text-sm text-slate-500 dark:text-slate-400 flex-1 bg-slate-50 dark:bg-gray-700 p-3 rounded-lg border border-slate-100 dark:border-gray-600">
-                Ikuti urutan dan arah goresan sesuai standar penulisan Jepang.
-            </p>
-            <label class="flex flex-col items-center gap-1 cursor-pointer select-none shrink-0">
-                <span class="text-xs font-medium text-slate-400 dark:text-slate-500">Panduan</span>
-                <div class="relative w-10 h-6">
-                    <input type="checkbox" id="guideToggle" class="sr-only" checked onchange="toggleGuide(this.checked)">
-                    <div id="guideTrack" class="w-10 h-6 bg-indigo-500 rounded-full transition-colors duration-200"></div>
-                    <div id="guideThumb" class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 translate-x-4"></div>
-                </div>
-            </label>
-        </div>
-
-       <div class="flex justify-center mb-8">
-            <div class="relative bg-white dark:bg-gray-900 border-4 border-slate-700 dark:border-slate-500 rounded-lg shadow-inner overflow-hidden w-full max-w-[300px] aspect-square">
-                <div class="absolute pointer-events-none border-l-2 border-dashed border-red-300 h-full left-1/2 opacity-60"></div>
-                <div class="absolute pointer-events-none border-t-2 border-dashed border-red-300 w-full top-1/2 opacity-60"></div>
-
-                {{-- Guide canvas: layer paling bawah, tidak bisa diklik --}}
-                <canvas id="guideCanvas"
-                        width="300"
-                        height="300"
-                        class="block w-full h-full absolute top-0 left-0 z-0 pointer-events-none transition-opacity duration-300">
-                </canvas>
-
-                <canvas id="kanjiCanvas"
-                        width="300"
-                        height="300"
-                        class="block w-full h-full touch-none relative z-10 cursor-crosshair">
-                </canvas>
+                <button onclick="backToMenu()" class="inline-flex items-center text-sm font-black text-rose-500 bg-rose-50 dark:bg-rose-900/20 border-2 border-b-4 border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-900/40 active:translate-y-1 active:border-b-2 transition-all px-5 py-2.5 rounded-xl uppercase tracking-widest">
+                    <i class="fas fa-times mr-2"></i> Tutup
+                </button>
             </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 bg-slate-50 dark:bg-gray-900/50 p-4 rounded-2xl border-2 border-slate-100 dark:border-gray-700">
+                <div class="flex-1">
+                    <p class="text-sm font-bold text-slate-500 dark:text-slate-400">
+                        <i class="fas fa-info-circle text-[#1cb0f6] mr-1"></i> Ikuti urutan dan arah goresan sesuai standar penulisan Jepang.
+                    </p>
+                </div>
+                <label class="flex flex-col items-center gap-1.5 cursor-pointer select-none shrink-0 bg-white dark:bg-gray-800 px-4 py-2 rounded-xl border-2 border-slate-200 dark:border-gray-600 shadow-sm">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Panduan Garis</span>
+                    <div class="relative w-12 h-6">
+                        <input type="checkbox" id="guideToggle" class="sr-only" checked onchange="toggleGuide(this.checked)">
+                        <div id="guideTrack" class="w-12 h-6 bg-[#1cb0f6] rounded-full transition-colors duration-200 border-2 border-transparent"></div>
+                        <div id="guideThumb" class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 translate-x-6"></div>
+                    </div>
+                </label>
+            </div>
+
+           <div class="flex justify-center mb-8">
+                <div class="relative bg-white dark:bg-gray-900 border-4 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-3xl shadow-sm overflow-hidden w-full max-w-[300px] aspect-square">
+                    <div class="absolute pointer-events-none border-l-2 border-dashed border-rose-200 dark:border-rose-900/50 h-full left-1/2 opacity-60"></div>
+                    <div class="absolute pointer-events-none border-t-2 border-dashed border-rose-200 dark:border-rose-900/50 w-full top-1/2 opacity-60"></div>
+
+                    <canvas id="guideCanvas" width="300" height="300" class="block w-full h-full absolute top-0 left-0 z-0 pointer-events-none transition-opacity duration-300"></canvas>
+                    <canvas id="kanjiCanvas" width="300" height="300" class="block w-full h-full touch-none relative z-10 cursor-crosshair"></canvas>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3 mb-6">
+                <button onclick="clearCanvas()" class="flex-1 sm:flex-none sm:w-32 px-4 py-3 text-sm font-black uppercase tracking-widest rounded-2xl border-2 border-b-[6px] border-slate-200 dark:border-gray-700 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 active:translate-y-1 active:border-b-2 transition-all">
+                    <i class="fas fa-trash-alt mr-1"></i> Reset
+                </button>
+
+                <button onclick="undoStroke()" class="flex-1 sm:flex-none sm:w-32 px-4 py-3 text-sm font-black uppercase tracking-widest rounded-2xl border-2 border-b-[6px] border-slate-200 dark:border-gray-700 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 active:translate-y-1 active:border-b-2 transition-all">
+                    <i class="fas fa-undo mr-1"></i> Undo
+                </button>
+
+                <button onclick="validateStroke()" class="w-full sm:w-auto sm:flex-none px-8 py-3 text-sm font-black uppercase tracking-widest rounded-2xl border-2 border-b-[6px] border-[#1899d6] bg-[#1cb0f6] text-white hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all shadow-sm">
+                    <i class="fas fa-check mr-2"></i> Periksa
+                </button>
+            </div>
+
+            <div id="statusMsg" class="text-center text-sm font-bold text-slate-600 dark:text-slate-300 px-4 py-4 rounded-xl bg-slate-50 dark:bg-gray-700 border-2 border-slate-200 dark:border-gray-600">
+                Pilih karakter untuk memulai.
+            </div>
+
         </div>
-
-        <div class="flex flex-wrap justify-center gap-3 mb-6">
-            <button onclick="clearCanvas()" class="flex-1 sm:flex-none sm:w-28 px-4 py-3 text-sm font-semibold rounded-xl border-2 border-slate-200 dark:border-gray-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-gray-700 hover:border-slate-300 dark:hover:border-gray-500 hover:text-slate-800 dark:hover:text-white transition-all">
-                Reset
-            </button>
-
-            <button onclick="undoStroke()" class="flex-1 sm:flex-none sm:w-28 px-4 py-3 text-sm font-semibold rounded-xl border-2 border-slate-200 dark:border-gray-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-gray-700 hover:border-slate-300 dark:hover:border-gray-500 hover:text-slate-800 dark:hover:text-white transition-all flex items-center justify-center">
-                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
-                Undo
-            </button>
-
-            <button onclick="validateStroke()" class="w-full sm:w-auto sm:flex-none px-6 py-3 text-sm font-bold rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/50 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 transition-all">
-                Periksa Tulisan
-            </button>
-        </div>
-
-        <div id="statusMsg" class="text-center text-sm font-bold text-slate-600 dark:text-slate-300 min-h-[24px] px-4 py-3 rounded-xl bg-slate-50 dark:bg-gray-700 border border-slate-100 dark:border-gray-600">
-            Pilih karakter untuk memulai.
-        </div>
-
     </div>
-
 </div>
 
 <script>
-    // グローバル変数の初期化
+
     let templateKanji = []; 
     let currentStroke = [];
     let allStrokes = [];
     let isDrawing = false;
 
-    // State toggle panduan — baca dari localStorage agar persisten
     let isGuideVisible = localStorage.getItem('kanjiGuideVisible') !== 'false';
     
     const canvas = document.getElementById('kanjiCanvas');
     const ctx = canvas.getContext('2d');
     const statusMsg = document.getElementById('statusMsg');
 
-    // Guide canvas context
     const guideCanvas = document.getElementById('guideCanvas');
     const gCtx = guideCanvas.getContext('2d');
 
@@ -147,7 +162,6 @@
 
     let currentCategory = "{{ $category ?? '' }}";
 
-    // APIからのカードデータロード機能（グループ化機能付き
     async function loadKanjiList() {
         try {
             let url = '/api/kanjis';
@@ -160,16 +174,17 @@
             const container = document.getElementById('kanjiContainer');
 
             if (!kanjis || kanjis.length === 0) {
-                container.innerHTML = `<p style="text-align:center;" class="text-slate-500 dark:text-slate-400">Data kosong.</p>`;
+                container.innerHTML = `<div class="bg-white dark:bg-gray-800 border-4 border-dashed border-slate-300 dark:border-gray-600 rounded-[2rem] p-16 text-center shadow-sm">
+                        <i class="fas fa-folder-open text-6xl text-slate-300 dark:text-gray-600 mb-4"></i>
+                        <h3 class="text-xl font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">Kategori Kosong</h3>
+                    </div>`;
                 return;
             }
 
-            // カテゴリーフィルター
             const hiragana = kanjis.filter(k => k.category === 'hiragana');
             const katakana = kanjis.filter(k => k.category === 'katakana');
             const kanjiList = kanjis.filter(k => k.category === 'kanji');
 
-            // グループ化
             const kanjiGroups = {};
             kanjiList.forEach(k => {
                 const lvl = k.level ? k.level : 'Lainnya';
@@ -183,11 +198,11 @@
                 let cardsHtml = '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">';
                 items.forEach(k => {
                     cardsHtml += `
-                        <div class="group bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl p-6 text-center hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-600 hover:-translate-y-1 transition-all cursor-pointer" onclick="window.location='/kanji/${k.character}'">
-                            <div class="text-4xl sm:text-5xl font-semibold text-slate-800 dark:text-white mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        <div class="group bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-[1.5rem] p-5 text-center hover:border-[#1cb0f6] dark:hover:border-[#1899d6] active:translate-y-1 active:border-b-2 transition-all cursor-pointer flex flex-col items-center justify-center h-36" onclick="window.location='/kanji/${k.character}'">
+                            <div class="text-4xl sm:text-5xl font-black text-slate-800 dark:text-white mb-3 group-hover:text-[#1cb0f6] dark:group-hover:text-[#1899d6] transition-colors drop-shadow-sm">
                                 ${k.character}
                             </div>
-                            <div class="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-white bg-slate-50 dark:bg-gray-700 py-1.5 rounded-lg border border-slate-100 dark:border-gray-600 whitespace-nowrap overflow-hidden text-ellipsis px-2">
+                            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-gray-700 py-1.5 px-2 rounded-lg border-2 border-slate-200 dark:border-gray-600 w-full truncate">
                                 ${k.meaning}
                             </div>
                         </div>
@@ -200,8 +215,8 @@
             if (hiragana.length > 0) {
                 htmlContent += `
                     <div class="mb-12">
-                        <h2 class="text-2xl font-extrabold text-slate-800 dark:text-white mb-6 flex items-center border-b border-slate-200 dark:border-gray-700 pb-3">
-                            <span class="bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 w-8 h-8 flex items-center justify-center rounded-lg mr-3 text-lg">あ</span> Huruf Hiragana
+                        <h2 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 flex items-center border-b-4 border-slate-200 dark:border-gray-700 pb-3">
+                            <span class="bg-rose-100 dark:bg-rose-900/30 text-rose-500 w-10 h-10 flex items-center justify-center rounded-xl mr-3 text-xl border-2 border-rose-200 dark:border-rose-800">あ</span> HIRAGANA
                         </h2>
                         ${renderGridCards(hiragana)}
                     </div>`;
@@ -210,21 +225,17 @@
             if (katakana.length > 0) {
                 htmlContent += `
                     <div class="mb-12">
-                        <h2 class="text-2xl font-extrabold text-slate-800 dark:text-white mb-6 flex items-center border-b border-slate-200 dark:border-gray-700 pb-3">
-                            <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 w-8 h-8 flex items-center justify-center rounded-lg mr-3 text-lg">ア</span> Huruf Katakana
+                        <h2 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 flex items-center border-b-4 border-slate-200 dark:border-gray-700 pb-3">
+                            <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-500 w-10 h-10 flex items-center justify-center rounded-xl mr-3 text-xl border-2 border-blue-200 dark:border-blue-800">ア</span> KATAKANA
                         </h2>
                         ${renderGridCards(katakana)}
                     </div>`;
             }
 
-            // RENDER KANJI
             if (kanjiList.length > 0) {
-                // JIKA SEDANG DI MENU KHUSUS "KANJI", PISAHKAN BERDASARKAN LEVEL
-                // Kita gunakan toLowerCase() agar "Kanji" atau "kanji" tetap terdeteksi
                 if (currentCategory && currentCategory.toLowerCase() === 'kanji') {
                     const kanjiGroups = {};
                     kanjiList.forEach(k => {
-                        // Pastikan k.level ada nilainya, jika kosong masuk ke 'Lainnya'
                         const lvl = (k.level && k.level !== "null") ? k.level : 'Lainnya';
                         if (!kanjiGroups[lvl]) kanjiGroups[lvl] = [];
                         kanjiGroups[lvl].push(k);
@@ -238,22 +249,21 @@
 
                     sortedLevels.forEach(lvl => {
                         const title = lvl === 'Lainnya' ? 'Kanji Ekstra (Tanpa Bab)' : `Kanji Bab ${lvl}`;
-                        const badgeColor = lvl === 'Lainnya' ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400' : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400';
+                        const badgeColor = lvl === 'Lainnya' ? 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-gray-800 dark:text-slate-400 dark:border-gray-700' : 'bg-emerald-100 text-emerald-500 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800';
                         htmlContent += `
                             <div class="mb-12">
-                                <h2 class="text-2xl font-extrabold text-slate-800 dark:text-white mb-6 flex items-center border-b border-slate-200 dark:border-gray-700 pb-3">
-                                    <span class="${badgeColor} w-8 h-8 flex items-center justify-center rounded-lg mr-3 text-lg">漢</span> ${title}
+                                <h2 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 flex items-center border-b-4 border-slate-200 dark:border-gray-700 pb-3">
+                                    <span class="${badgeColor} w-10 h-10 flex items-center justify-center rounded-xl mr-3 text-xl border-2">漢</span> ${title}
                                 </h2>
                                 ${renderGridCards(kanjiGroups[lvl])}
                             </div>`;
                     });
                 } 
-                // JIKA DI MENU CAMPURAN (SEMUA HURUF), JADIKAN SATU KELOMPOK SAJA
                 else {
                     htmlContent += `
                         <div class="mb-12">
-                            <h2 class="text-2xl font-extrabold text-slate-800 dark:text-white mb-6 flex items-center border-b border-slate-200 dark:border-gray-700 pb-3">
-                                <span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 w-8 h-8 flex items-center justify-center rounded-lg mr-3 text-lg">漢</span> Huruf Kanji
+                            <h2 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 flex items-center border-b-4 border-slate-200 dark:border-gray-700 pb-3">
+                                <span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 w-10 h-10 flex items-center justify-center rounded-xl mr-3 text-xl border-2 border-emerald-200 dark:border-emerald-800">漢</span> KANJI
                             </h2>
                             ${renderGridCards(kanjiList)}
                         </div>`;
@@ -264,7 +274,7 @@
 
         } catch (error) {
             console.error("Gagal load data:", error);
-            document.getElementById('kanjiContainer').innerHTML = "<p class='text-red-500 dark:text-red-400 font-bold text-center'>Gagal terhubung ke database. Periksa koneksi atau API Anda.</p>";
+            document.getElementById('kanjiContainer').innerHTML = "<p class='text-rose-500 font-bold text-center bg-rose-50 p-4 rounded-xl border-2 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800'>Gagal terhubung ke database. Periksa koneksi atau API Anda.</p>";
         }
     }
 
@@ -276,22 +286,19 @@
         if (char) startPractice(char);
     }
 
-    // FUNGSI MEMULAI LATIHAN
     async function startPractice(char) {
         try {
-            statusMsg.innerText = "Memuat template...";
+            statusMsg.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memuat template...';
             const response = await fetch(`/api/kanjis/${char}`);
             const data = await response.json();
 
             if (response.ok && data.strokes) {
                 
-                // Deteksi kategori otomatis jika kosong 
                 if (!currentCategory && data.category) {
-                    currentCategory = data.category; // Set kategori sesuai karakter
-                    loadKanjiList(); // Render ulang menu grid di belakang layar
+                    currentCategory = data.category; 
+                    loadKanjiList(); 
                 }
 
-                // Konversi string JSON ke Array jika diperlukan
                 templateKanji = typeof data.strokes === 'string' ? JSON.parse(data.strokes) : data.strokes; 
                 
                 document.getElementById('targetTitle').innerText = `Latihan: ${data.character} (${data.meaning})`;
@@ -299,8 +306,8 @@
                 document.getElementById('practiceArea').style.display = 'block';
                 
                 clearCanvas();
-                statusMsg.innerText = "Silakan mulai menulis.";
-                statusMsg.className = "text-center text-sm font-bold text-slate-600 dark:text-slate-300 min-h-[24px] px-4 py-3 rounded-xl bg-slate-50 dark:bg-gray-700 border border-slate-100 dark:border-gray-600 mt-4";
+                statusMsg.innerHTML = "<i class='fas fa-pen mr-2 text-indigo-500'></i> Silakan mulai menulis.";
+                statusMsg.className = "text-center text-sm font-bold text-slate-600 dark:text-slate-300 px-4 py-4 rounded-xl bg-slate-50 dark:bg-gray-700 border-2 border-slate-200 dark:border-gray-600 mt-4";
             } else {
                 alert("Gagal memuat template dari database. Mungkin karakter ini belum diberi urutan garis.");
             }
@@ -320,7 +327,6 @@
         window.history.replaceState({}, document.title, newUrl);
     }
 
-    // --- LOGIKA MENGGAMBAR DI CANVAS ---
     function getPos(e) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -358,30 +364,23 @@
     canvas.addEventListener('touchstart', startDrawing, {passive: false}); canvas.addEventListener('touchmove', draw, {passive: false});
     canvas.addEventListener('touchend', stopDrawing);
 
-    // ============================================================
-    //  FUNGSI GUIDE CANVAS
-    // ============================================================
-
-    // Gambar template samar di guideCanvas — dipanggil saat karakter dimuat & saat toggle
     function drawTemplateGuide() {
         gCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
 
         if (!isGuideVisible || !templateKanji || templateKanji.length === 0) return;
 
-        // Warna berbeda tiap goresan agar urutan terlihat jelas
         const strokeColors = [
-            'rgba(99,102,241,0.18)',   // indigo  – goresan 1
-            'rgba(234,179,8,0.18)',    // yellow  – goresan 2
-            'rgba(239,68,68,0.18)',    // red     – goresan 3
-            'rgba(16,185,129,0.18)',   // green   – goresan 4
-            'rgba(249,115,22,0.18)',   // orange  – goresan 5
-            'rgba(168,85,247,0.18)',   // purple  – goresan 6+
+            'rgba(99,102,241,0.18)',   
+            'rgba(234,179,8,0.18)',    
+            'rgba(239,68,68,0.18)',    
+            'rgba(16,185,129,0.18)',   
+            'rgba(249,115,22,0.18)',   
+            'rgba(168,85,247,0.18)',   
         ];
 
         templateKanji.forEach((stroke, index) => {
             if (!stroke || stroke.length === 0) return;
 
-            // Garis panduan
             gCtx.beginPath();
             gCtx.lineWidth = 22;
             gCtx.lineCap = 'round';
@@ -393,7 +392,6 @@
             }
             gCtx.stroke();
 
-            // Lingkaran + angka urutan di titik awal setiap goresan
             gCtx.fillStyle = 'rgba(99,102,241,0.45)';
             gCtx.beginPath();
             gCtx.arc(stroke[0].x, stroke[0].y, 8, 0, Math.PI * 2);
@@ -407,30 +405,28 @@
         });
     }
 
-    // Toggle panduan on/off via checkbox
     function toggleGuide(visible) {
         isGuideVisible = visible;
-        localStorage.setItem('kanjiGuideVisible', visible); // simpan ke localStorage
+        localStorage.setItem('kanjiGuideVisible', visible); 
         const thumb = document.getElementById('guideThumb');
         const track = document.getElementById('guideTrack');
-        thumb.style.transform = visible ? 'translateX(16px)' : 'translateX(0)';
-        track.style.backgroundColor = visible ? '#6366f1' : '#94a3b8';
+        thumb.style.transform = visible ? 'translateX(24px)' : 'translateX(0)';
+        track.style.backgroundColor = visible ? '#1cb0f6' : '#94a3b8';
         drawTemplateGuide();
     }
 
-    // Sinkronkan tampilan toggle dengan state yang tersimpan saat halaman pertama dimuat
     (function syncGuideToggleUI() {
         const checkbox = document.getElementById('guideToggle');
         const thumb    = document.getElementById('guideThumb');
         const track    = document.getElementById('guideTrack');
         if (!checkbox) return;
         checkbox.checked           = isGuideVisible;
-        thumb.style.transform      = isGuideVisible ? 'translateX(16px)' : 'translateX(0)';
-        track.style.backgroundColor = isGuideVisible ? '#6366f1' : '#94a3b8';
+        thumb.style.transform      = isGuideVisible ? 'translateX(24px)' : 'translateX(0)';
+        track.style.backgroundColor = isGuideVisible ? '#1cb0f6' : '#94a3b8';
     })();
 
     function highlightWrongStrokes(wrongStrokeIndices) {
-        redrawAllStrokes(); // gambar ulang dulu supaya bersih
+        redrawAllStrokes(); 
 
         const prevStyle    = ctx.strokeStyle;
         const prevWidth    = ctx.lineWidth;
@@ -443,7 +439,6 @@
             const stroke = allStrokes[strokeNum - 1];
             if (!stroke || stroke.length === 0) return;
 
-            // Overlay merah semi-transparan di atas goresan yang salah
             ctx.strokeStyle = 'rgba(239,68,68,0.75)';
             ctx.lineWidth = 18;
             ctx.beginPath();
@@ -453,9 +448,8 @@
             }
             ctx.stroke();
 
-            // Badge lingkaran merah berisi nomor goresan di titik awalnya
             const bx = stroke[0].x;
-            const by = Math.max(stroke[0].y - 16, 12); // jangan sampai keluar canvas atas
+            const by = Math.max(stroke[0].y - 16, 12); 
 
             ctx.fillStyle = 'rgba(239,68,68,0.9)';
             ctx.beginPath();
@@ -469,7 +463,6 @@
             ctx.fillText(strokeNum, bx, by);
         });
 
-        // Restore semua style supaya tidak merusak gambar berikutnya
         ctx.strokeStyle   = prevStyle;
         ctx.lineWidth     = prevWidth;
         ctx.font          = prevFont;
@@ -481,10 +474,9 @@
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         allStrokes = [];
-        // Refresh guide setiap kali reset
         drawTemplateGuide();
-        statusMsg.innerText = "Canvas Bersih";
-        statusMsg.className = "text-center text-sm font-bold text-slate-600 dark:text-slate-300 min-h-[24px] px-4 py-3 rounded-xl bg-slate-50 dark:bg-gray-700 border border-slate-100 dark:border-gray-600 mt-4";
+        statusMsg.innerHTML = "<i class='fas fa-eraser mr-2 text-slate-400'></i> Canvas Bersih";
+        statusMsg.className = "text-center text-sm font-bold text-slate-600 dark:text-slate-300 px-4 py-4 rounded-xl bg-slate-50 dark:bg-gray-700 border-2 border-slate-200 dark:border-gray-600 mt-4";
     }
 
     function redrawAllStrokes() {
@@ -504,19 +496,16 @@
         if (allStrokes.length > 0) {
             allStrokes.pop(); 
             redrawAllStrokes(); 
-            statusMsg.innerHTML = "Goresan terakhir dihapus.";
-            statusMsg.className = "text-center text-sm font-bold text-slate-500 dark:text-slate-400 min-h-[24px] px-4 py-3 rounded-xl bg-slate-50 dark:bg-gray-700 border border-slate-100 dark:border-gray-600 mt-4";
+            statusMsg.innerHTML = "<i class='fas fa-undo mr-2 text-slate-500'></i> Goresan terakhir dihapus.";
+            statusMsg.className = "text-center text-sm font-bold text-slate-500 dark:text-slate-400 px-4 py-4 rounded-xl bg-slate-50 dark:bg-gray-700 border-2 border-slate-200 dark:border-gray-600 mt-4";
         } else {
-            statusMsg.innerHTML = "Kanvas sudah kosong.";
-            statusMsg.className = "text-center text-sm font-bold text-amber-500 dark:text-amber-400 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 mt-4";
+            statusMsg.innerHTML = "<i class='fas fa-exclamation-circle mr-2'></i> Kanvas sudah kosong.";
+            statusMsg.className = "text-center text-sm font-bold text-amber-600 dark:text-amber-400 px-4 py-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 mt-4";
         }
     }
 
-    // NOTE: trueに変えたらdebugmodeが表示される
     window.DEBUG_MODE = true;
 
-    // TODO: refactor semua fungsi biar rapih
-    // LOGIKA VALIDASI STROKE ORDER + AI HYBRID
     function validateStroke() {
         if (allStrokes.length === 0) {
             statusMsg.innerHTML = "Tulis hurufnya dulu!";
@@ -575,11 +564,9 @@
             let strokePct = 100 - (totalError / TOLERANCE_ERROR) * 100;
             strokePct = Math.max(0, Math.min(100, strokePct)); 
             
-            // --- TAMBAHAN DEBUG SCORE PER STROKE ---
             if (window.DEBUG_MODE) {
                 console.log(`[DEBUG] Goresan ke-${i + 1} | Akurasi: ${strokePct.toFixed(2)}% (Bentuk: ${shapeError.toFixed(2)}, Posisi: ${posError.toFixed(2)})`);
             }
-            // ---------------------------------------
 
             totalScore += strokePct;
 
@@ -596,34 +583,25 @@
 
         const overallPct = totalScore / templateCount; 
         let msg = `Akurasi Urutan: ${overallPct.toFixed(1)}%`;
-        // kelebihan goresan
+        
         if (userCount > templateCount) {
             msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Kelebihan ${userCount - templateCount} goresan!</span>`;
         }
-        // kekurangan goresan
         if (userCount < templateCount) {
             msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Kekurangan ${templateCount - userCount} goresan!</span>`;
         }
-        // kalau ada goresan yang salah
         if (wrongStrokes.length > 0) {
             msg += `<br><span class="text-xs font-bold text-rose-600 mt-1 block">Cek lagi goresan ke: ${wrongStrokes.join(', ')}</span>`;
-            // Tampilkan highlight di kanvas untuk goresan yang salah
             highlightWrongStrokes(wrongStrokes);
         }
 
-        // KALO URUTAN BENAR, PANGGIL CNN DAN SIMPAN KE DATASET
         if (overallPct >= 75 && userCount === templateCount && wrongStrokes.length === 0) {
             
-            // Loading
             statusMsg.innerHTML = `<div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600 mr-2 mb-[-3px]"></div> Validating...`;
             statusMsg.className = "text-center text-sm font-bold text-indigo-600 dark:text-indigo-400 min-h-[24px] px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 mt-4";
             
-            //-------------------------------------------------------
-            // Kumpulkan Dataset. apus // biar nyala
             autoSaveToDataset();
-            //-------------------------------------------------------
 
-            // Buat kanvas bayangan untuk dikirim ke AI (64x64, background hitam)
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = 64;  
             tempCanvas.height = 64;
@@ -651,9 +629,8 @@
             });
 
             const imageData = tempCanvas.toDataURL("image/png");
-            const targetChar = document.getElementById('targetTitle').innerText.split(' ')[1]; // Mengambil huruf dari judul
+            const targetChar = document.getElementById('targetTitle').innerText.split(' ')[1];
 
-            // Proses Fetch ke Laravel -> Python
             fetch('/api/validate-ai', {
                 method: 'POST',
                 headers: {
@@ -671,12 +648,10 @@
                         return;
                     }
                     
-                    // Buat elemen Diagram Batang (Bar Chart) dari data Top 3
                     let chartHtml = `<div class="mt-4 pt-3 border-t border-slate-200 dark:border-gray-600 text-left">
                                         <p class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Analisis Probabilitas AI:</p>`;
                     
                     data.top_3.forEach((item, index) => {
-                        // Warnai batang: Hijau untuk tebakan ke-1, abu-abu/kuning untuk sisanya
                         let barColor = index === 0 ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-600';
                         chartHtml += `
                             <div class="flex items-center mb-1.5">
@@ -689,7 +664,6 @@
                     });
                     chartHtml += `</div>`;
 
-                    // Tampilkan Hasil Utama + Diagramnya
                     if (data.is_match) {
                         statusMsg.innerHTML = `<b>SEMPURNA!</b><br>Urutan goresan benar (${overallPct.toFixed(1)}%).<br>AI yakin ini huruf <b>${data.predicted_char}</b>. ${chartHtml}`;
                         statusMsg.className = "text-center text-sm font-bold text-emerald-600 dark:text-emerald-400 min-h-[24px] px-4 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 mt-4";
@@ -701,8 +675,10 @@
                     statusMsg.innerHTML = `Urutan Benar (${overallPct.toFixed(1)}%)!<br><span class="text-xs font-normal text-rose-500">Server AI sedang offline.</span>`;
                 }
             })
+            .catch(() => {
+                statusMsg.innerHTML = `Urutan Benar (${overallPct.toFixed(1)}%)!<br><span class="text-xs font-normal text-rose-500">Gagal terhubung ke AI.</span>`;
+            });
 
-        // JIKA URUTAN MASIH SALAH, JANGAN PANGGIL AI
         } else if (overallPct >= 45 && userCount === templateCount) {
             statusMsg.innerHTML = `Hampir Benar!<br>${msg}`;
             statusMsg.className = "text-center text-sm font-bold text-amber-600 dark:text-amber-400 min-h-[24px] px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 mt-4";
@@ -712,16 +688,13 @@
         }
     }
     
-    // FUNGSI AUTO-SAVE (MENGUMPULKAN DATASET UNTUK AI)
     function autoSaveToDataset() {
         try {
-            // Ekstrak huruf dari judul
             const titleText = document.getElementById('targetTitle').innerText;
             const currentCharacter = titleText.split(' ')[1]; 
             
             if(!currentCharacter) return;
 
-            // Siapkan kanvas tersembunyi (64x64, latar hitam, garis putih)
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = 64;  
             tempCanvas.height = 64;
@@ -741,7 +714,6 @@
                 if (stroke.length === 0) return;
                 tCtx.beginPath();
                 
-                // Dikali 0.45 (skala) dan ditambah 32 (geser ke titik tengah kanvas 64x64)
                 let startX = (stroke[0].x * 0.45) + 32;
                 let startY = (stroke[0].y * 0.45) + 32;
                 tCtx.moveTo(startX, startY);
@@ -754,10 +726,8 @@
                 tCtx.stroke();
             });
 
-            // Konversi jadi teks Base64
             const imageData = tempCanvas.toDataURL("image/png");
             
-            // Kirim ke Backend Laravel
             fetch('/api/dataset/save', {
                 method: 'POST',
                 headers: {
@@ -781,7 +751,6 @@
         }
     }
 
-    // FUNGSI MATEMATIKA
     function getBoundingBox(strokes) {
         let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         strokes.forEach(stroke => {
@@ -816,24 +785,33 @@
     
     function pathLength(points) { 
         let d = 0; 
-        for (let i = 1; i < points.length; i++) d += getDistance(points[i - 1], points[i]); 
+        for (let i = 1; i < points.length; i++) {
+            d += getDistance(points[i - 1], points[i]); 
+        }
         return d; 
     }
 
     function resample(points, n) {
         if (!points || points.length === 0) return points;
         let I = pathLength(points) / (n - 1);
-        let D = 0; let newPoints = [points[0]];
+        let D = 0; 
+        let newPoints = [points[0]];
         for (let i = 1; i < points.length; i++) {
             let d = getDistance(points[i - 1], points[i]);
             if ((D + d) >= I) {
                 let qx = points[i - 1].x + ((I - D) / d) * (points[i].x - points[i - 1].x);
                 let qy = points[i - 1].y + ((I - D) / d) * (points[i].y - points[i - 1].y);
                 let q = {x: qx, y: qy};
-                newPoints.push(q); points.splice(i, 0, q); D = 0;
-            } else { D += d; }
+                newPoints.push(q); 
+                points.splice(i, 0, q); 
+                D = 0;
+            } else { 
+                D += d; 
+            }
         }
-        while (newPoints.length < n) { newPoints.push(points[points.length - 1]); }
+        while (newPoints.length < n) { 
+            newPoints.push(points[points.length - 1]); 
+        }
         return newPoints;
     }
 
@@ -849,7 +827,6 @@
         const previousFont = ctx.font;
         const previousLineDash = ctx.getLineDash();
         
-        // HITUNG POSISI & SKALA USER
         let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         let cx = 0, cy = 0, pts = 0;
 
@@ -861,10 +838,8 @@
             });
         });
 
-        // Hitung skala terpanjang dari coretan User (untuk jadi patokan)
         const maxDim = Math.max(maxX - minX, maxY - minY) || 1;
 
-        // Gambar Kotak Batas & Center User
         ctx.strokeStyle = '#10b981'; 
         ctx.lineWidth = 2;
         ctx.setLineDash([6, 6]); 
@@ -880,7 +855,6 @@
             ctx.fillText("Center", cx + 10, cy - 10);
         }
 
-        // Gambar Titik Resampling User
         ctx.setLineDash([]);
         ctx.fillStyle = '#ef4444'; 
         ctx.font = "bold 10px sans-serif";
@@ -896,24 +870,18 @@
             });
         });
 
-        // TEMPLATE MENGIKUTI USER
         if (templateKanji && templateKanji.length > 0) {
-            
-            // Panggil fungsi normalisasi milik Anda (Skala 100, Pusat 0,0)
             const normTemp = normalizeStrokes(templateKanji);
 
-            // PROYEKSI BALIK: Ubah skala 100 jadi skala User, dan geser ke Titik Tengah User
             const mappedTemp = normTemp.map(stroke => stroke.map(p => ({
                 x: p.x * (maxDim / 100) + cx,
                 y: p.y * (maxDim / 100) + cy
             })));
 
-            // Gambar Titik Template yang sudah menempel dengan User
-            ctx.fillStyle = '#3b82f6'; // Warna Biru
+            ctx.fillStyle = '#3b82f6'; 
             ctx.font = "bold 10px sans-serif";
             
             mappedTemp.forEach((stroke) => {
-                // Lakukan resampling 30 titik untuk Template yang sudah diproyeksikan
                 const resampledPoints = resample(stroke, NUM_POINTS);
                 resampledPoints.forEach((pt, ptIndex) => {
                     ctx.beginPath();
@@ -925,14 +893,13 @@
             });
         }
         
-        // Restore style
         ctx.fillStyle = previousFillStyle;
         ctx.strokeStyle = previousStrokeStyle;
         ctx.lineWidth = previousLineWidth;
         ctx.font = previousFont;
         ctx.setLineDash(previousLineDash);
     };
-    // Tombol Cepat: Shift + D (Khusus saat Debug Mode nyala)
+
     document.addEventListener('keydown', function(e) {
         if (window.DEBUG_MODE && e.shiftKey && e.key.toLowerCase() === 'd') {
             e.preventDefault(); 
@@ -940,7 +907,7 @@
             if (isDebugVisible) {
                 window.drawDebugPoints();
             } else {
-                redrawAllStrokes(); // Hapus titik merah
+                redrawAllStrokes(); 
             }
         }
     });

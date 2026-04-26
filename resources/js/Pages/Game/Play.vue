@@ -1,95 +1,105 @@
 <template>
-  <div class="vn-wrapper">
-    <div v-if="!isLoaded" class="vn-loader">
-      <div class="loader-inner">
-        <div class="loader-icon">✦</div>
-        <h2 class="loader-title">Loading...</h2>
-        <p class="loader-pct">{{ Math.round(loadingProgress) }}%</p>
-        <div class="loader-track">
-          <div class="loader-fill" :style="{ width: `${loadingProgress}%` }"></div>
-        </div>
+  <div class="fixed inset-0 w-full h-full bg-slate-950 overflow-hidden font-sans select-none">
+    
+    <div v-if="!isLoaded" class="absolute inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center">
+      <div class="text-6xl text-violet-500 animate-bounce mb-6">
+        <i class="fas fa-theater-masks"></i>
+      </div>
+      <h2 class="text-2xl font-black text-white uppercase tracking-widest mb-2">Memuat Cerita...</h2>
+      <p class="text-violet-400 font-black mb-6 text-xl">{{ Math.round(loadingProgress) }}%</p>
+      
+      <div class="w-64 h-6 bg-slate-800 border-4 border-slate-950 rounded-full overflow-hidden shadow-inner">
+        <div class="h-full bg-violet-500 rounded-full transition-all duration-300" :style="{ width: `${loadingProgress}%` }"></div>
       </div>
     </div>
 
-    <div v-else class="vn-player" @click="handleClick">
+    <div v-else class="relative w-full h-full cursor-pointer" @click="handleClick">
 
       <transition name="fade">
         <div
           v-if="currentDialogue"
           :key="currentDialogue.background?.image_url"
-          class="vn-background"
+          class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 z-0"
           :style="{ backgroundImage: `url(${currentDialogue.background?.image_url || ''})` }"
         />
       </transition>
 
-      <div class="vn-overlay" />
-      <div class="vn-vignette" />
+      <div class="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.7)_100%)] z-10 pointer-events-none" />
 
       <transition name="slide-up">
         <div
           v-if="currentDialogue?.character?.default_sprite_path"
           :key="currentDialogue.character.name"
-          class="vn-character"
+          class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none flex justify-center items-end h-[55vh] sm:h-[85vh]"
         >
           <img
             :src="currentDialogue.character.default_sprite_path"
             :alt="currentDialogue.character?.name"
-            class="vn-character-img"
+            class="max-h-full w-auto object-contain object-bottom drop-shadow-[0_0_30px_rgba(0,0,0,0.8)] scale-[1.7] sm:scale-125 origin-bottom transition-transform duration-500"
           />
         </div>
       </transition>
 
-      <div v-if="!currentDialogue" class="vn-empty">
-        <div class="end-card">
-          <div class="end-ornament">✦</div>
-          <h1 class="end-title">Tamat</h1>
-          <div class="end-rule"></div>
+      <div v-if="!currentDialogue" class="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-white dark:bg-gray-800 border-4 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 sm:p-10 text-center flex flex-col items-center shadow-2xl max-w-sm w-full">
+          <i class="fas fa-flag-checkered text-5xl sm:text-6xl text-amber-500 mb-6"></i>
+          <h1 class="text-3xl sm:text-4xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6">Tamat</h1>
+          <div class="w-16 sm:w-20 h-2 bg-slate-200 dark:bg-gray-700 rounded-full mb-8"></div>
+          
           <template v-if="$page.props.auth.user && $page.props.auth.user.role === 'admin'">
-            <a href="/admin/vn/scenes" class="end-btn" @click.stop>Kembali ke Admin</a>
+            <a href="/admin/vn/scenes" class="w-full flex items-center justify-center gap-2 bg-violet-500 border-2 border-b-[6px] border-violet-700 text-white font-black uppercase tracking-widest py-4 px-6 rounded-2xl hover:brightness-110 active:border-b-2 active:translate-y-1 transition-all text-sm sm:text-base" @click.stop>
+              Kembali ke Admin
+            </a>
           </template>
           <template v-else-if="$page.props.auth.user && $page.props.auth.user.role === 'user'">
-            <a href="/vn/scenes" class="end-btn" @click.stop>Kembali ke Dashboard</a>
+            <a href="/vn/scenes" class="w-full flex items-center justify-center gap-2 bg-[#1cb0f6] border-2 border-b-[6px] border-[#1899d6] text-white font-black uppercase tracking-widest py-4 px-6 rounded-2xl hover:brightness-110 active:border-b-2 active:translate-y-1 transition-all text-sm sm:text-base" @click.stop>
+              Selesai
+            </a>
           </template>
         </div>
       </div>
 
-      <div v-if="currentDialogue" class="vn-dialogue-area">
+      <div v-if="currentDialogue" class="absolute bottom-4 sm:bottom-10 left-0 right-0 w-full px-3 sm:px-8 z-40 flex flex-col items-center pointer-events-none">
+        
         <transition name="fade">
-          <div v-if="hasChoices" class="vn-choices">
+          <div v-if="hasChoices" class="flex flex-col gap-3 sm:gap-4 mb-6 sm:mb-8 w-full max-w-2xl pointer-events-auto">
             <button
               v-for="choice in currentDialogue.choices"
               :key="choice.id"
               @click.stop="goToDialogue(choice.target_dialogue_id)"
-              class="vn-choice-btn"
+              class="w-full bg-slate-900/95 backdrop-blur-md border-4 border-b-[6px] sm:border-b-[8px] border-slate-700 text-white font-black text-lg sm:text-xl py-4 sm:py-5 px-6 sm:px-8 rounded-2xl sm:rounded-3xl hover:border-violet-500 hover:text-violet-300 active:border-b-4 active:translate-y-1 transition-all shadow-xl text-center"
             >
               {{ choice.choice_text }}
             </button>
           </div>
         </transition>
 
-        <div class="vn-dialogue-box">
-          <div v-if="currentDialogue.character" class="vn-name-tag">
-            <span class="name-accent">◆</span>
+        <div class="relative w-full max-w-5xl bg-slate-900/95 backdrop-blur-md border-4 border-b-[6px] sm:border-b-[8px] border-slate-800 rounded-3xl sm:rounded-[2rem] p-5 sm:p-10 pointer-events-auto shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          
+          <div v-if="currentDialogue.character" class="absolute -top-5 sm:-top-7 left-4 sm:left-10 bg-violet-600 border-2 border-b-[4px] sm:border-b-[6px] border-violet-800 text-white font-black uppercase tracking-widest px-5 sm:px-8 py-1.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-xl shadow-lg transform -rotate-2 origin-bottom-left">
             {{ currentDialogue.character.name }}
           </div>
 
-          <div class="vn-text-content">
-            <p class="vn-original-text" :key="'orig-' + currentDialogue.id">
+          <div class="min-h-[80px] sm:min-h-[100px] flex flex-col justify-center mt-3 sm:mt-2">
+            
+            <p class="text-2xl sm:text-4xl font-black text-white leading-snug sm:leading-relaxed mb-3 sm:mb-4 tracking-wide break-words" :key="'orig-' + currentDialogue.id">
               <span
                 v-for="(char, i) in displayedOriginal"
                 :key="i"
-                class="vn-char"
+                class="vn-char inline-block"
                 :style="{ animationDelay: `${i * 30}ms` }"
               >{{ char }}</span>
             </p>
-            <p class="vn-translated-text" :key="'trans-' + currentDialogue.id">
+            
+            <p class="text-xs sm:text-lg font-bold text-slate-400 border-t-2 border-dashed border-slate-700 pt-3 sm:pt-4" :key="'trans-' + currentDialogue.id">
               {{ currentDialogue.translated_text }}
             </p>
           </div>
 
-          <div v-if="!hasChoices" class="vn-nav-indicator">
-            <span class="vn-nav-arrow">▾</span>
-            <span>Klik / Spasi (Next) &nbsp;·&nbsp; ◄ (Back)</span>
+          <div v-if="!hasChoices" class="absolute bottom-4 sm:bottom-5 right-5 sm:right-8 text-slate-500 font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center gap-1.5 sm:gap-2">
+            <span class="hidden sm:inline">Klik Layar / Spasi</span><span class="sm:hidden">Tap Layar</span> 
+            <span class="text-violet-500 animate-bounce text-lg sm:text-xl">▼</span>
           </div>
         </div>
       </div>
@@ -101,28 +111,29 @@
         preload="auto"
       />
 
-      <div v-if="currentDialogue" class="vn-hud">
+      <div v-if="currentDialogue" class="absolute top-4 sm:top-6 right-4 sm:right-6 z-50 flex items-center gap-2 sm:gap-3 pointer-events-auto">
+        
         <button
           v-if="dialogueHistory.length > 0"
-          class="vn-hud-btn"
+          class="flex items-center justify-center gap-1.5 sm:gap-2 h-10 sm:h-12 px-4 sm:px-6 bg-slate-800/90 backdrop-blur-md border-2 border-b-[4px] border-slate-900 text-white font-black uppercase tracking-widest rounded-xl sm:rounded-2xl hover:bg-slate-700 active:border-b-2 active:translate-y-1 transition-all shadow-lg text-[10px] sm:text-sm"
           @click.stop="goBack"
-          title="Kembali ke teks sebelumnya"
         >
-          <svg class="hud-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m17 16-4-4 4-4m-6 8-4-4 4-4" />
-          </svg>
-          Back
+          <i class="fas fa-undo text-[10px] sm:text-sm"></i> Back
         </button>
 
         <template v-if="$page.props.auth.user && $page.props.auth.user.role === 'admin'">
-          <a href="/admin/vn/scenes" class="vn-hud-btn" @click.stop>Admin</a>
+          <a href="/admin/vn/scenes" class="flex items-center justify-center gap-1.5 sm:gap-2 h-10 sm:h-12 px-4 sm:px-6 bg-rose-600/90 backdrop-blur-md border-2 border-b-[4px] border-rose-800 text-white font-black uppercase tracking-widest rounded-xl sm:rounded-2xl hover:bg-rose-500 active:border-b-2 active:translate-y-1 transition-all shadow-lg text-[10px] sm:text-sm" @click.stop>
+            Keluar
+          </a>
         </template>
         <template v-else-if="$page.props.auth.user && $page.props.auth.user.role === 'user'">
-          <a href="/vn/scenes" class="vn-hud-btn" @click.stop>Kembali</a>
+          <a href="/vn/scenes" class="flex items-center justify-center gap-1.5 sm:gap-2 h-10 sm:h-12 px-4 sm:px-6 bg-rose-600/90 backdrop-blur-md border-2 border-b-[4px] border-rose-800 text-white font-black uppercase tracking-widest rounded-xl sm:rounded-2xl hover:bg-rose-500 active:border-b-2 active:translate-y-1 transition-all shadow-lg text-[10px] sm:text-sm" @click.stop>
+            Keluar
+          </a>
         </template>
 
-        <button class="vn-hud-btn vn-hud-audio" @click.stop="toggleAudio">
-          {{ audioMuted ? '🔇' : '🔊' }}
+        <button class="w-10 h-10 sm:w-12 sm:h-12 bg-slate-800/90 backdrop-blur-md border-2 border-b-[4px] border-slate-900 text-white font-black rounded-xl sm:rounded-2xl hover:bg-slate-700 active:border-b-2 active:translate-y-1 transition-all flex items-center justify-center shadow-lg text-sm sm:text-xl" @click.stop="toggleAudio" title="Mute/Unmute Voice">
+          <i :class="audioMuted ? 'fas fa-volume-mute text-slate-400' : 'fas fa-volume-up text-emerald-400'"></i>
         </button>
       </div>
 
@@ -306,334 +317,44 @@ function goToDialogue(dialogueId, isBack = false) {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap');
-
-/* ── Variables ───────────────────────────────────────── */
-/* :root {
-  --gold:   #c9a86c;
-  --gold-d: #a07840;
-  --ink:    #050404;
-  --panel:  rgba(8, 7, 14, 0.82);
-  --border: rgba(201, 168, 108, 0.18);
-  --muted:  rgba(201, 168, 108, 0.45);
-  --text:   #ffffffe5;
-  --sub:    #8c8070;
-} */
-
-/* ── Loader ──────────────────────────────────────────── */
-.vn-loader {
-  position: fixed; inset: 0;
-  background: var(--ink);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 100;
+/* Transisi Standar Vue */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.4s ease;
 }
-.loader-inner {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 12px;
-}
-.loader-icon {
-  font-size: 2rem; color: var(--gold);
-  animation: spin-slow 4s linear infinite;
-}
-@keyframes spin-slow { to { transform: rotate(360deg); } }
-
-.loader-title {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.75rem; font-weight: 600;
-  letter-spacing: 0.25em; text-transform: uppercase;
-  color: var(--muted); margin: 0;
-}
-.loader-pct {
-  font-family: 'Crimson Pro', serif;
-  font-size: 2.5rem; font-weight: 400; color: var(--text);
-  line-height: 1; margin: 0;
-}
-.loader-track {
-  width: 220px; height: 2px;
-  background: rgba(255,255,255,0.07);
-  border-radius: 2px; overflow: hidden;
-}
-.loader-fill {
-  height: 100%; background: var(--gold);
-  border-radius: 2px;
-  transition: width 0.3s ease-out;
-  box-shadow: 0 0 8px rgba(201,168,108,0.5);
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 
-/* ── Base ────────────────────────────────────────────── */
-.vn-wrapper { 
-  background: var(--ink); 
-  min-height: 100vh; 
-  color-scheme: dark; /* Tambahan: Kunci agar browser tahu ini area mode gelap */
-  --gold:   #006eff;
-  --gold-d: #1000f0;
-  --ink:     #050404;
-  --panel:   rgba(8, 7, 14, 0.82);
-  --border: rgba(0, 0, 0, 0.18);
-  --muted:  rgba(46, 42, 253, 0.45);
-  --text:   #ffffffe5; /* Teks putihmu aman di sini */
-  --sub:    #f8f8f8c5;
+/* Transisi Kemunculan Karakter (Slide up dari bawah) */
+.slide-up-enter-active {
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.slide-up-leave-active {
+  transition: all 0.3s ease-in;
+}
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(10%);
+}
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-5%);
 }
 
-.vn-player {
-  position: fixed; inset: 0; overflow: hidden;
-  cursor: pointer; user-select: none;
-  background: var(--ink);
-  font-family: 'DM Sans', sans-serif;
-}
-
-/* ── Background ──────────────────────────────────────── */
-.vn-background {
-  position: absolute; inset: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  transition: opacity 0.7s ease;
-  z-index: 0;
-}
-
-/* ── Overlays ────────────────────────────────────────── */
-.vn-overlay {
-  position: absolute; inset: 0; z-index: 5; pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.15) 0%,
-    transparent        35%,
-    rgba(0,0,0,0.4)   65%,
-    rgba(8,7,14,0.92) 100%
-  );
-}
-/* subtle radial vignette on edges */
-.vn-vignette {
-  position: absolute; inset: 0; z-index: 6; pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
-}
-
-/* ── Character ───────────────────────────────────────── */
-.vn-character {
-  position: absolute; bottom: 0; left: 50%;
-  transform: translateX(-50%);
-  z-index: 10; pointer-events: none;
-  filter: drop-shadow(0 20px 50px rgba(0,0,0,0.6));
-}
-.vn-character-img {
-  height: 110vh; width: auto;
-  max-width: none !important; max-height: none;
-  object-fit: contain; object-position: bottom center;
-}
-
-/* ── End Screen ──────────────────────────────────────── */
-.vn-empty {
-  position: absolute; inset: 0; z-index: 30;
-  display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(ellipse at center, rgba(201,168,108,0.04) 0%, transparent 70%);
-}
-.end-card {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 16px;
-}
-.end-ornament {
-  font-size: 1.5rem; color: var(--gold);
-  animation: pulse-gold 2.5s ease-in-out infinite;
-}
-@keyframes pulse-gold {
-  0%, 100% { opacity: 0.6; transform: scale(1);    }
-  50%       { opacity: 1;   transform: scale(1.15); }
-}
-.end-title {
-  font-family: 'Crimson Pro', serif;
-  font-size: 3.5rem; font-weight: 600; color: var(--text);
-  letter-spacing: 0.08em; margin: 0;
-}
-.end-rule {
-  width: 60px; height: 1px;
-  background: linear-gradient(to right, transparent, var(--gold), transparent);
-}
-.end-btn {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.8rem; font-weight: 600;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--gold); text-decoration: none;
-  padding: 10px 28px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: rgba(201,168,108,0.06);
-  transition: all 0.2s ease;
-}
-.end-btn:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.45);
-  color: white;
-}
-
-/* ── Dialogue Area ───────────────────────────────────── */
-.vn-dialogue-area {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  z-index: 20; padding: 0 28px 28px;
-}
-
-/* ── Choices ─────────────────────────────────────────── */
-.vn-choices {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 10px; margin-bottom: 18px; padding: 0 18%;
-}
-.vn-choice-btn {
-  width: 100%; max-width: 520px;
-  padding: 14px 24px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.95rem; font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
-  position: relative; overflow: hidden;
-}
-.vn-choice-btn::before {
-  content: '';
-  position: absolute; left: 0; top: 0; bottom: 0;
-  width: 2px;
-  background: var(--gold);
-  transform: scaleY(0);
-  transition: transform 0.2s ease;
-  transform-origin: bottom;
-}
-.vn-choice-btn:hover {
-  background: rgba(0, 0, 0, 0.514);
-  border-color: rgba(0, 89, 255, 0.4);
-  color: white;
-  transform: translateX(4px);
-}
-.vn-choice-btn:hover::before { transform: scaleY(1); }
-
-/* ── Dialogue Box ────────────────────────────────────── */
-.vn-dialogue-box {
-  position: relative;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 28px 36px 22px;
-  max-width: 920px; margin: 0 auto;
-  box-shadow: 0 -8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,168,108,0.08);
-}
-/* top accent line */
-.vn-dialogue-box::before {
-  content: '';
-  position: absolute; top: 0; left: 10%; right: 10%;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--gold-d), transparent);
-}
-
-/* ── Name Tag ────────────────────────────────────────── */
-.vn-name-tag {
-  position: absolute; top: -13px; left: 28px;
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--ink);
-  border: 1px solid var(--border);
-  color: white;
-  padding: 4px 18px 4px 12px;
-  border-radius: 3px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.78rem; font-weight: 600;
-  letter-spacing: 0.12em; text-transform: uppercase;
-}
-.name-accent { font-size: 0.55rem; opacity: 0.8; }
-
-/* ── Dialogue Text ───────────────────────────────────── */
-.vn-text-content { padding-top: 6px; }
-
-.vn-original-text {
-  font-family: 'Crimson Pro', serif;
-  font-size: 1.35rem; line-height: 1.85;
-  color: var(--text); margin-bottom: 10px; min-height: 2.5em;
-}
+/* Animasi Mesin Tik (Typewriter Effect) */
 .vn-char {
-  display: inline-block; opacity: 0;
-  animation: charAppear 0.08s ease forwards;
-}
-@keyframes charAppear {
-  from { opacity: 0; transform: translateY(3px); }
-  to   { opacity: 1; transform: translateY(0);   }
+  opacity: 0;
+  animation: revealChar 0.08s ease forwards;
 }
 
-.vn-translated-text {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem; color: var(--sub);
-  line-height: 1.6; font-style: italic;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  padding-top: 10px;
-}
-
-/* ── Nav Indicator ───────────────────────────────────── */
-.vn-nav-indicator {
-  display: flex; align-items: center; justify-content: flex-end;
-  gap: 6px; margin-top: 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.72rem; letter-spacing: 0.05em;
-  color: rgba(140,128,112,0.5);
-}
-.vn-nav-arrow {
-  color: var(--gold); opacity: 0.6;
-  animation: bounce-gentle 1.8s ease-in-out infinite;
-}
-@keyframes bounce-gentle {
-  0%, 100% { transform: translateY(0);  }
-  50%       { transform: translateY(3px);}
-}
-
-/* ── HUD ─────────────────────────────────────────────── */
-.vn-hud {
-  position: absolute; top: 18px; right: 18px;
-  z-index: 50; display: flex; gap: 6px;
-}
-.vn-hud-btn {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 7px 14px;
-  background: rgba(8,7,14,0.65);
-  border: 1px solid rgba(201,168,108,0.15);
-  border-radius: 3px;
-  color: var(--gold);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em;
-  cursor: pointer; text-decoration: none;
-  transition: all 0.2s ease;
-}
-.vn-hud-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  border-color: rgba(255, 255, 255, 0.35);
-  color: var(--gold);
-  color: white;
-}
-.hud-icon { width: 13px; height: 13px; }
-
-/* ── Transitions ─────────────────────────────────────── */
-.fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
-.fade-enter-from,  .fade-leave-to      { opacity: 0; }
-
-.slide-up-enter-active { transition: all 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
-.slide-up-leave-active { transition: all 0.25s ease-in; }
-.slide-up-enter-from   { opacity: 0; transform: translateX(-50%) translateY(36px); }
-.slide-up-leave-to     { opacity: 0; transform: translateX(-50%) translateY(-16px); }
-
-/* ── Mobile ──────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .vn-character-img { height: 100vh; max-width: none !important; }
-  .vn-dialogue-area { padding: 0 14px 16px; }
-  .vn-dialogue-box  { padding: 22px 18px 16px; border-radius: 5px; }
-  .vn-name-tag      { top: -11px; left: 14px; padding: 3px 14px 3px 10px; font-size: 0.7rem; }
-  .vn-original-text { font-size: 1.15rem; line-height: 1.7; margin-bottom: 6px; }
-  .vn-translated-text { font-size: 0.82rem; }
-  .vn-choices       { padding: 0 4%; gap: 8px; }
-  .vn-choice-btn    { padding: 12px 16px; font-size: 0.88rem; border-radius: 3px; }
-  .vn-hud           { top: 12px; right: 12px; gap: 5px; }
-  .vn-hud-btn       { padding: 6px 11px; font-size: 0.7rem; }
-}
-@media (max-height: 500px) {
-  .vn-character-img { height: 95vh; }
-  .vn-dialogue-area { padding-bottom: 8px; }
-  .vn-dialogue-box  { padding: 18px 22px 12px; }
-  .vn-original-text { font-size: 1.05rem; min-height: 2em; }
+@keyframes revealChar {
+  0% { 
+    opacity: 0; 
+    transform: translateY(4px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 </style>

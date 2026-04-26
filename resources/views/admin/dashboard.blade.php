@@ -89,14 +89,14 @@
     </div>
 </div>
 
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8">
+<!-- <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8">
     <div class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-gray-700 pb-4">
         <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">Selamat datang di Admin Panel</h3>
         <span class="text-sm text-gray-500 dark:text-gray-400"><i class="far fa-clock mr-1"></i> Hari ini: {{ now()->translatedFormat('l, d F Y') }}</span>
     </div>
     <div class="text-gray-600 dark:text-gray-300 space-y-4">
         <p class="leading-relaxed">Gunakan menu di sebelah kiri untuk mengelola berbagai data aplikasi Anda.</p>
-        <!-- <div class="bg-indigo-50 dark:bg-indigo-950/50 rounded-lg p-5 border border-indigo-100 dark:border-indigo-800">
+        <div class="bg-indigo-50 dark:bg-indigo-950/50 rounded-lg p-5 border border-indigo-100 dark:border-indigo-800">
             <h4 class="font-bold text-indigo-800 dark:text-indigo-300 mb-2 flex items-center"><i class="fas fa-info-circle mr-2"></i> Akses Cepat</h4>
             <ul class="space-y-2">
                 <li>
@@ -120,12 +120,254 @@
                     </a>
                 </li>
             </ul>
-        </div> -->
+        </div>
+    </div>
+</div> -->
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8 hover:shadow-md transition-shadow">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+            <div>
+                <h3 class="text-lg font-black text-gray-800 dark:text-gray-100 flex items-center gap-2 uppercase tracking-wider">
+                    <i class="fas fa-chart-area text-indigo-500"></i> Statistik Aktivitas Kuis
+                </h3>
+                <p id="chart-subtitle" class="text-xs font-bold text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-widest">Tren pengerjaan kuis dalam 7 hari terakhir</p>
+            </div>
+            <div class="flex items-center bg-gray-100 dark:bg-gray-700 p-1 rounded-lg self-start sm:self-auto">
+                <button onclick="updateChartRange(7)" id="btn-range-7" class="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800 shadow-sm">7 Hari</button>
+                <button onclick="updateChartRange(15)" id="btn-range-15" class="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">15 Hari</button>
+                <button onclick="updateChartRange(30)" id="btn-range-30" class="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">30 Hari</button>
+            </div>
+        </div>
+        <div class="w-full h-[350px] relative">
+            <canvas id="quizActivityChart"></canvas>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8 hover:shadow-md transition-shadow flex flex-col">
+        <div class="mb-8">
+            <h3 class="text-lg font-black text-gray-800 dark:text-gray-100 flex items-center gap-2 uppercase tracking-wider">
+                <i class="fas fa-chart-pie text-emerald-500"></i> Distribusi Nilai
+            </h3>
+            <p class="text-xs font-bold text-gray-500 dark:text-gray-400 mt-1 uppercase tracking-widest">Predikat Kuis Pengguna</p>
+        </div>
+        <div class="w-full flex-1 relative flex justify-center items-center min-h-[300px]">
+            <canvas id="gradePieChart"></canvas>
+        </div>
     </div>
 </div>
 
+
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('quizActivityChart').getContext('2d');
+        
+        window.chartAllLabels = {!! json_encode($labels) !!};
+        window.chartAllAttemptData = {!! json_encode($attemptData) !!};
+        window.chartAllSessionData = {!! json_encode($sessionData) !!};
+        
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        const textColor = isDarkMode ? '#9ca3af' : '#6b7280';
+        const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+
+        // Create gradients
+        const gradientIndigo = ctx.createLinearGradient(0, 0, 0, 350);
+        gradientIndigo.addColorStop(0, 'rgba(99, 102, 241, 0.4)'); // Indigo 500
+        gradientIndigo.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+        const gradientEmerald = ctx.createLinearGradient(0, 0, 0, 350);
+        gradientEmerald.addColorStop(0, 'rgba(16, 185, 129, 0.4)'); // Emerald 500
+        gradientEmerald.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+        window.quizChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: window.chartAllLabels.slice(-7),
+                datasets: [
+                    {
+                        label: 'Kuis Builder (Manual)',
+                        data: window.chartAllAttemptData.slice(-7),
+                        borderColor: '#6366f1', // Indigo 500
+                        backgroundColor: gradientIndigo,
+                        borderWidth: 3,
+                        pointBackgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#6366f1',
+                        pointHoverBorderColor: '#ffffff',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Kuis AI (Auto)',
+                        data: window.chartAllSessionData.slice(-7),
+                        borderColor: '#10b981', // Emerald 500
+                        backgroundColor: gradientEmerald,
+                        borderWidth: 3,
+                        pointBackgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                        pointBorderColor: '#10b981',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#10b981',
+                        pointHoverBorderColor: '#ffffff',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end',
+                        labels: { 
+                            color: textColor, 
+                            font: { family: "'Segoe UI', Arial, sans-serif", weight: 'bold', size: 12 },
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                        titleColor: isDarkMode ? '#f3f4f6' : '#111827',
+                        bodyColor: isDarkMode ? '#d1d5db' : '#4b5563',
+                        borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 12,
+                        titleFont: { family: "'Segoe UI', Arial, sans-serif", size: 13, weight: 'bold' },
+                        bodyFont: { family: "'Segoe UI', Arial, sans-serif", size: 13, weight: '500' },
+                        boxPadding: 6,
+                        usePointStyle: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y + ' Sesi';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false, drawBorder: false },
+                        ticks: { color: textColor, font: { weight: '600', size: 11 }, padding: 10 }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: gridColor, borderDash: [4, 4], drawBorder: false },
+                        ticks: { stepSize: 1, color: textColor, font: { weight: '600', size: 11 }, padding: 15 },
+                        border: { display: false }
+                    }
+                }
+            }
+        });
+        // Create Pie Chart
+        const pieCtx = document.getElementById('gradePieChart').getContext('2d');
+        const pieLabels = {!! json_encode($gradeLabels) !!};
+        const pieData = {!! json_encode($gradeData) !!};
+
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: pieLabels,
+                datasets: [{
+                    data: pieData,
+                    backgroundColor: [
+                        '#10b981', // S - Emerald
+                        '#3b82f6', // A - Blue
+                        '#8b5cf6', // B - Violet
+                        '#f59e0b', // C - Amber
+                        '#f97316', // D - Orange
+                        '#ef4444'  // F - Red
+                    ],
+                    borderWidth: isDarkMode ? 2 : 0,
+                    borderColor: isDarkMode ? '#1f2937' : '#ffffff',
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: textColor,
+                            font: { family: "'Segoe UI', Arial, sans-serif", weight: 'bold', size: 12 },
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                        titleColor: isDarkMode ? '#f3f4f6' : '#111827',
+                        bodyColor: isDarkMode ? '#d1d5db' : '#4b5563',
+                        borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 12,
+                        titleFont: { family: "'Segoe UI', Arial, sans-serif", size: 13, weight: 'bold' },
+                        bodyFont: { family: "'Segoe UI', Arial, sans-serif", size: 13, weight: '500' },
+                        boxPadding: 6,
+                        usePointStyle: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + ' Sesi';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    window.updateChartRange = function(days) {
+        if (!window.quizChart) return;
+        
+        window.quizChart.data.labels = window.chartAllLabels.slice(-days);
+        window.quizChart.data.datasets[0].data = window.chartAllAttemptData.slice(-days);
+        window.quizChart.data.datasets[1].data = window.chartAllSessionData.slice(-days);
+        window.quizChart.update();
+
+        const ranges = [7, 15, 30];
+        ranges.forEach(r => {
+            const btn = document.getElementById('btn-range-' + r);
+            if (r === days) {
+                btn.className = "px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800 shadow-sm";
+            } else {
+                btn.className = "px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200";
+            }
+        });
+
+        document.getElementById('chart-subtitle').innerText = 'Tren pengerjaan kuis dalam ' + days + ' hari terakhir';
+    }
+
     const AI_URL = 'http://127.0.0.1:5000/status'; // sesuaikan URL Flask kamu
 
     async function checkAIStatus() {

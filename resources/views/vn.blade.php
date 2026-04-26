@@ -18,7 +18,7 @@
             document.documentElement.classList.add('dark');
         }
     </script>
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         html.dark { color-scheme: dark; }
         body { transition: background-color 0.3s ease, color 0.3s ease; }

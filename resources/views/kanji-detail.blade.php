@@ -1,141 +1,144 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Kanji')
+@section('title', 'Detail Karakter — Manabu')
 
 @section('content')
-<div class="max-w-3xl mx-auto px-6 py-12">
+<div class="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-900 font-sans pb-20">
 
-    <a onclick="window.history.back()"
-       class="inline-flex items-center justify-center px-5 py-2.5 
-              border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-medium 
-              text-slate-700 dark:text-slate-300 bg-white dark:bg-gray-800 
-              hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-700 
-              transition-all shadow-sm mb-8 cursor-pointer">
-        
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-        </svg>
-        Kembali
-    </a>
+    <div class="max-w-3xl mx-auto px-6 py-12">
 
-    <div id="infoArea" class="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-2xl shadow-sm p-10 relative overflow-hidden transition-all duration-300 min-h-[500px]">
-        
-        <div class="absolute top-0 left-0 w-full h-2 bg-blue-500"></div>
-
-        <div id="skeletonLoading" class="animate-pulse w-full">
-            
-            <div class="flex flex-col items-center justify-center mb-10 mt-4 space-y-6">
-                <div class="w-32 h-32 bg-slate-200 dark:bg-gray-700 rounded-3xl"></div>
-                <div class="w-48 h-6 bg-slate-200 dark:bg-gray-700 rounded-lg"></div>
-                <div class="w-14 h-14 bg-slate-200 dark:bg-gray-700 rounded-full mt-2"></div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-6 mb-10 bg-slate-50 dark:bg-gray-700/50 p-6 rounded-xl border border-slate-100 dark:border-gray-600">
-                <div>
-                    <div class="w-16 h-3 bg-slate-300 dark:bg-gray-600 rounded mb-2"></div>
-                    <div class="w-24 h-5 bg-slate-200 dark:bg-gray-500 rounded"></div>
+        {{-- Header Section --}}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-[#1cb0f6]/10 dark:bg-[#1899d6]/20 text-[#1cb0f6] dark:text-[#1899d6] rounded-2xl flex items-center justify-center text-3xl border-2 border-b-4 border-[#1cb0f6]/20 shrink-0 shadow-sm">
+                    <i class="fas fa-search"></i>
                 </div>
                 <div>
-                    <div class="w-20 h-3 bg-slate-300 dark:bg-gray-600 rounded mb-2"></div>
-                    <div class="w-24 h-5 bg-slate-200 dark:bg-gray-500 rounded"></div>
-                </div>
-                <div class="col-span-2">
-                    <div class="w-40 h-3 bg-slate-300 dark:bg-gray-600 rounded mb-2"></div>
-                    <div class="w-64 h-5 bg-slate-200 dark:bg-gray-500 rounded"></div>
+                    <h1 class="text-3xl font-black text-slate-800 dark:text-white uppercase tracking-wider mb-1">
+                        Detail Karakter
+                    </h1>
+                    <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Informasi dan cara penulisan karakter.</p>
                 </div>
             </div>
 
-            <div class="mb-12">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-8 h-8 bg-slate-200 dark:bg-gray-700 rounded-lg"></div>
-                    <div class="w-40 h-6 bg-slate-200 dark:bg-gray-700 rounded-md"></div>
-                </div>
-                <div class="space-y-4">
-                    <div class="flex items-start bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-xl p-5 shadow-sm">
-                        <div class="w-7 h-7 bg-slate-200 dark:bg-gray-700 rounded mr-4 shrink-0"></div>
-                        <div class="flex-1 space-y-3 mt-1">
-                            <div class="w-3/4 h-5 bg-slate-200 dark:bg-gray-700 rounded"></div>
-                            <div class="w-1/2 h-4 bg-slate-100 dark:bg-gray-600 rounded"></div>
-                        </div>
-                        <div class="w-10 h-10 bg-slate-200 dark:bg-gray-700 rounded-full ml-4 shrink-0"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex flex-col items-center justify-center mb-10">
-                <div class="w-40 h-3 bg-slate-300 dark:bg-gray-600 rounded mb-4"></div>
-                <div class="w-48 h-48 bg-slate-200 dark:bg-gray-700 rounded-xl"></div>
-            </div>
-
+            <a onclick="window.history.back()"
+                class="inline-flex items-center justify-center px-6 py-3 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl text-sm font-black text-slate-600 dark:text-slate-300 bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 active:border-b-2 active:translate-y-1 transition-all uppercase tracking-widest shrink-0 cursor-pointer">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali
+            </a>
         </div>
 
-        <div id="realContent" class="hidden fade-in">
-            <div class="text-center mb-10 mt-2">
-                <div class="flex justify-center items-center gap-4">
-                    <h1 id="character" class="text-8xl font-bold text-slate-800 dark:text-white tracking-tight"></h1>
+        {{-- Main Card Container --}}
+        <div id="infoArea" class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] shadow-sm p-8 sm:p-10 relative overflow-hidden transition-all duration-300 min-h-[500px]">
+            
+            <div class="absolute top-0 left-0 w-full h-3 bg-[#1cb0f6]"></div>
+
+            {{-- Skeleton Loading --}}
+            <div id="skeletonLoading" class="animate-pulse w-full">
+                <div class="flex flex-col items-center justify-center mb-10 mt-4 space-y-6">
+                    <div class="w-32 h-32 bg-slate-200 dark:bg-gray-700 rounded-[2rem]"></div>
+                    <div class="w-48 h-6 bg-slate-200 dark:bg-gray-700 rounded-xl"></div>
+                    <div class="w-16 h-16 bg-slate-200 dark:bg-gray-700 rounded-2xl mt-2"></div>
                 </div>
 
-                <p id="meaning" class="mt-4 text-xl font-medium text-slate-600 dark:text-slate-300 capitalize"></p>
+                <div class="grid grid-cols-2 gap-6 mb-10 bg-slate-50 dark:bg-gray-700/50 p-6 rounded-2xl border-2 border-slate-100 dark:border-gray-600">
+                    <div>
+                        <div class="w-16 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-3"></div>
+                        <div class="w-24 h-6 bg-slate-200 dark:bg-gray-500 rounded-md"></div>
+                    </div>
+                    <div>
+                        <div class="w-20 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-3"></div>
+                        <div class="w-24 h-6 bg-slate-200 dark:bg-gray-500 rounded-md"></div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="w-40 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-3"></div>
+                        <div class="w-64 h-6 bg-slate-200 dark:bg-gray-500 rounded-md"></div>
+                    </div>
+                </div>
+
+                <div class="mb-12">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 bg-slate-200 dark:bg-gray-700 rounded-xl"></div>
+                        <div class="w-40 h-6 bg-slate-200 dark:bg-gray-700 rounded-xl"></div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start bg-white dark:bg-gray-800 border-2 border-slate-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm">
+                            <div class="w-10 h-10 bg-slate-200 dark:bg-gray-700 rounded-xl mr-4 shrink-0"></div>
+                            <div class="flex-1 space-y-3 mt-1">
+                                <div class="w-3/4 h-5 bg-slate-200 dark:bg-gray-700 rounded-md"></div>
+                                <div class="w-1/2 h-4 bg-slate-100 dark:bg-gray-600 rounded-md"></div>
+                            </div>
+                            <div class="w-12 h-12 bg-slate-200 dark:bg-gray-700 rounded-xl ml-4 shrink-0"></div>
+                        </div>
+                    </div>
+                </div>
                 
-                <button onclick="window.speakText(window.currentKanjiChar)" 
-                        class="p-3 text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-full transition-all hover:scale-110 active:scale-95 mt-2" 
-                        title="Dengarkan Cara Baca">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
-                    </svg>
-                </button>
+                <div class="flex flex-col items-center justify-center mb-10">
+                    <div class="w-40 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-5"></div>
+                    <div class="w-48 h-48 bg-slate-200 dark:bg-gray-700 rounded-[2rem]"></div>
+                </div>
             </div>
 
-            <div id="infoGrid" class="grid grid-cols-2 gap-6 text-sm text-slate-500 dark:text-slate-400 mb-10 bg-slate-50 dark:bg-gray-700/50 p-6 rounded-xl border border-slate-100 dark:border-gray-600 hidden">
+            {{-- Konten Asli --}}
+            <div id="realContent" class="hidden fade-in">
                 
-                <div id="categoryWrapper" class="hidden">
-                    <p class="uppercase tracking-wide text-xs font-bold text-slate-400 dark:text-slate-500 mb-1">Kategori</p>
-                    <p id="category" class="text-slate-800 dark:text-slate-200 font-medium text-base">-</p>
+                <div class="text-center mb-10 mt-2 relative">
+                    <h1 id="character" class="text-[6rem] sm:text-[8rem] font-black text-slate-800 dark:text-white tracking-tight drop-shadow-sm leading-none"></h1>
+                    <p id="meaning" class="mt-4 text-xl font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest"></p>
+                    
+                    <button onclick="window.speakText(window.currentKanjiChar)" 
+                            class="mt-6 w-16 h-16 inline-flex items-center justify-center text-[#1cb0f6] bg-[#1cb0f6]/10 border-2 border-b-[6px] border-[#1cb0f6]/30 hover:bg-[#1cb0f6]/20 active:translate-y-1 active:border-b-2 rounded-2xl transition-all" 
+                            title="Dengarkan Cara Baca">
+                        <i class="fas fa-volume-up text-2xl"></i>
+                    </button>
                 </div>
-                
-                <div id="levelWrapper" class="hidden">
-                    <p class="uppercase tracking-wide text-xs font-bold text-slate-400 dark:text-slate-500 mb-1">Bab / Level</p>
-                    <p id="level" class="text-slate-800 dark:text-slate-200 font-medium text-base">-</p>
+
+                <div id="infoGrid" class="grid grid-cols-2 gap-6 mb-10 bg-slate-50 dark:bg-gray-700/50 p-6 rounded-2xl border-2 border-slate-100 dark:border-gray-600 hidden">
+                    
+                    <div id="categoryWrapper" class="hidden">
+                        <p class="uppercase tracking-widest text-[10px] font-black text-slate-400 dark:text-slate-500 mb-1">Kategori</p>
+                        <p id="category" class="text-slate-800 dark:text-slate-200 font-bold text-lg capitalize">-</p>
+                    </div>
+                    
+                    <div id="levelWrapper" class="hidden">
+                        <p class="uppercase tracking-widest text-[10px] font-black text-slate-400 dark:text-slate-500 mb-1">Bab / Level</p>
+                        <p id="level" class="text-slate-800 dark:text-slate-200 font-bold text-lg">-</p>
+                    </div>
+                    
+                    <div id="readingsWrapper" class="col-span-2 hidden">
+                        <p class="uppercase tracking-widest text-[10px] font-black text-slate-400 dark:text-slate-500 mb-1">Cara Baca (Kunyomi / Onyomi)</p>
+                        <p id="readings" class="text-slate-800 dark:text-slate-200 font-bold text-lg">-</p>
+                    </div>
                 </div>
-                
-                <div id="readingsWrapper" class="col-span-2 hidden">
-                    <p class="uppercase tracking-wide text-xs font-bold text-slate-400 dark:text-slate-500 mb-1">Cara Baca (Kunyomi / Onyomi)</p>
-                    <p id="readings" class="text-slate-800 dark:text-slate-200 font-medium text-base">-</p>
+
+                <div id="examplesSection" class="mb-12 hidden">
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 flex items-center gap-3">
+                        <div class="bg-amber-100 dark:bg-amber-900/30 text-amber-500 w-10 h-10 rounded-xl flex items-center justify-center border-2 border-b-4 border-amber-200 dark:border-amber-800 shrink-0">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        Contoh Kalimat
+                    </h3>
+                    <div id="examplesList" class="space-y-4"></div>
+                </div>
+
+                <div class="flex flex-col items-center justify-center mb-10">
+                    <p class="uppercase tracking-widest text-xs font-black text-slate-400 dark:text-slate-500 mb-4"><i class="fas fa-play-circle mr-1"></i> Animasi Urutan Goresan</p>
+                    <div class="relative bg-white dark:bg-gray-900 border-4 border-b-[8px] border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm w-56 h-56 flex items-center justify-center overflow-hidden">
+                        <div class="absolute pointer-events-none border-l-2 border-dashed border-rose-200 dark:border-rose-900/50 h-full left-1/2 opacity-70"></div>
+                        <div class="absolute pointer-events-none border-t-2 border-dashed border-rose-200 dark:border-rose-900/50 w-full top-1/2 opacity-70"></div>
+                        <canvas id="playbackCanvas" width="300" height="300" class="block w-full h-full relative z-10"></canvas>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8">
+                    <button id="practiceBtn" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-[#1cb0f6] border-2 border-b-[6px] border-[#1899d6] text-white font-black uppercase tracking-widest hidden hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all shadow-sm">
+                        <i class="fas fa-pencil-alt mr-2"></i> Latihan Menulis
+                    </button>
                 </div>
             </div>
 
-            <div id="examplesSection" class="mb-12 hidden">
-                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-3">
-                    <span class="bg-rose-500 text-white p-1.5 rounded-lg shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332-.477-4.5-1.253"></path>
-                        </svg>
-                    </span>
-                    Contoh Kalimat
-                </h3>
-                <div id="examplesList" class="space-y-4"></div>
-            </div>
-
-            <div class="flex flex-col items-center justify-center mb-10">
-                <p class="uppercase tracking-wide text-xs font-bold text-slate-400 dark:text-slate-500 mb-3">Animasi Urutan Goresan</p>
-                <div class="relative bg-white dark:bg-gray-900 border-2 border-slate-200 dark:border-slate-600 rounded-xl shadow-inner w-48 h-48 flex items-center justify-center overflow-hidden">
-                    <div class="absolute pointer-events-none border-l border-dashed border-red-200 h-full left-1/2 opacity-70"></div>
-                    <div class="absolute pointer-events-none border-t border-dashed border-red-200 w-full top-1/2 opacity-70"></div>
-                    <canvas id="playbackCanvas" width="300" height="300" class="block w-full h-full relative z-10"></canvas>
-                </div>
-            </div>
-
-            <div class="text-center">
-                <button id="practiceBtn" class="px-8 py-3.5 rounded-xl bg-indigo-600 text-white font-bold hidden hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-900/50">
-                    Mulai Latihan Menulis
-                </button>
-            </div>
         </div>
 
     </div>
-
 </div>
 
 <style>
@@ -299,7 +302,7 @@
         function showNoStrokeMessage() {
             const canvasBox = document.getElementById('playbackCanvas')?.parentElement;
             if (canvasBox) {
-                canvasBox.innerHTML = '<span class="text-xs text-slate-400 font-medium p-4 text-center">Data goresan belum ditambahkan.</span>';
+                canvasBox.innerHTML = '<span class="text-xs text-slate-400 font-bold p-4 text-center"><i class="fas fa-eye-slash text-2xl block mb-2"></i> Data goresan belum ditambahkan.</span>';
             }
         }
 
@@ -362,27 +365,24 @@
                         const number = index + 1;
                         
                         examplesHTML += `
-                            <div class="flex items-start bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 border-l-[5px] border-l-rose-600 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex items-start bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl p-5 mb-4 hover:border-[#1cb0f6]/50 transition-colors">
                                 <div class="mr-4 mt-1 shrink-0">
-                                    <div class="bg-rose-600 text-white w-7 h-7 flex items-center justify-center rounded text-sm font-bold shadow-sm">
+                                    <div class="bg-[#1cb0f6] text-white w-10 h-10 flex items-center justify-center rounded-xl font-black text-sm border-2 border-b-4 border-[#1899d6]">
                                         ${number}
                                     </div>
                                 </div>
                                 <div class="flex-1 mr-4">
-                                    <p class="text-lg sm:text-xl font-medium text-slate-800 dark:text-slate-100 mb-2 leading-relaxed">
+                                    <p class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 leading-relaxed">
                                         ${displayText}
                                     </p>
-                                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                                    <p class="text-sm font-bold text-slate-500 dark:text-slate-400">
                                         ${ex.meaning}
                                     </p>
                                 </div>
                                 <button onclick="window.speakText('${safeTextForTTS}')" 
-                                        class="w-10 h-10 rounded-full bg-slate-100 dark:bg-gray-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-gray-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center justify-center shrink-0 mt-1" 
+                                        class="w-12 h-12 rounded-xl border-2 border-b-[4px] border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-500 hover:text-[#1cb0f6] hover:bg-slate-100 dark:hover:bg-gray-700 active:translate-y-1 active:border-b-2 transition-all flex items-center justify-center shrink-0 mt-1" 
                                         title="Dengarkan Kalimat">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                            d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
-                                    </svg>
+                                    <i class="fas fa-volume-up text-xl"></i>
                                 </button>
                             </div>
                         `;
@@ -404,6 +404,7 @@
                 const practiceBtn = document.getElementById('practiceBtn');
                 practiceBtn.classList.remove('hidden');
                 practiceBtn.addEventListener('click', () => {
+                    // Redirect kembali ke halaman grid list untuk latihan
                     window.location = `/list?practice=${encodeURIComponent(data.character)}`;
                 });
 
@@ -411,9 +412,9 @@
                 console.error("Error Detail:", e);
                 document.getElementById('infoArea').innerHTML = `
                     <div class="text-center py-12">
-                        <i class="fas fa-exclamation-triangle text-4xl text-rose-500 mb-4"></i>
-                        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Oops! Terjadi Kesalahan</h2>
-                        <p class="text-slate-500 dark:text-slate-400">Data karakter gagal dimuat. Buka Console (F12) untuk melihat detail error.</p>
+                        <i class="fas fa-exclamation-triangle text-6xl text-rose-500 mb-4 animate-bounce"></i>
+                        <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-2">Oops! Terjadi Kesalahan</h2>
+                        <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Data karakter gagal dimuat. Buka Console (F12) untuk melihat detail error.</p>
                     </div>
                 `;
             }
