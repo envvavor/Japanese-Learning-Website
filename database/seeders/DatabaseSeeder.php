@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => 'password',
             'role' => 'admin',
+            'email_verified_at' => now(),
         ]);
 
         // Create demo regular user
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'user@example.com',
             'password' => 'password',
             'role' => 'user',
+            'email_verified_at' => now(),
         ]);
 
         // Seed Visual Novel data
