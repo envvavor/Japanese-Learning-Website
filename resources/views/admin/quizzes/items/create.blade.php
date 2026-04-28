@@ -3,34 +3,77 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto">
-    <div class="flex items-center gap-3 mb-6">
-        <a href="{{ route('admin.quizzes.show', $quiz) }}" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Tambah Soal Baru</h1>
+
+    {{-- Header --}}
+    <div class="flex items-center justify-between gap-3 mb-6">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.quizzes.show', $quiz) }}"
+               class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-400 transition-all">
+                <i class="fas fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Tambah Soal Baru</h1>
+                <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">
+                    {{ $quiz->title }}
+                    <span class="mx-1.5">·</span>
+                    <span class="font-semibold text-indigo-500">{{ $quiz->items->count() }} soal sudah ada</span>
+                </p>
+            </div>
+        </div>
     </div>
+
+    {{-- Error Banner --}}
+    <div id="form-error" class="hidden mb-4 p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-sm font-medium rounded-xl flex items-center gap-2">
+        <i class="fas fa-exclamation-triangle flex-shrink-0"></i>
+        <span id="form-error-msg"></span>
+    </div>
+
+    @if ($errors->any())
+    <div class="mb-4 p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-sm rounded-xl">
+        <p class="font-semibold mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> Terdapat kesalahan:</p>
+        <ul class="list-disc list-inside space-y-0.5">
+            @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
+        </ul>
+    </div>
+    @endif
 
     <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm p-8">
         <form action="{{ route('admin.quizzes.items.store', $quiz) }}" method="POST" id="itemForm" class="space-y-8">
             @csrf
             <input type="hidden" name="question_type" id="question_type" value="{{ old('question_type', 'multiple_choice') }}">
+            <input type="hidden" name="action" id="form_action" value="save">
 
             {{-- === TYPE SELECTOR === --}}
             <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Pilih Jenis Soal</label>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <button type="button" onclick="selectType('multiple_choice')" data-type="multiple_choice" class="type-btn p-4 rounded-xl border-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-left ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800 transition-all group">
-                        <i class="fas fa-list-ul text-indigo-500 text-xl mb-2"></i>
+                    <button type="button" onclick="selectType('multiple_choice')" data-type="multiple_choice"
+                            class="type-btn p-4 rounded-xl border-2 text-left transition-all group">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
+                                <i class="fas fa-list-ul text-indigo-500 text-sm"></i>
+                            </div>
+                        </div>
                         <p class="font-bold text-gray-800 dark:text-gray-200">Pilihan Ganda</p>
                         <p class="text-xs text-gray-500 mt-1">Soal teks dengan 4 pilihan jawaban.</p>
                     </button>
-                    <button type="button" onclick="selectType('drawing')" data-type="drawing" class="type-btn p-4 rounded-xl border-2 border-slate-200 dark:border-gray-600 text-left hover:border-emerald-400 transition-all group">
-                        <i class="fas fa-pencil-alt text-emerald-500 text-xl mb-2"></i>
+                    <button type="button" onclick="selectType('drawing')" data-type="drawing"
+                            class="type-btn p-4 rounded-xl border-2 text-left transition-all group">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
+                                <i class="fas fa-pencil-alt text-emerald-500 text-sm"></i>
+                            </div>
+                        </div>
                         <p class="font-bold text-gray-800 dark:text-gray-200">Menggambar</p>
                         <p class="text-xs text-gray-500 mt-1">Evaluasi urutan goresan Kanji.</p>
                     </button>
-                    <button type="button" onclick="selectType('listening')" data-type="listening" class="type-btn p-4 rounded-xl border-2 border-slate-200 dark:border-gray-600 text-left hover:border-amber-400 transition-all group">
-                        <i class="fas fa-headphones text-amber-500 text-xl mb-2"></i>
+                    <button type="button" onclick="selectType('listening')" data-type="listening"
+                            class="type-btn p-4 rounded-xl border-2 text-left transition-all group">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                                <i class="fas fa-headphones text-amber-500 text-sm"></i>
+                            </div>
+                        </div>
                         <p class="font-bold text-gray-800 dark:text-gray-200">Listening</p>
                         <p class="text-xs text-gray-500 mt-1">Soal audio berbasis ElevenLabs.</p>
                     </button>
@@ -39,70 +82,100 @@
 
             {{-- === COMMON FIELD: QUESTION TEXT === --}}
             <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Teks Pertanyaan <span class="text-rose-500">*</span></label>
-                <textarea name="question_text" id="question_text" rows="2" placeholder="Tuliskan pertanyaan di sini..."
-                          class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">{{ old('question_text') }}</textarea>
-                @error('question_text') <p class="text-xs text-rose-500 mt-1">{{ $message }}</p> @enderror
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Teks Pertanyaan <span class="text-rose-500">*</span>
+                </label>
+                <textarea name="question_text" id="question_text" rows="2"
+                          placeholder="Tuliskan pertanyaan di sini..."
+                          class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none">{{ old('question_text') }}</textarea>
+                @error('question_text') <p class="text-xs text-rose-500 mt-1"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p> @enderror
             </div>
 
-            {{-- === MULTIPLE CHOICE SECTION === --}}
-            <div id="mc-section" class="space-y-4 p-5 bg-indigo-50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
-                <p class="text-sm font-bold text-indigo-700 dark:text-indigo-400 mb-2"><i class="fas fa-list-ul"></i> Pilihan Jawaban</p>
-                <div class="space-y-3">
+            {{-- ================================================================
+                 MULTIPLE CHOICE SECTION
+                 ================================================================ --}}
+            <div id="mc-section" class="space-y-3 p-5 bg-indigo-50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-sm font-bold text-indigo-700 dark:text-indigo-400">
+                        <i class="fas fa-list-ul mr-1"></i> Pilihan Jawaban
+                    </p>
+                    <p class="text-xs text-indigo-400 dark:text-indigo-500">
+                        <i class="fas fa-info-circle mr-1"></i>Klik baris untuk tandai jawaban benar
+                    </p>
+                </div>
+
+                <div class="space-y-2" id="mc-options">
                     @for($i = 0; $i < 4; $i++)
-                    <div class="flex items-center gap-3">
-                        <input type="radio" name="correct_answer" value="" class="mc-radio w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500">
-                        <input type="text" name="options[]" placeholder="Opsi {{ $i + 1 }}"
-                               class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    <label class="option-row mc-row flex items-center gap-3 p-3 rounded-xl border-2 border-transparent bg-white dark:bg-gray-900 cursor-pointer transition-all hover:border-indigo-200 dark:hover:border-indigo-800 group">
+                        <input type="radio" name="correct_answer" value="" data-index="{{ $i }}"
+                               class="mc-radio w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 flex-shrink-0"
+                               onchange="highlightSelectedRow(this, 'mc-row', 'indigo')">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-xs font-black flex items-center justify-center flex-shrink-0">
+                            {{ chr(65 + $i) }}
+                        </span>
+                        <input type="text" name="options[]" placeholder="Opsi {{ chr(65 + $i) }}"
+                               class="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-gray-800 dark:text-gray-200 text-sm placeholder-gray-400"
                                oninput="syncRadioValue(this, {{ $i }})">
-                    </div>
+                        <i class="fas fa-check text-indigo-500 opacity-0 flex-shrink-0 correct-check transition-opacity text-sm"></i>
+                    </label>
                     @endfor
                 </div>
-                <p class="text-xs text-indigo-500 flex items-center gap-1 mt-2">
-                    <i class="fas fa-info-circle"></i> Klik radio button bulat di sebelah kiri untuk menandai jawaban yang benar.
-                </p>
             </div>
 
-            {{-- === DRAWING SECTION === --}}
+            {{-- ================================================================
+                 DRAWING SECTION
+                 ================================================================ --}}
             <div id="drawing-section" class="space-y-4 hidden p-5 bg-emerald-50 dark:bg-emerald-900/10 rounded-xl border border-emerald-100 dark:border-emerald-900/50">
-                <p class="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-2"><i class="fas fa-pencil-alt"></i> Target Karakter (Kanji)</p>
-                
+                <p class="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-3">
+                    <i class="fas fa-pencil-alt mr-1"></i> Target Karakter (Kanji)
+                </p>
+
                 <div class="relative">
-                    <div class="flex items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500">
-                        <i class="fas fa-search text-gray-400 ml-4"></i>
-                        <input type="text" id="kanji_search" placeholder="Cari karakter atau arti bahasa Indonesia..." class="w-full px-3 py-3 bg-transparent border-none focus:ring-0 text-sm dark:text-gray-200">
+                    <div class="flex items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500 transition-all">
+                        <i class="fas fa-search text-gray-400 ml-4 text-sm"></i>
+                        <input type="text" id="kanji_search"
+                               placeholder="Cari karakter atau arti bahasa Indonesia..."
+                               class="w-full px-3 py-3 bg-transparent border-none focus:ring-0 text-sm dark:text-gray-200 placeholder-gray-400">
                     </div>
-                    
-                    {{-- Search Results --}}
-                    <div id="kanji_results" class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
+                    <div id="kanji_results"
+                         class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
                 </div>
 
                 {{-- Selected Display --}}
-                <div id="selected_kanji_display" class="hidden mt-4 flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-xl border-2 border-emerald-200 dark:border-emerald-800">
+                <div id="selected_kanji_display"
+                     class="hidden mt-3 flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-xl border-2 border-emerald-300 dark:border-emerald-700">
                     <div class="flex items-center gap-4">
-                        <span id="selected_kanji_char" class="text-4xl font-black text-emerald-600 dark:text-emerald-400"></span>
+                        <div class="w-14 h-14 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center">
+                            <span id="selected_kanji_char" class="text-3xl font-black text-emerald-600 dark:text-emerald-400"></span>
+                        </div>
                         <div>
                             <p id="selected_kanji_meaning" class="text-sm font-bold text-gray-800 dark:text-gray-100"></p>
-                            <p id="selected_kanji_cat" class="text-xs text-gray-500"></p>
+                            <p id="selected_kanji_cat" class="text-xs text-gray-500 mt-0.5"></p>
                         </div>
                     </div>
-                    <button type="button" onclick="clearKanji()" class="p-2 text-gray-400 hover:text-rose-500 transition-colors">
-                        <i class="fas fa-times text-xl"></i>
+                    <button type="button" onclick="clearKanji()"
+                            class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
-                
+
                 <input type="hidden" name="kanji_id" id="kanji_id">
                 <input type="hidden" name="correct_answer" id="drawing_correct_answer">
             </div>
 
-            {{-- === LISTENING SECTION === --}}
+            {{-- ================================================================
+                 LISTENING SECTION
+                 ================================================================ --}}
             <div id="listening-section" class="hidden space-y-4 p-5 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-100 dark:border-amber-900/50">
-                <p class="text-sm font-bold text-amber-700 dark:text-amber-400 mb-2"><i class="fas fa-volume-up"></i> Setup Audio ElevenLabs</p>
+                <p class="text-sm font-bold text-amber-700 dark:text-amber-400 mb-3">
+                    <i class="fas fa-volume-up mr-1"></i> Setup Audio ElevenLabs
+                </p>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="md:col-span-1">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
                         <label class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1 block">Voice Model</label>
-                        <select id="voice_select" class="w-full px-3 py-2.5 rounded-xl border border-amber-200 dark:border-amber-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <select id="voice_select"
+                                class="w-full px-3 py-2.5 rounded-xl border border-amber-200 dark:border-amber-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                             @forelse($voices as $voice)
                                 <option value="{{ $voice['voice_id'] }}">{{ $voice['name'] }}</option>
                             @empty
@@ -116,57 +189,76 @@
                             <input type="text" id="tts_text" placeholder="Masukkan tulisan Jepang..."
                                    class="flex-1 px-4 py-2.5 rounded-xl border border-amber-200 dark:border-amber-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                             <button type="button" onclick="generateAudio()" id="gen_btn"
-                                    class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold rounded-xl shadow transition-all flex items-center gap-2">
-                                <i class="fas fa-magic" id="gen_icon"></i> Generate
+                                    class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white text-sm font-bold rounded-xl shadow transition-all flex items-center gap-2 whitespace-nowrap">
+                                <i class="fas fa-magic" id="gen_icon"></i>
+                                <span id="gen_label">Generate</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
                 {{-- Audio Preview --}}
-                <div id="audio_preview_wrap" class="hidden mt-3">
-                    <div class="flex items-center gap-3 p-3 bg-white dark:bg-gray-900 rounded-xl border border-amber-200 dark:border-amber-700">
-                        <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
-                        <audio id="audio_preview" controls class="flex-1 h-10"></audio>
+                <div id="audio_preview_wrap" class="hidden mt-2">
+                    <div class="flex items-center gap-3 p-3 bg-white dark:bg-gray-900 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                        <div class="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-check text-emerald-600 text-xs"></i>
+                        </div>
+                        <audio id="audio_preview" controls class="flex-1 h-9"></audio>
                         <button type="button" onclick="regenerateAudio()" id="regen_btn"
-                                class="px-4 py-2 text-xs font-bold text-amber-600 border border-amber-300 rounded-lg hover:bg-amber-50 transition-all flex items-center gap-1.5">
+                                class="px-3 py-1.5 text-xs font-bold text-amber-600 border border-amber-300 dark:border-amber-700 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all flex items-center gap-1.5 whitespace-nowrap">
                             <i class="fas fa-redo" id="regen_icon"></i> Regenerate
                         </button>
                     </div>
                 </div>
-                <p id="audio_status" class="text-xs text-gray-500"></p>
+                <p id="audio_status" class="text-xs text-gray-500 min-h-[1rem]"></p>
                 <input type="hidden" name="audio_url" id="audio_url_input">
 
-                <hr class="border-amber-200 dark:border-amber-800 my-4">
+                <hr class="border-amber-200 dark:border-amber-800">
 
-                <p class="text-xs font-bold text-amber-600 dark:text-amber-400 mb-2">Pilihan Jawaban</p>
-                <div class="space-y-3">
+                <p class="text-xs font-bold text-amber-600 dark:text-amber-400 mb-2">
+                    Pilihan Jawaban <span class="font-normal text-gray-400">(klik baris untuk pilih jawaban benar)</span>
+                </p>
+                <div class="space-y-2" id="listening-options">
                     @for($i = 0; $i < 4; $i++)
-                    <div class="flex items-center gap-3">
-                        <input type="radio" name="correct_answer" value="" class="listening-radio w-5 h-5 text-amber-500 border-gray-300 focus:ring-amber-500">
-                        <input type="text" name="options[]" placeholder="Opsi {{ $i + 1 }}"
-                               class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    <label class="option-row listening-row flex items-center gap-3 p-3 rounded-xl border-2 border-transparent bg-white dark:bg-gray-900 cursor-pointer transition-all hover:border-amber-200 dark:hover:border-amber-800 group">
+                        <input type="radio" name="correct_answer" value="" data-index="{{ $i }}"
+                               class="listening-radio w-4 h-4 text-amber-500 border-gray-300 focus:ring-amber-500 flex-shrink-0"
+                               onchange="highlightSelectedRow(this, 'listening-row', 'amber')">
+                        <span class="w-6 h-6 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 text-xs font-black flex items-center justify-center flex-shrink-0">
+                            {{ chr(65 + $i) }}
+                        </span>
+                        <input type="text" name="options[]" placeholder="Opsi {{ chr(65 + $i) }}"
+                               class="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-gray-800 dark:text-gray-200 text-sm placeholder-gray-400"
                                oninput="syncListeningRadio(this, {{ $i }})">
-                    </div>
+                        <i class="fas fa-check text-amber-500 opacity-0 flex-shrink-0 correct-check transition-opacity text-sm"></i>
+                    </label>
                     @endfor
                 </div>
             </div>
 
             {{-- === COMMON FIELD: ORDER === --}}
             <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Urutan Tampil (Order)</label>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Urutan Tampil
+                </label>
                 <input type="number" name="order" value="{{ old('order', $nextOrder) }}" min="1"
-                       class="w-32 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-center text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                       class="w-28 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-center text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 @error('order') <p class="text-xs text-rose-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
-            {{-- === SUBMIT === --}}
+            {{-- === SUBMIT BUTTONS === --}}
             <div class="flex gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-                <a href="{{ route('admin.quizzes.show', $quiz) }}" class="flex-1 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                <a href="{{ route('admin.quizzes.show', $quiz) }}"
+                   class="px-5 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
                     Batal
                 </a>
-                <button type="submit" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow transition-all">
+                <button type="submit" onclick="setAction('save')"
+                        class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-bold rounded-xl shadow transition-all">
                     <i class="fas fa-save mr-2"></i> Simpan Soal
+                </button>
+                <button type="submit" onclick="setAction('save_and_add')"
+                        class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-sm font-bold rounded-xl shadow transition-all">
+                    <i class="fas fa-plus mr-2"></i> Simpan & Tambah Lagi
                 </button>
             </div>
         </form>
@@ -180,36 +272,95 @@
     let currentType = '{{ old('question_type', 'multiple_choice') }}';
     let generatedAudioUrl = '';
 
+    // ─── Type Selector ───────────────────────────────────────────────────────
     function selectType(type) {
         currentType = type;
         document.getElementById('question_type').value = type;
 
+        const colorMap = {
+            multiple_choice: { border: 'border-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', ring: 'ring-indigo-500' },
+            drawing:         { border: 'border-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', ring: 'ring-emerald-500' },
+            listening:       { border: 'border-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', ring: 'ring-amber-500' },
+        };
+
         document.querySelectorAll('.type-btn').forEach(btn => {
             const t = btn.dataset.type;
             if (t === type) {
-                if (t === 'multiple_choice') btn.className = 'type-btn p-4 rounded-xl border-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-left ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800 transition-all group';
-                if (t === 'drawing') btn.className = 'type-btn p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-left ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-gray-800 transition-all group';
-                if (t === 'listening') btn.className = 'type-btn p-4 rounded-xl border-2 border-amber-500 bg-amber-50 dark:bg-amber-900/20 text-left ring-2 ring-amber-500 ring-offset-2 dark:ring-offset-gray-800 transition-all group';
+                const c = colorMap[t];
+                btn.className = `type-btn p-4 rounded-xl border-2 text-left transition-all group ${c.border} ${c.bg} ring-2 ${c.ring} ring-offset-2 dark:ring-offset-gray-800`;
             } else {
-                btn.className = 'type-btn p-4 rounded-xl border-2 border-slate-200 dark:border-gray-600 text-left hover:border-gray-400 transition-all group';
+                btn.className = 'type-btn p-4 rounded-xl border-2 text-left transition-all group border-slate-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500';
             }
         });
 
-        document.getElementById('mc-section').style.display = type === 'multiple_choice' ? 'block' : 'none';
-        document.getElementById('drawing-section').style.display = type === 'drawing' ? 'block' : 'none';
-        document.getElementById('listening-section').style.display = type === 'listening' ? 'block' : 'none';
+        const sections = {
+            multiple_choice: 'mc-section',
+            drawing:         'drawing-section',
+            listening:       'listening-section',
+        };
+
+        for (const [key, id] of Object.entries(sections)) {
+            const section = document.getElementById(id);
+            if (key === type) {
+                section.style.display = 'block';
+                section.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+            } else {
+                section.style.display = 'none';
+                section.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+            }
+        }
     }
 
+    // ─── Action (Save vs Save & Add) ─────────────────────────────────────────
+    function setAction(action) {
+        document.getElementById('form_action').value = action;
+    }
+
+    // ─── Multiple Choice Sync ─────────────────────────────────────────────────
     function syncRadioValue(input, idx) {
-        document.querySelectorAll('.mc-radio')[idx].value = input.value;
+        const radio = document.querySelectorAll('.mc-radio')[idx];
+        radio.value = input.value;
+        if (radio.checked) {
+            highlightSelectedRow(radio, 'mc-row', 'indigo');
+        }
     }
 
     function syncListeningRadio(input, idx) {
-        document.querySelectorAll('.listening-radio')[idx].value = input.value;
+        const radio = document.querySelectorAll('.listening-radio')[idx];
+        radio.value = input.value;
+        if (radio.checked) {
+            highlightSelectedRow(radio, 'listening-row', 'amber');
+        }
     }
 
+    // ─── Row Highlight ────────────────────────────────────────────────────────
+    function highlightSelectedRow(radio, rowClass, color) {
+        const colorStyles = {
+            indigo: { border: 'border-indigo-400 dark:border-indigo-600', bg: 'bg-indigo-50/80 dark:bg-indigo-900/20' },
+            amber:  { border: 'border-amber-400 dark:border-amber-600',   bg: 'bg-amber-50/80 dark:bg-amber-900/20' },
+        };
+        const c = colorStyles[color];
+
+        document.querySelectorAll('.' + rowClass).forEach(row => {
+            row.classList.remove(
+                'border-indigo-400', 'dark:border-indigo-600', 'bg-indigo-50/80', 'dark:bg-indigo-900/20',
+                'border-amber-400',  'dark:border-amber-600',  'bg-amber-50/80',  'dark:bg-amber-900/20'
+            );
+            row.classList.add('border-transparent');
+            row.querySelector('.correct-check').style.opacity = '0';
+        });
+
+        const row = radio.closest('.' + rowClass);
+        if (row) {
+            row.classList.remove('border-transparent');
+            row.classList.add(...c.border.split(' '), ...c.bg.split(' '));
+            row.querySelector('.correct-check').style.opacity = '1';
+        }
+    }
+
+    // ─── Kanji Search ─────────────────────────────────────────────────────────
     let searchTimeout;
-    document.getElementById('kanji_search').addEventListener('input', function() {
+    document.getElementById('kanji_search').addEventListener('input', function () {
         clearTimeout(searchTimeout);
         const q = this.value.trim();
         if (!q) { document.getElementById('kanji_results').classList.add('hidden'); return; }
@@ -223,14 +374,16 @@
             });
             const data = await res.json();
             const box = document.getElementById('kanji_results');
-            if (!data.length) { 
-                box.innerHTML = '<p class="text-sm text-gray-400 p-3">Tidak ditemukan</p>'; 
+
+            if (!data.length) {
+                box.innerHTML = '<p class="text-sm text-gray-400 p-4 text-center"><i class="fas fa-search mr-1"></i>Tidak ditemukan</p>';
             } else {
                 box.innerHTML = data.map(k => `
-                    <button type="button" onclick='selectKanji(${JSON.stringify(k)})' class="w-full text-left px-4 py-3 hover:bg-indigo-50 flex items-center gap-3 border-b border-gray-100 transition-colors">
-                        <span class="text-2xl font-bold text-gray-800 w-8">${k.character}</span>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-800">${k.meaning}</p>
+                    <button type="button" onclick='selectKanji(${JSON.stringify(k)})'
+                            class="w-full text-left px-4 py-3 hover:bg-indigo-50 dark:hover:bg-gray-700 flex items-center gap-3 border-b border-gray-100 dark:border-gray-700 last:border-0 transition-colors">
+                        <span class="text-2xl font-bold text-gray-800 dark:text-white w-8 text-center">${k.character}</span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">${k.meaning}</p>
                             <p class="text-xs text-gray-400">${k.category} · ${(k.strokes||[]).length} goresan</p>
                         </div>
                     </button>`).join('');
@@ -257,6 +410,7 @@
         document.getElementById('kanji_id').value = '';
         document.getElementById('drawing_correct_answer').value = '';
         document.getElementById('selected_kanji_display').classList.add('hidden');
+        document.getElementById('kanji_search').focus();
     }
 
     document.addEventListener('click', (e) => {
@@ -265,16 +419,17 @@
         }
     });
 
+    // ─── Audio Generation ─────────────────────────────────────────────────────
     async function generateAudio() {
-        const text = document.getElementById('tts_text').value.trim();
+        const text    = document.getElementById('tts_text').value.trim();
         const voiceId = document.getElementById('voice_select').value;
-        if (!text) { alert('Masukkan teks terlebih dahulu!'); return; }
+        if (!text) { showError('Masukkan teks untuk di-generate terlebih dahulu!'); return; }
 
         const btn = document.getElementById('gen_btn');
-        btn.disabled = true; document.getElementById('gen_icon').className = 'fas fa-spinner fa-spin';
+        setGeneratingState(btn, 'gen_icon', 'gen_label', true, 'Generating...');
 
         try {
-            const res = await fetch('/admin/quizzes/api/generate-audio-preview', {
+            const res  = await fetch('/admin/quizzes/api/generate-audio-preview', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
                 body: JSON.stringify({ text, voice_id: voiceId })
@@ -282,31 +437,44 @@
             const data = await res.json();
             if (data.audio_url) {
                 setAudioPreview(data.audio_url);
-                document.getElementById('audio_status').textContent = '✅ Berhasil digenerate';
-            } else { alert(data.error); }
-        } catch(e) { alert('Error: ' + e.message); } finally {
-            btn.disabled = false; document.getElementById('gen_icon').className = 'fas fa-magic';
+                document.getElementById('audio_status').innerHTML = '<i class="fas fa-check-circle text-emerald-500 mr-1"></i>Audio berhasil di-generate';
+            } else {
+                showError(data.error || 'Gagal generate audio.');
+            }
+        } catch(e) {
+            showError('Error: ' + e.message);
+        } finally {
+            setGeneratingState(btn, 'gen_icon', 'gen_label', false, 'Generate', 'fa-magic');
         }
     }
 
     async function regenerateAudio() {
-        const text = document.getElementById('tts_text').value.trim();
+        const text    = document.getElementById('tts_text').value.trim();
         const voiceId = document.getElementById('voice_select').value;
-        if (!text) { alert('Masukkan teks!'); return; }
+        if (!text) { showError('Masukkan teks terlebih dahulu!'); return; }
 
         const btn = document.getElementById('regen_btn');
-        btn.disabled = true; document.getElementById('regen_icon').className = 'fas fa-spinner fa-spin';
+        btn.disabled = true;
+        document.getElementById('regen_icon').className = 'fas fa-spinner fa-spin';
 
         try {
-            const res = await fetch('/admin/quizzes/api/regenerate-audio-preview', {
+            const res  = await fetch('/admin/quizzes/api/regenerate-audio-preview', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
                 body: JSON.stringify({ text, voice_id: voiceId, current_url: generatedAudioUrl })
             });
             const data = await res.json();
-            if (data.audio_url) { setAudioPreview(data.audio_url); }
-        } catch(e) { alert('Error: ' + e.message); } finally {
-            btn.disabled = false; document.getElementById('regen_icon').className = 'fas fa-redo';
+            if (data.audio_url) {
+                setAudioPreview(data.audio_url);
+                document.getElementById('audio_status').innerHTML = '<i class="fas fa-check-circle text-emerald-500 mr-1"></i>Audio berhasil di-regenerate';
+            } else {
+                showError(data.error || 'Gagal regenerate audio.');
+            }
+        } catch(e) {
+            showError('Error: ' + e.message);
+        } finally {
+            btn.disabled = false;
+            document.getElementById('regen_icon').className = 'fas fa-redo';
         }
     }
 
@@ -317,16 +485,57 @@
         document.getElementById('audio_preview_wrap').classList.remove('hidden');
     }
 
+    function setGeneratingState(btn, iconId, labelId, isLoading, labelText, iconClass = 'fa-spinner fa-spin') {
+        btn.disabled = isLoading;
+        document.getElementById(iconId).className = isLoading ? 'fas fa-spinner fa-spin' : `fas ${iconClass}`;
+        if (labelId) document.getElementById(labelId).textContent = labelText;
+    }
+
+    // ─── Error Display ────────────────────────────────────────────────────────
+    function showError(msg) {
+        const banner = document.getElementById('form-error');
+        document.getElementById('form-error-msg').textContent = msg;
+        banner.classList.remove('hidden');
+        banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => banner.classList.add('hidden'), 5000);
+    }
+
+    // ─── Form Submit Validation ───────────────────────────────────────────────
     document.getElementById('itemForm').addEventListener('submit', function(e) {
-        if (currentType === 'drawing' && !document.getElementById('kanji_id').value) {
-            e.preventDefault(); alert('Pilih karakter Kanji terlebih dahulu!');
-        } else if (currentType === 'multiple_choice' && !document.querySelector('.mc-radio:checked')?.value) {
-            e.preventDefault(); alert('Pilih satu jawaban yang benar untuk Pilihan Ganda!');
-        } else if (currentType === 'listening' && !document.querySelector('.listening-radio:checked')?.value) {
-            e.preventDefault(); alert('Pilih satu jawaban yang benar untuk Listening!');
+        document.getElementById('form-error').classList.add('hidden');
+
+        if (!document.getElementById('question_text').value.trim()) {
+            e.preventDefault();
+            showError('Teks pertanyaan tidak boleh kosong!');
+            return;
+        }
+
+        if (currentType === 'drawing') {
+            if (!document.getElementById('kanji_id').value) {
+                e.preventDefault();
+                showError('Pilih karakter Kanji terlebih dahulu!');
+            }
+        } else if (currentType === 'multiple_choice') {
+            const checked = document.querySelector('.mc-radio:checked');
+            if (!checked || !checked.value.trim()) {
+                e.preventDefault();
+                showError('Pilih satu jawaban yang benar untuk soal Pilihan Ganda!');
+            }
+        } else if (currentType === 'listening') {
+            if (!document.getElementById('audio_url_input').value) {
+                e.preventDefault();
+                showError('Generate audio terlebih dahulu sebelum menyimpan!');
+                return;
+            }
+            const checked = document.querySelector('.listening-radio:checked');
+            if (!checked || !checked.value.trim()) {
+                e.preventDefault();
+                showError('Pilih satu jawaban yang benar untuk soal Listening!');
+            }
         }
     });
 
+    // ─── Init ─────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => selectType(currentType));
 </script>
 @endpush

@@ -16,7 +16,7 @@ class AiValidationController extends Controller
         ]);
 
         try {
-            $response = Http::post('http://127.0.0.1:5000/predict', [
+            $response = Http::post('http://108.136.150.128:8000/predict', [
                 'target_character' => $request->character,
                 'image_base64' => $request->image_base64
             ]);
