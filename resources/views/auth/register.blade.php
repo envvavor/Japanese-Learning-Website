@@ -37,11 +37,11 @@
     <div class="relative w-full max-w-md z-10 m-auto py-8">
         <div class="relative w-full bg-white dark:bg-gray-800 rounded-[2rem] border-2 border-b-[8px] border-slate-200 dark:border-gray-700 p-8 sm:p-10 flex flex-col items-center shadow-sm">
 
-            <!-- <div class="w-full flex justify-start mb-4 mt-2">
+            <div class="w-full flex justify-start mb-4 mt-2">
                 <a href="/" class="px-4 py-2 bg-slate-50 dark:bg-gray-900 border-2 border-b-4 border-slate-200 dark:border-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white active:border-b-2 active:translate-y-1 transition-all">
                     <i class="fas fa-arrow-left mr-1"></i> Beranda
                 </a>
-            </div> -->
+            </div>
 
             <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 border-2 border-emerald-200 dark:border-emerald-800 rounded-[1.5rem] flex items-center justify-center p-3 mb-5 shadow-sm">
                 <img src="{{ asset('storage/images/logo_manabu.png') }}" alt="Manabu Logo" class="w-full h-full object-contain">

@@ -39,11 +39,11 @@
     <div class="relative w-full max-w-md z-10 m-auto py-8">
         <div class="relative w-full bg-white dark:bg-gray-800 rounded-[2rem] border-2 border-b-[8px] border-slate-200 dark:border-gray-700 p-8 sm:p-10 flex flex-col items-center shadow-sm">
 
-            <!-- <div class="w-full flex justify-start mb-6 mt-2">
+            <div class="w-full flex justify-start mb-6 mt-2">
                 <a href="/" class="px-4 py-2 bg-slate-50 dark:bg-gray-900 border-2 border-b-4 border-slate-200 dark:border-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white active:border-b-2 active:translate-y-1 transition-all">
                     <i class="fas fa-arrow-left mr-1"></i> Beranda
                 </a>
-            </div> -->
+            </div>
 
             {{-- Logo --}}
             <div class="w-24 h-24 bg-[#1cb0f6]/10 dark:bg-[#1899d6]/20 border-2 border-[#1cb0f6]/20 rounded-3xl flex items-center justify-center p-3 mb-6 shadow-sm">

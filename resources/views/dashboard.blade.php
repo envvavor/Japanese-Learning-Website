@@ -255,8 +255,8 @@
             <div class="flex items-center justify-center mt-12 mb-4">
                 <a href="https://saweria.co/envvavor" target="_blank" rel="noopener noreferrer"
                 class="group flex items-center gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-[#ffc82c] border-2 border-b-[6px] border-[#d8a110] text-slate-900 font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl sm:rounded-[1.25rem] hover:brightness-105 hover:-translate-y-1 active:border-b-2 active:translate-y-1 transition-all shadow-sm">
-                    <i class="fas fa-mug-hot text-lg group-hover:-translate-y-1 group-hover:rotate-12 transition-transform duration-300"></i>
-                    <span>Traktir Kopi</span>
+                    <i class="fas fa-money-bill-wave text-lg group-hover:-translate-y-1 group-hover:rotate-12 transition-transform duration-300"></i>
+                    <span>Traktir Gw Kopi</span>
                 </a>
             </div>
         </div>

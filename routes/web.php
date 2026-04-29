@@ -21,8 +21,8 @@ use App\Http\Controllers\VocabularyController;
 
 // Public routes
 Route::get('/', function () {
-    return redirect()->route('login');
-});
+    return view('welcome');
+})->name('welcome');
 
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
