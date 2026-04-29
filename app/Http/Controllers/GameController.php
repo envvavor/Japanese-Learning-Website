@@ -14,12 +14,8 @@ class GameController extends Controller
         protected ElevenLabsService $elevenLabsService
     ) {}
 
-    /**
-     * Start playing the visual novel from the entry dialogue.
-     */
     public function start()
     {
-        // Collect all dialogue IDs that are targets of something else
         $referencedIds = VnDialogue::whereNotNull('next_dialogue_id')
             ->pluck('next_dialogue_id')
             ->merge(
@@ -27,12 +23,10 @@ class GameController extends Controller
             )
             ->unique();
 
-        // The root dialogue is the one not referenced by anything
         $firstDialogue = VnDialogue::whereNotIn('id', $referencedIds)
             ->orderBy('id')
             ->first();
 
-        // Fallback: just grab the first one by ID
         if (!$firstDialogue) {
             $firstDialogue = VnDialogue::orderBy('id')->first();
         }
@@ -41,26 +35,25 @@ class GameController extends Controller
             return Inertia::render('Game/Play', [
                 'allDialogues' => [],
                 'startDialogueId' => null,
+                'sceneId' => null,
+                'sceneVersion' => null,
             ]);
         }
 
         return redirect()->route('vn.play', $firstDialogue->id);
     }
 
-    /**
-     * Play a specific dialogue scene.
-     * Auto-generate audio untuk semua dialog di scene ini, lalu kirim ke Vue.
-     */
     public function play(VnDialogue $dialogue)
     {
         $sceneId = $dialogue->scene_id;
 
-        // Ambil SEMUA dialog di scene ini
+        // Ambil data scene untuk versioning
+        $scene = VnScene::find($sceneId);
+
         $allDialoguesInScene = VnDialogue::with(['character', 'background', 'choices'])
             ->where('scene_id', $sceneId)
             ->get();
 
-        // AUTO-GENERATE AUDIO (ElevenLabs) UNTUK SEMUA DIALOG YANG KOSONG
         foreach ($allDialoguesInScene as $d) {
             if (
                 !$d->audio_file_path
@@ -68,21 +61,18 @@ class GameController extends Controller
                 && $d->character
                 && $d->character->elevenlabs_voice_id
             ) {
-                // Generate TTS audio
                 $audioUrl = $this->elevenLabsService->getOrGenerateAudio(
                     $d->original_text,
                     $d->character->elevenlabs_voice_id
                 );
 
                 if ($audioUrl) {
-                    // Simpan ke database agar request berikutnya tidak generate lagi
                     $d->update(['audio_file_path' => $audioUrl]);
-                    $d->audio_file_path = $audioUrl; 
+                    $d->audio_file_path = $audioUrl;
                 }
             }
         }
 
-        // Format seluruh data tersebut menjadi array agar siap digunakan oleh Vue
         $formattedDialogues = $allDialoguesInScene->map(function ($d) {
             return [
                 'id' => $d->id,
@@ -108,16 +98,15 @@ class GameController extends Controller
             ];
         });
 
-        // Kirim semua data ke Vue Player
         return Inertia::render('Game/Play', [
             'allDialogues' => $formattedDialogues,
             'startDialogueId' => $dialogue->id,
+            // Dikirim ke Vue untuk cache key
+            'sceneId' => $sceneId,
+            'sceneVersion' => $scene?->updated_at?->timestamp ?? 0,
         ]);
     }
 
-    /**
-     * Show the list of available VN scenes for the user.
-     */
     public function scenes()
     {
         $scenes = VnScene::whereNotNull('first_dialogue_id')->latest()->get();

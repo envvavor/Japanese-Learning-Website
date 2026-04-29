@@ -79,8 +79,8 @@
                     </div>
                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
                         @if($item->question_type === 'multiple_choice') MC
-                        @elseif($item->question_type === 'drawing') ✏️
-                        @else 🔊 @endif
+                        @elseif($item->question_type === 'drawing') <i class="fa fa-pen"></i>
+                        @else <i class="fa fa-volume-up"></i> @endif
                     </span>
                 </div>
 

@@ -368,7 +368,7 @@
         document.getElementById('chart-subtitle').innerText = 'Tren pengerjaan kuis dalam ' + days + ' hari terakhir';
     }
 
-    const AI_URL = 'http://16.78.43.88:8000/status'; // sesuaikan URL Flask kamu
+    const AI_URL = '{{ env('AI_PREDICT_URL')."/status" }}';
 
     async function checkAIStatus() {
         const badge = document.getElementById('ai-status-badge');

@@ -14,6 +14,8 @@ Route::get('/kanjis', [KanjiController::class, 'index']);
 Route::get('/kanjis/{character}', [KanjiController::class, 'show']);
 Route::post('/kanjis', [KanjiController::class, 'store']);
 
+Route::get('/kanjis/{character}/vocabulary', [KanjiController::class, 'vocabulary']);
+
 // Route untuk menerima kiriman gambar Auto-Save dari JavaScript
 Route::post('/dataset/save', [DatasetController::class, 'store']);
 

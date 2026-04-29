@@ -195,7 +195,7 @@
                 </a>
 
                 {{-- Modul: Vocabulary --}}
-                <a href="#" class="block bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 hover:bg-slate-50 dark:hover:bg-gray-700/50 hover:-translate-y-1 active:translate-y-1 active:border-b-2 transition-all group">
+                <a href="{{ route('vocabulary.index') }}" class="block bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 hover:bg-slate-50 dark:hover:bg-gray-700/50 hover:-translate-y-1 active:translate-y-1 active:border-b-2 transition-all group">
                     <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 border-2 border-b-4 border-indigo-200 dark:border-indigo-800 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">
                         <i class="fas fa-book-open"></i>
                     </div>
@@ -250,6 +250,14 @@
                         <i class="fas fa-clipboard-check mr-2 text-lg"></i> Isi Kuesioner
                     </a>
                 </div>
+            </div>
+            {{-- Footer Buy Me Coffee --}}
+            <div class="flex items-center justify-center mt-12 mb-4">
+                <a href="https://saweria.co/envvavor" target="_blank" rel="noopener noreferrer"
+                class="group flex items-center gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-[#ffc82c] border-2 border-b-[6px] border-[#d8a110] text-slate-900 font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl sm:rounded-[1.25rem] hover:brightness-105 hover:-translate-y-1 active:border-b-2 active:translate-y-1 transition-all shadow-sm">
+                    <i class="fas fa-mug-hot text-lg group-hover:-translate-y-1 group-hover:rotate-12 transition-transform duration-300"></i>
+                    <span>Traktir Kopi</span>
+                </a>
             </div>
         </div>
     </div>

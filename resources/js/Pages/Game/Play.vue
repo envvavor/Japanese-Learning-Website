@@ -31,7 +31,7 @@
         <div
           v-if="currentDialogue?.character?.default_sprite_path"
           :key="currentDialogue.character.name"
-          class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none flex justify-center items-end h-[55vh] sm:h-[85vh]"
+          class="absolute bottom-0 left-0 right-0 z-20 pointer-events-none flex justify-center items-end h-[55vh] sm:h-[75vh]"
         >
           <img
             :src="currentDialogue.character.default_sprite_path"
@@ -145,86 +145,87 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 
 const props = defineProps({
-  allDialogues: {
-    type: Array,
-    default: () => []
-  },
+  allDialogues: { type: Array, default: () => [] },
   startDialogueId: [Number, String],
+  sceneId: [Number, String],
+  sceneVersion: [Number, String],
 });
 
-// State
+// ============================================================
+// STATE
+// ============================================================
 const isLoaded = ref(false);
 const loadingProgress = ref(0);
 const currentDialogue = ref(null);
-
-// ARRAY UNTUK MENYIMPAN JEJAK (HISTORY)
 const dialogueHistory = ref([]);
-
 const audioEl = ref(null);
 const audioPlaying = ref(false);
 const audioMuted = ref(false);
 
+// ============================================================
+// COMPUTED
+// ============================================================
 const hasChoices = computed(() => currentDialogue.value?.choices && currentDialogue.value.choices.length > 0);
 const displayedOriginal = computed(() => currentDialogue.value?.original_text?.split('') || []);
 
-// TODO: maybe buat biar lebih ringan lagi
-// PRELOADER
+// ============================================================
+// PRELOADER — Load semua aset, decode gambar ke memori
+// ============================================================
 onMounted(async () => {
-  const assetUrls = new Set();
-  
-  // Kumpulkan semua alamat file (Gambar + Audio)
+  const imageUrls = new Set();
+  const audioUrls = new Set();
+
+  // Kumpulkan SEMUA aset dari SEMUA dialogue
   props.allDialogues.forEach(d => {
-    if (d.background?.image_url) assetUrls.add(d.background.image_url);
-    if (d.character?.default_sprite_path) assetUrls.add(d.character.default_sprite_path);
-    
-    // TAMBAHKAN AUDIO KE DAFTAR SEDOTAN
-    if (d.audio_file_path) assetUrls.add(d.audio_file_path);
+    if (d.background?.image_url) imageUrls.add(d.background.image_url);
+    if (d.character?.default_sprite_path) imageUrls.add(d.character.default_sprite_path);
+    if (d.audio_file_path) audioUrls.add(d.audio_file_path);
   });
 
-  const urlsToLoad = Array.from(assetUrls);
+  const allUrls = [...imageUrls, ...audioUrls];
   let loadedCount = 0;
 
-  if (urlsToLoad.length === 0) {
+  if (allUrls.length === 0) {
     finishLoading();
     return;
   }
 
-  // Fungsi untuk update progress bar
   const updateProgress = () => {
     loadedCount++;
-    loadingProgress.value = (loadedCount / urlsToLoad.length) * 100;
+    loadingProgress.value = (loadedCount / allUrls.length) * 100;
   };
 
-  //  Proses Download Semua Aset
-  const loadPromises = urlsToLoad.map(url => {
-    //  Jika file adalah Audio (Cek dari ekstensi)
-    if (url.includes('.mp3') || url.includes('.wav') || url.includes('.ogg')) {
-      return fetch(url)
-        .then(response => response.blob()) // Sedot file ke cache browser
-        .then(() => { updateProgress(); })
-        .catch(() => { updateProgress(); }); // Kalau error tetep lanjut biar gak stuck
-    } 
-    // Jika file adalah Gambar
-    else {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.src = url;
-        img.onload = () => { updateProgress(); resolve(); };
-        img.onerror = () => { updateProgress(); resolve(); };
-      });
-    }
+  // Gambar: decode ke memori — tampil instan tanpa pop
+  const imagePromises = Array.from(imageUrls).map(url => {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.src = url;
+      img.decode()
+        .catch(() => {}) // Tetap lanjut kalau gagal
+        .finally(() => {
+          updateProgress();
+          resolve();
+          // img sengaja dibiarkan di-GC setelah ini
+          // Browser sudah decode ke internal cache, cukup
+        });
+    });
   });
 
-  // Tunggu semua bala bantuan selesai didownload
-  await Promise.all(loadPromises);
-  
-  // Kasih jeda estetik sebelum masuk layar utama
+  // Audio: fetch biar ke-cache di HTTP cache browser
+  const audioPromises = Array.from(audioUrls).map(url => {
+    return fetch(url)
+      .then(r => r.blob())
+      .catch(() => {})
+      .finally(() => updateProgress());
+  });
+
+  await Promise.all([...imagePromises, ...audioPromises]);
   setTimeout(finishLoading, 500);
 });
 
 function finishLoading() {
   isLoaded.value = true;
-  dialogueHistory.value = []; // Reset history di awal
+  dialogueHistory.value = [];
   goToDialogue(props.startDialogueId);
   window.addEventListener('keydown', handleKeydown);
 }
@@ -233,7 +234,9 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown);
 });
 
+// ============================================================
 // AUDIO LOGIC
+// ============================================================
 watch(() => currentDialogue.value?.id, async () => {
   await nextTick();
   playAudio();
@@ -250,29 +253,24 @@ function playAudio() {
 function toggleAudio() {
   audioMuted.value = !audioMuted.value;
   if (audioEl.value) {
-    if (audioMuted.value) {
-      audioEl.value.pause();
-    } else {
-      playAudio();
-    }
+    audioMuted.value ? audioEl.value.pause() : playAudio();
   }
 }
 
+// ============================================================
 // GAMEPLAY LOGIC
+// ============================================================
 function handleClick() {
   if (!currentDialogue.value || hasChoices.value) return;
   advance();
 }
 
 function handleKeydown(e) {
-  // Tombol Next (Spasi / Enter)
   if (e.code === 'Space' || e.code === 'Enter') {
     e.preventDefault();
     if (!currentDialogue.value || hasChoices.value) return;
     advance();
-  }
-  // Tombol Back (Panah Kiri)
-  else if (e.code === 'ArrowLeft') {
+  } else if (e.code === 'ArrowLeft') {
     e.preventDefault();
     goBack();
   }
@@ -282,31 +280,23 @@ function advance() {
   if (currentDialogue.value?.next_dialogue_id) {
     goToDialogue(currentDialogue.value.next_dialogue_id);
   } else {
-    currentDialogue.value = null; // Tamat
+    currentDialogue.value = null;
   }
 }
 
-// FUNGSI KEMBALI 1 DIALOG
 function goBack() {
-  // Cek apakah ada history sebelumnya
   if (dialogueHistory.value.length === 0) return;
-  
-  // Ambil ID dialog sebelumnya dari array history dan hapus dari array tersebut (pop)
   const prevDialogueId = dialogueHistory.value.pop();
-  
-  // Pergi ke dialog tersebut (isBack = true, agar tidak masuk ke history lagi)
   goToDialogue(prevDialogueId, true);
 }
 
-// LOCAL NAVIGATION
 function goToDialogue(dialogueId, isBack = false) {
-  // Jika ini adalah pergerakan maju (bukan back), rekam jejak dialog saat ini ke History
   if (!isBack && currentDialogue.value) {
     dialogueHistory.value.push(currentDialogue.value.id);
   }
 
   const nextDialog = props.allDialogues.find(d => String(d.id) === String(dialogueId));
-  
+
   if (nextDialog) {
     currentDialogue.value = nextDialog;
     window.history.pushState({}, '', `/vn/play/${dialogueId}`);

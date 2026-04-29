@@ -15,6 +15,7 @@ use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Admin\AdminQuizController;
 use App\Http\Controllers\QuizNewController;
 use App\Http\Controllers\SocialAuthController;
+use App\Http\Controllers\VocabularyController;
 
 
 
@@ -274,3 +275,5 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('password.update.profile');
 });
 
+Route::get('/kosakata', [VocabularyController::class, 'index'])->name('vocabulary.index');
+Route::get('/kosakata/search', [VocabularyController::class, 'search'])->name('vocabulary.search');

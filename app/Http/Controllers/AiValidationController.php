@@ -9,14 +9,15 @@ class AiValidationController extends Controller
 {
     public function check(Request $request)
     {
-        // Pastikan data dari Javascript masuk dengan benar
         $request->validate([
             'character' => 'required|string',
             'image_base64' => 'required|string',
         ]);
 
         try {
-            $response = Http::post('http://108.136.150.128:8000/predict', [
+            $apiUrl = env('AI_PREDICT_URL')."/predict";
+
+            $response = Http::post($apiUrl, [
                 'target_character' => $request->character,
                 'image_base64' => $request->image_base64
             ]);

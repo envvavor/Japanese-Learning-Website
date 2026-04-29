@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kanji;
+use App\Models\Vocabulary;
 use Illuminate\Http\Request;
 
 class KanjiController extends Controller
@@ -94,5 +95,38 @@ class KanjiController extends Controller
             'message' => 'Data Kanji Berhasil Disimpan!',
             'data' => $kanji
         ], 200);
+    }
+
+    public function vocabulary($character)
+    {
+        try {
+            // Pastikan karakter ini memang kategori kanji
+            $kanji = Kanji::where('character', $character)
+                          ->where('category', 'kanji')
+                          ->first();
+    
+            if (!$kanji) {
+                return response()->json([]); 
+            }
+    
+            // Urutan level dari mudah ke sulit
+            $levelOrder = ['N5' => 1, 'N4' => 2, 'N3' => 3, 'N2' => 4, 'N1' => 5];
+    
+            $vocab = Vocabulary::where('original', 'like', "%{$character}%")
+                ->select('id', 'original', 'furigana', 'english', 'jlpt_level')
+                ->get()
+                ->sortBy(fn($v) => $levelOrder[$v->jlpt_level] ?? 99)
+                ->values();
+    
+            return response()->json($vocab);
+
+        } catch (\Exception $e) {
+            // INI ADALAH KODE UNTUK MENANGKAP ERRORNYA
+            return response()->json([
+                'PESAN_ERROR_ASLI' => $e->getMessage(),
+                'DI_FILE' => $e->getFile(),
+                'BARIS_KE' => $e->getLine()
+            ], 500);
+        }
     }
 }

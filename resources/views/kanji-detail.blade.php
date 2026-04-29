@@ -14,102 +14,70 @@
                     <i class="fas fa-search"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-black text-slate-800 dark:text-white uppercase tracking-wider mb-1">
-                        Detail Karakter
-                    </h1>
+                    <h1 class="text-3xl font-black text-slate-800 dark:text-white uppercase tracking-wider mb-1">Detail Karakter</h1>
                     <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Informasi dan cara penulisan karakter.</p>
                 </div>
             </div>
-
             <a onclick="window.history.back()"
-                class="inline-flex items-center justify-center px-6 py-3 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl text-sm font-black text-slate-600 dark:text-slate-300 bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 active:border-b-2 active:translate-y-1 transition-all uppercase tracking-widest shrink-0 cursor-pointer">
+               class="inline-flex items-center justify-center px-6 py-3 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl text-sm font-black text-slate-600 dark:text-slate-300 bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 active:border-b-2 active:translate-y-1 transition-all uppercase tracking-widest shrink-0 cursor-pointer">
                 <i class="fas fa-arrow-left mr-2"></i> Kembali
             </a>
         </div>
 
-        {{-- Main Card Container --}}
+        {{-- Main Card --}}
         <div id="infoArea" class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] shadow-sm p-8 sm:p-10 relative overflow-hidden transition-all duration-300 min-h-[500px]">
-            
+
             <div class="absolute top-0 left-0 w-full h-3 bg-[#1cb0f6]"></div>
 
-            {{-- Skeleton Loading --}}
+            {{-- Skeleton --}}
             <div id="skeletonLoading" class="animate-pulse w-full">
                 <div class="flex flex-col items-center justify-center mb-10 mt-4 space-y-6">
                     <div class="w-32 h-32 bg-slate-200 dark:bg-gray-700 rounded-[2rem]"></div>
                     <div class="w-48 h-6 bg-slate-200 dark:bg-gray-700 rounded-xl"></div>
                     <div class="w-16 h-16 bg-slate-200 dark:bg-gray-700 rounded-2xl mt-2"></div>
                 </div>
-
                 <div class="grid grid-cols-2 gap-6 mb-10 bg-slate-50 dark:bg-gray-700/50 p-6 rounded-2xl border-2 border-slate-100 dark:border-gray-600">
-                    <div>
-                        <div class="w-16 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-3"></div>
-                        <div class="w-24 h-6 bg-slate-200 dark:bg-gray-500 rounded-md"></div>
-                    </div>
-                    <div>
-                        <div class="w-20 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-3"></div>
-                        <div class="w-24 h-6 bg-slate-200 dark:bg-gray-500 rounded-md"></div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="w-40 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-3"></div>
-                        <div class="w-64 h-6 bg-slate-200 dark:bg-gray-500 rounded-md"></div>
-                    </div>
+                    <div><div class="w-16 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-3"></div><div class="w-24 h-6 bg-slate-200 dark:bg-gray-500 rounded-md"></div></div>
+                    <div><div class="w-20 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-3"></div><div class="w-24 h-6 bg-slate-200 dark:bg-gray-500 rounded-md"></div></div>
+                    <div class="col-span-2"><div class="w-40 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-3"></div><div class="w-64 h-6 bg-slate-200 dark:bg-gray-500 rounded-md"></div></div>
                 </div>
-
-                <div class="mb-12">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 bg-slate-200 dark:bg-gray-700 rounded-xl"></div>
-                        <div class="w-40 h-6 bg-slate-200 dark:bg-gray-700 rounded-xl"></div>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex items-start bg-white dark:bg-gray-800 border-2 border-slate-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm">
-                            <div class="w-10 h-10 bg-slate-200 dark:bg-gray-700 rounded-xl mr-4 shrink-0"></div>
-                            <div class="flex-1 space-y-3 mt-1">
-                                <div class="w-3/4 h-5 bg-slate-200 dark:bg-gray-700 rounded-md"></div>
-                                <div class="w-1/2 h-4 bg-slate-100 dark:bg-gray-600 rounded-md"></div>
-                            </div>
-                            <div class="w-12 h-12 bg-slate-200 dark:bg-gray-700 rounded-xl ml-4 shrink-0"></div>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="flex flex-col items-center justify-center mb-10">
                     <div class="w-40 h-3 bg-slate-300 dark:bg-gray-600 rounded-md mb-5"></div>
                     <div class="w-48 h-48 bg-slate-200 dark:bg-gray-700 rounded-[2rem]"></div>
                 </div>
             </div>
 
-            {{-- Konten Asli --}}
+            {{-- Real Content --}}
             <div id="realContent" class="hidden fade-in">
-                
-                <div class="text-center mb-10 mt-2 relative">
+
+                {{-- Karakter besar + speaker --}}
+                <div class="text-center mb-10 mt-2">
                     <h1 id="character" class="text-[6rem] sm:text-[8rem] font-black text-slate-800 dark:text-white tracking-tight drop-shadow-sm leading-none"></h1>
                     <p id="meaning" class="mt-4 text-xl font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest"></p>
-                    
-                    <button onclick="window.speakText(window.currentKanjiChar)" 
-                            class="mt-6 w-16 h-16 inline-flex items-center justify-center text-[#1cb0f6] bg-[#1cb0f6]/10 border-2 border-b-[6px] border-[#1cb0f6]/30 hover:bg-[#1cb0f6]/20 active:translate-y-1 active:border-b-2 rounded-2xl transition-all" 
+                    <button onclick="window.speakText(window.currentKanjiChar)"
+                            class="mt-6 w-16 h-16 inline-flex items-center justify-center text-[#1cb0f6] bg-[#1cb0f6]/10 border-2 border-b-[6px] border-[#1cb0f6]/30 hover:bg-[#1cb0f6]/20 active:translate-y-1 active:border-b-2 rounded-2xl transition-all"
                             title="Dengarkan Cara Baca">
                         <i class="fas fa-volume-up text-2xl"></i>
                     </button>
                 </div>
 
+                {{-- Info Grid --}}
                 <div id="infoGrid" class="grid grid-cols-2 gap-6 mb-10 bg-slate-50 dark:bg-gray-700/50 p-6 rounded-2xl border-2 border-slate-100 dark:border-gray-600 hidden">
-                    
                     <div id="categoryWrapper" class="hidden">
                         <p class="uppercase tracking-widest text-[10px] font-black text-slate-400 dark:text-slate-500 mb-1">Kategori</p>
                         <p id="category" class="text-slate-800 dark:text-slate-200 font-bold text-lg capitalize">-</p>
                     </div>
-                    
                     <div id="levelWrapper" class="hidden">
                         <p class="uppercase tracking-widest text-[10px] font-black text-slate-400 dark:text-slate-500 mb-1">Bab / Level</p>
                         <p id="level" class="text-slate-800 dark:text-slate-200 font-bold text-lg">-</p>
                     </div>
-                    
                     <div id="readingsWrapper" class="col-span-2 hidden">
                         <p class="uppercase tracking-widest text-[10px] font-black text-slate-400 dark:text-slate-500 mb-1">Cara Baca (Kunyomi / Onyomi)</p>
                         <p id="readings" class="text-slate-800 dark:text-slate-200 font-bold text-lg">-</p>
                     </div>
                 </div>
 
+                {{-- Contoh Kalimat --}}
                 <div id="examplesSection" class="mb-12 hidden">
                     <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 flex items-center gap-3">
                         <div class="bg-amber-100 dark:bg-amber-900/30 text-amber-500 w-10 h-10 rounded-xl flex items-center justify-center border-2 border-b-4 border-amber-200 dark:border-amber-800 shrink-0">
@@ -120,8 +88,57 @@
                     <div id="examplesList" class="space-y-4"></div>
                 </div>
 
+                {{-- ============================================================
+                     KOSAKATA TERKAIT
+                     Section ini HANYA muncul jika kategori kanji DAN ada vocab
+                     ============================================================ --}}
+                <div id="relatedVocabSection" class="mb-12 hidden">
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-4 flex items-center gap-3">
+                        <div class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 w-10 h-10 rounded-xl flex items-center justify-center border-2 border-b-4 border-indigo-200 dark:border-indigo-800 shrink-0">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        Kosakata Terkait
+                        <span id="vocabCount" class="ml-auto text-xs font-bold text-slate-400 normal-case tracking-normal border border-slate-200 dark:border-gray-600 px-2.5 py-1 rounded-lg"></span>
+                    </h3>
+
+                    {{-- Filter Level (muncul kalau lebih dari 1 level) --}}
+                    <div id="vocabLevelFilter" class="flex flex-wrap gap-2 mb-4 hidden">
+                        @php
+                            $filterBtns = ['' => 'Semua', 'N5' => 'N5', 'N4' => 'N4', 'N3' => 'N3', 'N2' => 'N2', 'N1' => 'N1'];
+                        @endphp
+                        @foreach($filterBtns as $lvl => $lbl)
+                        <button onclick="filterVocabLevel('{{ $lvl }}')" data-lvl="{{ $lvl }}"
+                                class="vocab-lvl-btn px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-xl border-2 border-b-[4px] transition-all active:border-b-2 active:translate-y-0.5
+                                       {{ $lvl === '' ? 'border-slate-800 dark:border-slate-200 bg-slate-800 dark:bg-white text-white dark:text-slate-900' : 'border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-slate-500 dark:text-slate-400' }}">
+                            {{ $lbl }}
+                        </button>
+                        @endforeach
+                    </div>
+
+                    {{-- Skeleton vocab --}}
+                    <div id="vocabSkeleton" class="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-pulse">
+                        @for($i = 0; $i < 4; $i++)
+                        <div class="h-20 bg-slate-100 dark:bg-gray-700 rounded-2xl"></div>
+                        @endfor
+                    </div>
+
+                    {{-- Daftar vocab --}}
+                    <div id="vocabList" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+
+                    {{-- Load more --}}
+                    <div id="vocabLoadMore" class="hidden mt-4 text-center">
+                        <button onclick="loadMoreVocab()"
+                                class="px-6 py-2.5 border-2 border-b-[5px] border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest rounded-2xl hover:border-indigo-300 hover:text-indigo-600 active:border-b-2 active:translate-y-0.5 transition-all">
+                            <i class="fas fa-chevron-down mr-2"></i> Tampilkan Lebih Banyak
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Animasi Goresan --}}
                 <div class="flex flex-col items-center justify-center mb-10">
-                    <p class="uppercase tracking-widest text-xs font-black text-slate-400 dark:text-slate-500 mb-4"><i class="fas fa-play-circle mr-1"></i> Animasi Urutan Goresan</p>
+                    <p class="uppercase tracking-widest text-xs font-black text-slate-400 dark:text-slate-500 mb-4">
+                        <i class="fas fa-play-circle mr-1"></i> Animasi Urutan Goresan
+                    </p>
                     <div class="relative bg-white dark:bg-gray-900 border-4 border-b-[8px] border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm w-56 h-56 flex items-center justify-center overflow-hidden">
                         <div class="absolute pointer-events-none border-l-2 border-dashed border-rose-200 dark:border-rose-900/50 h-full left-1/2 opacity-70"></div>
                         <div class="absolute pointer-events-none border-t-2 border-dashed border-rose-200 dark:border-rose-900/50 w-full top-1/2 opacity-70"></div>
@@ -130,297 +147,329 @@
                 </div>
 
                 <div class="text-center mt-8">
-                    <button id="practiceBtn" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-[#1cb0f6] border-2 border-b-[6px] border-[#1899d6] text-white font-black uppercase tracking-widest hidden hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all shadow-sm">
+                    <button id="practiceBtn"
+                            class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-[#1cb0f6] border-2 border-b-[6px] border-[#1899d6] text-white font-black uppercase tracking-widest hidden hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all shadow-sm">
                         <i class="fas fa-pencil-alt mr-2"></i> Latihan Menulis
                     </button>
                 </div>
             </div>
 
         </div>
-
     </div>
 </div>
 
 <style>
-    /* CSS kecil untuk animasi kemunculan yang mulus */
-    .fade-in {
-        animation: fadeIn 0.4s ease-in-out;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+.fade-in { animation: fadeIn 0.4s ease-in-out; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.vocab-card-enter { animation: vocabIn 0.2s ease both; }
+@keyframes vocabIn { from { opacity:0; transform:scale(0.97); } to { opacity:1; transform:scale(1); } }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        
-        window.currentKanjiChar = "";
-        let animationTimeout; 
-        let synth = null;
+document.addEventListener('DOMContentLoaded', function () {
+
+    window.currentKanjiChar = '';
+    let animationTimeout;
+    let synth = null;
+    try { if ('speechSynthesis' in window) synth = window.speechSynthesis; } catch(e) {}
+
+    // ── State kosakata ───────────────────────────────────────────
+    let allVocab      = [];
+    let filteredVocab = [];
+    let shownCount    = 0;
+    const PAGE_SIZE   = 10;
+    const LEVEL_COLOR = {
+        N1: 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800',
+        N2: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800',
+        N3: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+        N4: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+        N5: 'bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800',
+    };
+
+    // ── Speech ───────────────────────────────────────────────────
+    window.speakText = function(text) {
+        if (!text || !synth) return;
+        try { synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; synth.speak(u); }
+        catch(e) { console.error(e); }
+    };
+
+    // ── Filter level kosakata ────────────────────────────────────
+    window.filterVocabLevel = function(level) {
+        filteredVocab = level ? allVocab.filter(v => v.jlpt_level === level) : allVocab;
+        shownCount    = 0;
+        document.getElementById('vocabList').innerHTML = '';
+
+        // Update button style
+        document.querySelectorAll('.vocab-lvl-btn').forEach(btn => {
+            const active = btn.dataset.lvl === level;
+            btn.className = btn.className
+                .replace(/border-slate-800 dark:border-slate-200 bg-slate-800 dark:bg-white text-white dark:text-slate-900/g, '')
+                .replace(/border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-slate-500 dark:text-slate-400/g, '')
+                .trim();
+            btn.className += active
+                ? ' border-slate-800 dark:border-slate-200 bg-slate-800 dark:bg-white text-white dark:text-slate-900'
+                : ' border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-slate-500 dark:text-slate-400';
+        });
+
+        updateVocabCount();
+        renderVocabBatch();
+    };
+
+    function updateVocabCount() {
+        const el = document.getElementById('vocabCount');
+        if (el) el.textContent = filteredVocab.length + ' kata';
+    }
+
+    // ── Render kartu kosakata ────────────────────────────────────
+    function renderVocabBatch() {
+        const list  = document.getElementById('vocabList');
+        const slice = filteredVocab.slice(shownCount, shownCount + PAGE_SIZE);
+        shownCount += slice.length;
+
+        if (slice.length === 0) {
+            list.innerHTML = '<p class="col-span-2 text-center text-sm text-slate-400 py-6 font-bold">Tidak ada kata untuk level ini.</p>';
+            document.getElementById('vocabLoadMore').classList.add('hidden');
+            return;
+        }
+
+        slice.forEach((v, i) => {
+            const badge = LEVEL_COLOR[v.jlpt_level] ?? LEVEL_COLOR['N3'];
+            const textToSpeak = (v.furigana || v.original).replace(/['"]/g, "\\'");
+
+            const card = document.createElement('div');
+            card.className = 'vocab-card-enter bg-white dark:bg-gray-900 border-2 border-b-[5px] border-slate-200 dark:border-gray-700 rounded-2xl p-4 hover:border-[#1cb0f6] hover:-translate-y-1 transition-all h-fit w-full group';
+            card.style.animationDelay = `${i * 30}ms`;
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex flex-col items-center justify-center shrink-0 min-w-[3.5rem]">
+                        <span class="text-3xl font-black text-slate-800 dark:text-white leading-none mb-1">${v.original}</span>
+                        ${v.furigana && v.furigana !== v.original
+                            ? `<span class="text-[10px] text-slate-500 font-bold leading-none">${v.furigana}</span>`
+                            : ''}
+                    </div>
+                    <div class="flex-1 min-w-0 border-l-2 border-slate-100 dark:border-gray-700 pl-4 py-1">
+                        ${v.indonesian
+                            ? `<p class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-tight">
+                                  <span class="text-[9px] text-rose-500 font-black mr-1.5 uppercase tracking-widest">ID</span>${v.indonesian}
+                               </p>
+                               <p class="text-[11px] text-slate-400 dark:text-slate-500 font-semibold leading-tight mt-1">
+                                  <span class="text-[9px] text-blue-500 font-black mr-1.5 uppercase tracking-widest">EN</span>${v.english}
+                               </p>`
+                            : `<p class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-tight">
+                                  <span class="text-[9px] text-blue-500 font-black mr-1.5 uppercase tracking-widest">EN</span>${v.english}
+                               </p>`}
+                    </div>
+                    <div class="flex flex-col items-end gap-2.5 shrink-0">
+                        <span class="px-2 py-0.5 rounded-lg border-2 text-[9px] font-black uppercase ${badge}">${v.jlpt_level}</span>
+                        <button onclick="window.speakText('${textToSpeak}')"
+                                class="w-8 h-8 rounded-xl flex items-center justify-center text-[#1cb0f6] bg-[#1cb0f6]/10 hover:bg-[#1cb0f6]/20 transition-all border-2 border-transparent">
+                            <i class="fas fa-volume-up text-sm"></i>
+                        </button>
+                    </div>
+                </div>`;
+            list.appendChild(card);
+        });
+        document.getElementById('vocabLoadMore').classList.toggle('hidden', shownCount >= filteredVocab.length);
+    }
+
+    window.loadMoreVocab = function() { renderVocabBatch(); };
+
+    // ── Load kosakata dari API ────────────────────────────────────
+    async function loadRelatedVocab(character) {
+        const section = document.getElementById('relatedVocabSection');
 
         try {
-            if ('speechSynthesis' in window) {
-                synth = window.speechSynthesis;
-            }
-        } catch (e) {
-            console.warn("Speech Synthesis diblokir oleh browser.");
-        }
+            // Encode URI component untuk handle karakter multibyte
+            const url = `/api/kanjis/${encodeURIComponent(character)}/vocabulary`;
 
-        window.speakText = function(text) {
-            if (!text) return;
-            if (!synth) {
-                alert("Browser Anda memblokir fitur suara.");
+            const res  = await fetch(url);
+
+            if (!res.ok) {
+                console.warn('[Vocab] API error:', res.status, res.statusText);
+                section.classList.add('hidden');
                 return;
             }
-            try {
-                synth.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ja-JP';
-                synth.speak(utterance);
-            } catch (error) {
-                console.error("Gagal memainkan suara:", error);
-            }
-        };
 
-        // --- FUNGSI ANIMASI GORESAN (dengan nomor urutan) ---
-        function playStrokesAnimation(strokes) {
-            const canvas = document.getElementById('playbackCanvas');
-            if (!canvas || !strokes || strokes.length === 0) {
+            const data = await res.json();
+
+            // Sembunyikan skeleton
+            document.getElementById('vocabSkeleton').classList.add('hidden');
+            document.getElementById('vocabList').classList.remove('hidden');
+
+            if (!data || data.length === 0) {
+                console.log('[Vocab] No related vocabulary found');
+                section.classList.add('hidden');
+                return;
+            }
+
+            // Tampilkan section
+            section.classList.remove('hidden');
+            allVocab      = data;
+            filteredVocab = data;
+            shownCount    = 0;
+
+            // Tampilkan filter level kalau ada lebih dari 1 level
+            const levels = [...new Set(data.map(v => v.jlpt_level))];
+            if (levels.length > 1) {
+                document.getElementById('vocabLevelFilter').classList.remove('hidden');
+            }
+
+            updateVocabCount();
+            renderVocabBatch();
+
+        } catch(e) {
+            console.error('[Vocab] Exception:', e);
+            section.classList.add('hidden');
+        }
+    }
+
+    // ── Stroke animation ─────────────────────────────────────────
+    function playStrokesAnimation(strokes) {
+        const canvas = document.getElementById('playbackCanvas');
+        if (!canvas || !strokes || !strokes.length) { showNoStrokeMessage(); return; }
+        const ctx = canvas.getContext('2d');
+        const colors = ['#6366f1','#eab308','#ef4444','#10b981','#f97316','#a855f7','#1e293b','#f97316','#a855f7','#1e293b'];
+
+        function drawCompleted(upTo) {
+            strokes.forEach((s, i) => {
+                if (i >= upTo || !s?.length) return;
+                const c = colors[i % colors.length];
+                ctx.globalAlpha = 0.25; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                ctx.strokeStyle = c; ctx.beginPath(); ctx.moveTo(s[0].x, s[0].y);
+                for (let p = 1; p < s.length; p++) ctx.lineTo(s[p].x, s[p].y);
+                ctx.stroke(); ctx.globalAlpha = 1.0;
+                drawBadge(s[0].x, s[0].y, i + 1, c, 0.35);
+            });
+        }
+
+        function drawBadge(x, y, n, c, a) {
+            const prev = ctx.globalAlpha; ctx.globalAlpha = a;
+            ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(n, x, y);
+            ctx.globalAlpha = prev; ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+        }
+
+        let si = 0, pi = 0;
+        function animate() {
+            if (si >= strokes.length) {
+                animationTimeout = setTimeout(() => { ctx.clearRect(0,0,canvas.width,canvas.height); si=0; pi=0; animate(); }, 2000);
+                return;
+            }
+            const s = strokes[si]; const c = colors[si % colors.length];
+            if (!s?.length) { si++; setTimeout(animate, 0); return; }
+            if (pi === 0) {
+                ctx.clearRect(0,0,canvas.width,canvas.height); drawCompleted(si);
+                drawBadge(s[0].x, s[0].y, si+1, c, 1.0);
+                ctx.lineWidth=12; ctx.lineCap='round'; ctx.lineJoin='round';
+                ctx.strokeStyle=c; ctx.globalAlpha=1.0; ctx.beginPath(); ctx.moveTo(s[0].x, s[0].y);
+                pi++;
+            } else if (pi < s.length) {
+                ctx.lineTo(s[pi].x, s[pi].y); ctx.stroke();
+                drawBadge(s[0].x, s[0].y, si+1, c, 1.0);
+                ctx.beginPath(); ctx.moveTo(s[pi].x, s[pi].y); pi++;
+            } else { si++; pi=0; }
+            animationTimeout = setTimeout(animate, 15);
+        }
+        ctx.clearRect(0,0,canvas.width,canvas.height); clearTimeout(animationTimeout); animate();
+    }
+
+    function showNoStrokeMessage() {
+        const box = document.getElementById('playbackCanvas')?.parentElement;
+        if (box) box.innerHTML = '<span class="text-xs text-slate-400 font-bold p-4 text-center"><i class="fas fa-eye-slash text-2xl block mb-2"></i> Data goresan belum ditambahkan.</span>';
+    }
+
+    // ── Main: load detail ────────────────────────────────────────
+    async function loadDetail() {
+        try {
+            const char     = `{!! $character !!}`;
+            const response = await fetch(`/api/kanjis/${encodeURIComponent(char)}`);
+            if (!response.ok) throw new Error('Karakter tidak ditemukan');
+
+            const data = await response.json();
+            console.log('[Detail] category:', data.category); // debug
+
+            document.getElementById('skeletonLoading').classList.add('hidden');
+            document.getElementById('realContent').classList.remove('hidden');
+
+            window.currentKanjiChar = data.character;
+            document.getElementById('character').innerText = data.character;
+            document.getElementById('meaning').innerText   = data.meaning;
+
+            if (data.category?.trim()) {
+                document.getElementById('category').innerText = data.category;
+                document.getElementById('categoryWrapper').classList.remove('hidden');
+            }
+            if (String(data.level ?? '').trim()) {
+                document.getElementById('level').innerText = data.level;
+                document.getElementById('levelWrapper').classList.remove('hidden');
+            }
+            const readings = [];
+            if (data.kunyomi?.trim()) readings.push(`Kun: ${data.kunyomi}`);
+            if (data.onyomi?.trim())  readings.push(`On: ${data.onyomi}`);
+            if (readings.length) {
+                document.getElementById('readings').innerText = readings.join(' | ');
+                document.getElementById('readingsWrapper').classList.remove('hidden');
+            }
+            if (data.category || data.level || readings.length) {
+                document.getElementById('infoGrid').classList.remove('hidden');
+            }
+
+            // Contoh kalimat
+            if (data.examples?.length) {
+                document.getElementById('examplesSection').classList.remove('hidden');
+                document.getElementById('examplesList').innerHTML = data.examples.map((ex, i) => {
+                    const safe = ex.japanese_text.replace(/['"]/g, '');
+                    let disp   = ex.japanese_text;
+                    if (ex.furigana_html) disp = ex.furigana_html.replace(/([\u4e00-\u9faf]+)\(([^)]+)\)/g, '<ruby>$1<rt>$2</rt></ruby>');
+                    return `<div class="flex items-start bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl p-5 hover:border-[#1cb0f6]/50 transition-colors">
+                        <div class="mr-4 mt-1 shrink-0"><div class="bg-[#1cb0f6] text-white w-10 h-10 flex items-center justify-center rounded-xl font-black text-sm border-2 border-b-4 border-[#1899d6]">${i+1}</div></div>
+                        <div class="flex-1 mr-4">
+                            <p class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 leading-relaxed">${disp}</p>
+                            <p class="text-sm font-bold text-slate-500 dark:text-slate-400">${ex.meaning}</p>
+                        </div>
+                        <button onclick="window.speakText('${safe}')" class="w-12 h-12 rounded-xl border-2 border-b-[4px] border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-500 hover:text-[#1cb0f6] active:translate-y-1 active:border-b-2 transition-all flex items-center justify-center shrink-0 mt-1">
+                            <i class="fas fa-volume-up text-xl"></i>
+                        </button>
+                    </div>`;
+                }).join('');
+            }
+
+            // ↓ Kosakata terkait — cek kategori case-insensitive
+            const isKanji = (data.category ?? '').toLowerCase() === 'kanji';
+            console.log('[Detail] isKanji:', isKanji);
+            if (isKanji) {
+                loadRelatedVocab(data.character);
+            }
+
+            // Stroke
+            if (data.strokes && data.strokes !== 'null' && data.strokes !== '[]') {
+                const arr = typeof data.strokes === 'string' ? JSON.parse(data.strokes) : data.strokes;
+                if (Array.isArray(arr) && arr.length) playStrokesAnimation(arr);
+                else showNoStrokeMessage();
+            } else {
                 showNoStrokeMessage();
-                return;
-            }
-            
-            const ctx = canvas.getContext('2d');
-            
-            const strokeColors = [
-                '#6366f1', '#eab308', '#ef4444', '#10b981', '#f97316', '#a855f7', '#1e293b',
-                '#f97316', '#a855f7', '#1e293b', '#6366f1', '#eab308', '#ef4444', '#10b981', 
-                '#f97316', '#a855f7', '#1e293b', '#f97316', '#a855f7', '#1e293b'
-            ];
-
-            function drawCompletedStrokes(upToIndex) {
-                strokes.forEach((stroke, i) => {
-                    if (i >= upToIndex || !stroke || stroke.length === 0) return;
-                    const color = strokeColors[i % strokeColors.length];
-
-                    ctx.globalAlpha = 0.25;
-                    ctx.lineWidth = 12;
-                    ctx.lineCap = 'round';
-                    ctx.lineJoin = 'round';
-                    ctx.strokeStyle = color;
-                    ctx.beginPath();
-                    ctx.moveTo(stroke[0].x, stroke[0].y);
-                    for (let p = 1; p < stroke.length; p++) {
-                        ctx.lineTo(stroke[p].x, stroke[p].y);
-                    }
-                    ctx.stroke();
-                    ctx.globalAlpha = 1.0;
-
-                    drawStrokeBadge(ctx, stroke[0].x, stroke[0].y, i + 1, color, 0.35);
-                });
             }
 
-            function drawStrokeBadge(ctx, x, y, number, color, alpha) {
-                const prevAlpha = ctx.globalAlpha;
-                ctx.globalAlpha = alpha;
+            const practiceBtn = document.getElementById('practiceBtn');
+            practiceBtn.classList.remove('hidden');
+            practiceBtn.addEventListener('click', () => {
+                window.location = `/list?practice=${encodeURIComponent(data.character)}`;
+            });
 
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(x, y, 9, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(number, x, y);
-
-                ctx.globalAlpha = prevAlpha;
-                ctx.textAlign = 'start';
-                ctx.textBaseline = 'alphabetic';
-            }
-
-            let currentStrokeIndex = 0;
-            let currentPointIndex = 0;
-
-            function animate() {
-                if (currentStrokeIndex >= strokes.length) {
-                    animationTimeout = setTimeout(() => {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        currentStrokeIndex = 0;
-                        currentPointIndex = 0;
-                        animate();
-                    }, 2000);
-                    return;
-                }
-
-                const stroke = strokes[currentStrokeIndex];
-                if (!stroke || stroke.length === 0) {
-                    currentStrokeIndex++;
-                    setTimeout(animate, 0);
-                    return;
-                }
-
-                const color = strokeColors[currentStrokeIndex % strokeColors.length];
-
-                if (currentPointIndex === 0) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    drawCompletedStrokes(currentStrokeIndex);
-                    drawStrokeBadge(ctx, stroke[0].x, stroke[0].y, currentStrokeIndex + 1, color, 1.0);
-
-                    ctx.lineWidth = 12;
-                    ctx.lineCap = 'round';
-                    ctx.lineJoin = 'round';
-                    ctx.strokeStyle = color;
-                    ctx.globalAlpha = 1.0;
-                    ctx.beginPath();
-                    ctx.moveTo(stroke[0].x, stroke[0].y);
-                    currentPointIndex++;
-
-                } else if (currentPointIndex < stroke.length) {
-                    ctx.lineTo(stroke[currentPointIndex].x, stroke[currentPointIndex].y);
-                    ctx.stroke();
-                    drawStrokeBadge(ctx, stroke[0].x, stroke[0].y, currentStrokeIndex + 1, color, 1.0);
-
-                    ctx.beginPath();
-                    ctx.moveTo(stroke[currentPointIndex].x, stroke[currentPointIndex].y);
-                    currentPointIndex++;
-                } else {
-                    currentStrokeIndex++;
-                    currentPointIndex = 0;
-                }
-
-                animationTimeout = setTimeout(animate, 15);
-            }
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            clearTimeout(animationTimeout);
-            animate();
+        } catch(e) {
+            console.error('Error Detail:', e);
+            document.getElementById('infoArea').innerHTML = `
+                <div class="text-center py-12">
+                    <i class="fas fa-exclamation-triangle text-6xl text-rose-500 mb-4 animate-bounce"></i>
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-2">Oops!</h2>
+                    <p class="text-sm font-bold text-slate-500">Data karakter gagal dimuat.</p>
+                </div>`;
         }
+    }
 
-        function showNoStrokeMessage() {
-            const canvasBox = document.getElementById('playbackCanvas')?.parentElement;
-            if (canvasBox) {
-                canvasBox.innerHTML = '<span class="text-xs text-slate-400 font-bold p-4 text-center"><i class="fas fa-eye-slash text-2xl block mb-2"></i> Data goresan belum ditambahkan.</span>';
-            }
-        }
-
-        // --- LOAD DATA DARI API ---
-        async function loadDetail() {
-            try {
-                const char = `{!! $character !!}`; 
-                const response = await fetch(`/api/kanjis/${encodeURIComponent(char)}`);
-                
-                if (!response.ok) {
-                    throw new Error("Karakter tidak ditemukan");
-                }
-                
-                const data = await response.json();
-                
-                // MENGHILANGKAN SKELETON & MENAMPILKAN KONTEN ASLI
-                document.getElementById('skeletonLoading').classList.add('hidden');
-                document.getElementById('realContent').classList.remove('hidden');
-
-                window.currentKanjiChar = data.character;
-                document.getElementById('character').innerText = data.character;
-                document.getElementById('meaning').innerText = data.meaning;
-
-                if (data.category && String(data.category).trim() !== "") {
-                    document.getElementById('category').innerText = data.category;
-                    document.getElementById('categoryWrapper').classList.remove('hidden');
-                }
-
-                if (data.level !== null && data.level !== undefined && String(data.level).trim() !== "") {
-                    document.getElementById('level').innerText = data.level;
-                    document.getElementById('levelWrapper').classList.remove('hidden');
-                }
-
-                let readings = [];
-                if (data.kunyomi && String(data.kunyomi).trim() !== "") readings.push(`Kun: ${data.kunyomi}`);
-                if (data.onyomi && String(data.onyomi).trim() !== "") readings.push(`On: ${data.onyomi}`);
-                if (readings.length > 0) {
-                    document.getElementById('readings').innerText = readings.join(' | ');
-                    document.getElementById('readingsWrapper').classList.remove('hidden');
-                }
-
-                if (data.category || data.level || readings.length > 0) {
-                    document.getElementById('infoGrid').classList.remove('hidden');
-                }
-                
-                if (data.examples && data.examples.length > 0) {
-                    const examplesSection = document.getElementById('examplesSection');
-                    const examplesList = document.getElementById('examplesList');
-                    
-                    examplesSection.classList.remove('hidden');
-
-                    let examplesHTML = '';
-                    data.examples.forEach((ex, index) => {
-                        const safeTextForTTS = ex.japanese_text.replace(/['"]/g, ''); 
-                        let displayText = ex.japanese_text; 
-                        
-                        if (ex.furigana_html) {
-                            displayText = ex.furigana_html.replace(/([\u4e00-\u9faf]+)\(([^)]+)\)/g, '<ruby>$1<rt>$2</rt></ruby>');
-                        }
-                        const number = index + 1;
-                        
-                        examplesHTML += `
-                            <div class="flex items-start bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl p-5 mb-4 hover:border-[#1cb0f6]/50 transition-colors">
-                                <div class="mr-4 mt-1 shrink-0">
-                                    <div class="bg-[#1cb0f6] text-white w-10 h-10 flex items-center justify-center rounded-xl font-black text-sm border-2 border-b-4 border-[#1899d6]">
-                                        ${number}
-                                    </div>
-                                </div>
-                                <div class="flex-1 mr-4">
-                                    <p class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 leading-relaxed">
-                                        ${displayText}
-                                    </p>
-                                    <p class="text-sm font-bold text-slate-500 dark:text-slate-400">
-                                        ${ex.meaning}
-                                    </p>
-                                </div>
-                                <button onclick="window.speakText('${safeTextForTTS}')" 
-                                        class="w-12 h-12 rounded-xl border-2 border-b-[4px] border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-500 hover:text-[#1cb0f6] hover:bg-slate-100 dark:hover:bg-gray-700 active:translate-y-1 active:border-b-2 transition-all flex items-center justify-center shrink-0 mt-1" 
-                                        title="Dengarkan Kalimat">
-                                    <i class="fas fa-volume-up text-xl"></i>
-                                </button>
-                            </div>
-                        `;
-                    });
-                    examplesList.innerHTML = examplesHTML;
-                }
-
-                if (data.strokes && data.strokes !== "null" && data.strokes !== "[]") {
-                    let strokesArray = typeof data.strokes === 'string' ? JSON.parse(data.strokes) : data.strokes;
-                    if (Array.isArray(strokesArray) && strokesArray.length > 0) {
-                        playStrokesAnimation(strokesArray);
-                    } else {
-                        showNoStrokeMessage();
-                    }
-                } else {
-                    showNoStrokeMessage();
-                }
-
-                const practiceBtn = document.getElementById('practiceBtn');
-                practiceBtn.classList.remove('hidden');
-                practiceBtn.addEventListener('click', () => {
-                    // Redirect kembali ke halaman grid list untuk latihan
-                    window.location = `/list?practice=${encodeURIComponent(data.character)}`;
-                });
-
-            } catch (e) {
-                console.error("Error Detail:", e);
-                document.getElementById('infoArea').innerHTML = `
-                    <div class="text-center py-12">
-                        <i class="fas fa-exclamation-triangle text-6xl text-rose-500 mb-4 animate-bounce"></i>
-                        <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-widest mb-2">Oops! Terjadi Kesalahan</h2>
-                        <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Data karakter gagal dimuat. Buka Console (F12) untuk melihat detail error.</p>
-                    </div>
-                `;
-            }
-        }
-
-        loadDetail();
-    });
+    loadDetail();
+});
 </script>
 @endsection
