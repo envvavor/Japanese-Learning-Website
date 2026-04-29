@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\MateriController;
 use App\Http\Controllers\GameController;
@@ -37,6 +38,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard')->middleware('auth');
+
+Route::post('/onboarding/complete', function () {
+    Auth::user()->update(['has_seen_onboarding' => true]);
+    return response()->json(['success' => true]);
+})->name('onboarding.complete')->middleware('auth');
 
 // Protected routes - Admin panel
 Route::middleware(['auth', 'admin'])

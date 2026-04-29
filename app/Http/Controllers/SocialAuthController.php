@@ -44,9 +44,10 @@ class SocialAuthController extends Controller
                 'email'            => $googleUser->getEmail(),
                 'google_id'        => $googleUser->getId(),
                 'google_avatar'    => $googleUser->getAvatar(),
-                'password'         => null, // Google users have no password
+                'password'         => null,
                 'role'             => 'user',
-                'email_verified_at' => now(), // Google already verified the email
+                'email_verified_at' => now(),
+                'has_seen_onboarding' => false,
             ]);
         }
 

@@ -77,6 +77,7 @@ class AuthController extends Controller
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role'     => 'user',
+            'has_seen_onboarding' => false,
         ]);
 
         Auth::login($user);

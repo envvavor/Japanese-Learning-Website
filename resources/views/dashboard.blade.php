@@ -10,7 +10,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {{-- Header Section --}}
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
+        <div id="onboard-header" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
             <div class="flex items-center gap-4">
                 <div class="w-20 h-20 bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-3xl flex items-center justify-center p-2 shrink-0">
                     <img src="{{ asset('storage/images/logo_manabu.png') }}" alt="Logo" class="w-full h-full object-contain">
@@ -24,7 +24,7 @@
             </div>
 
             {{-- Profile Dropdown --}}
-            <div x-data="{ open: false }" class="relative z-50">
+            <div id="onboard-profile" x-data="{ open: false }" class="relative z-50">
                 <button @click="open = !open" @click.away="open = false" 
                     class="inline-flex items-center justify-center px-6 py-3 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl text-sm font-black text-slate-700 dark:text-slate-200 bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700 active:border-b-2 active:translate-y-1 transition-all uppercase tracking-widest gap-3 shadow-sm">
                     @if(Auth::user()->google_avatar)
@@ -71,7 +71,7 @@
         </div>
 
         {{-- Level & XP Progress (Gamification Element) --}}
-        <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6 shadow-sm">
+        <div id="onboard-xp" class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 sm:p-8 mb-10 flex flex-col sm:flex-row items-center gap-6 shadow-sm">
             <div class="relative shrink-0 w-24 h-24 bg-amber-100 dark:bg-amber-900/30 border-4 border-amber-400 dark:border-amber-600 rounded-full flex items-center justify-center shadow-inner">
                 <i class="fas fa-shield-alt text-6xl text-amber-400 dark:text-amber-500 opacity-20 absolute"></i>
                 <span class="text-4xl font-black text-amber-500 dark:text-amber-400 z-10">{{ Auth::user()->level ?? 1 }}</span>
@@ -100,7 +100,7 @@
         </div>
 
         {{-- Stats Cards --}}
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+        <div id="onboard-stats" class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
             {{-- Stat 1 --}}
             <div class="bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
                 <div>
@@ -138,7 +138,7 @@
         </div>
 
         {{-- Main Modules Menu --}}
-        <div>
+        <div id="onboard-modules">
             <h2 class="text-lg font-black text-slate-800 dark:text-white uppercase tracking-widest mb-6 flex items-center gap-3">
                 <i class="fas fa-compass text-slate-400"></i> Pilih Modul
                 <span class="h-1 flex-1 bg-slate-200 dark:bg-gray-800 rounded-full"></span>
@@ -262,4 +262,461 @@
         </div>
     </div>
 </div>
+
+@if(!Auth::user()->has_seen_onboarding)
+<div id="onboarding-overlay" style="display:none;">
+    <div id="onboard-backdrop"></div>
+    <div id="onboarding-tooltip">
+        <div class="onboard-card">
+            <div class="onboard-head">
+                <div id="tooltip-icon" class="onboard-icon-box">
+                    <i class="fas fa-hand-sparkles"></i>
+                </div>
+                <div>
+                    <p id="tooltip-step" class="onboard-step-label"></p>
+                    <h3 id="tooltip-title" class="onboard-title"></h3>
+                </div>
+            </div>
+            <p id="tooltip-desc" class="onboard-desc"></p>
+            <div class="onboard-footer">
+                <button id="onboard-skip" class="onboard-btn-skip">Lewati</button>
+                <div class="onboard-actions">
+                    <div id="onboard-dots" class="onboard-dots"></div>
+                    <button id="onboard-prev" class="onboard-btn-prev" style="display:none;">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button id="onboard-next" class="onboard-btn-next">Lanjut</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #onboarding-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        pointer-events: none;
+    }
+    #onboard-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15,23,42,0.7);
+        z-index: 1;
+        pointer-events: auto;
+        transition: opacity 0.3s ease;
+    }
+    .onboard-highlight {
+        position: relative !important;
+        z-index: 99999 !important;
+        box-shadow: 0 0 0 4px #1cb0f6, 0 0 0 9999px rgba(15,23,42,0.7) !important;
+        border-radius: 1.5rem !important;
+        pointer-events: none !important;
+        transition: box-shadow 0.4s ease;
+    }
+    #onboarding-tooltip {
+        position: fixed;
+        z-index: 100000;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: calc(100vw - 2rem);
+        max-width: 420px;
+        pointer-events: auto;
+        box-sizing: border-box;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    #onboarding-tooltip.tooltip-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+    #onboarding-tooltip.tooltip-visible {
+        opacity: 1;
+        visibility: visible;
+    }
+    .onboard-card {
+        background: #fff;
+        border: 2px solid #e2e8f0;
+        border-bottom-width: 8px;
+        border-radius: 2rem;
+        padding: 1.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+    html.dark .onboard-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    .onboard-head {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .onboard-icon-box {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        border: 2px solid;
+        border-bottom-width: 4px;
+    }
+    .onboard-step-label {
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #94a3b8;
+        margin: 0;
+    }
+    .onboard-title {
+        font-size: 1.1rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #1e293b;
+        margin: 0;
+    }
+    html.dark .onboard-title { color: #f1f5f9; }
+    .onboard-desc {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 1.25rem;
+    }
+    html.dark .onboard-desc { color: #94a3b8; }
+    .onboard-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .onboard-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .onboard-dots {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-right: 0.5rem;
+    }
+    .onboard-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #cbd5e1;
+        transition: all 0.2s;
+    }
+    html.dark .onboard-dot { background: #475569; }
+    .onboard-dot.active {
+        width: 10px;
+        height: 10px;
+        background: #1cb0f6;
+    }
+    .onboard-btn-skip {
+        padding: 0.5rem 1rem;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #94a3b8;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+    .onboard-btn-skip:hover { color: #64748b; }
+    .onboard-btn-prev {
+        padding: 0.5rem 0.75rem;
+        font-size: 12px;
+        font-weight: 900;
+        background: #f1f5f9;
+        border: 2px solid #e2e8f0;
+        border-bottom-width: 4px;
+        border-radius: 0.75rem;
+        color: #64748b;
+        cursor: pointer;
+    }
+    html.dark .onboard-btn-prev { background: #334155; border-color: #475569; color: #94a3b8; }
+    .onboard-btn-prev:active { border-bottom-width: 2px; transform: translateY(2px); }
+    .onboard-btn-next {
+        padding: 0.5rem 1.25rem;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        background: #1cb0f6;
+        border: 2px solid #1899d6;
+        border-bottom-width: 4px;
+        border-radius: 0.75rem;
+        color: #fff;
+        cursor: pointer;
+    }
+    .onboard-btn-next:hover { filter: brightness(1.1); }
+    .onboard-btn-next:active { border-bottom-width: 2px; transform: translateY(2px); }
+    @media (max-width: 640px) {
+        #onboarding-tooltip { max-width: calc(100vw - 1.5rem); width: calc(100vw - 1.5rem); }
+        .onboard-card { padding: 1rem; border-radius: 1.25rem; }
+        .onboard-icon-box { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
+        .onboard-title { font-size: 0.9rem; }
+        .onboard-desc { font-size: 0.8rem; margin-bottom: 1rem; }
+        .onboard-dots { display: none; }
+        .onboard-footer { gap: 0.25rem; }
+        .onboard-btn-next { padding: 0.5rem 1rem; font-size: 11px; }
+        .onboard-btn-skip { padding: 0.4rem 0.5rem; font-size: 10px; }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var steps = [
+        { target: null, icon: 'fas fa-door-open', color: '#1cb0f6', title: 'Yokoso! (ようこそ!)', desc: 'Selamat datang di Manabu! Ini adalah dashboard utama tempat kamu memulai semua aktivitas belajar. Yuk, saya tunjukkan fitur-fitur pentingnya!' },
+        { target: '#onboard-header', icon: 'fas fa-user-circle', color: '#1cb0f6', title: 'Halaman Utamamu', desc: 'Ini adalah header dashboard. Di sini kamu bisa melihat sapaan personal dan mengakses menu profil.' },
+        { target: '#onboard-xp', icon: 'fas fa-bolt', color: '#f59e0b', title: 'Level & XP', desc: 'Setiap kali kamu menyelesaikan quiz, kamu akan mendapatkan XP! Kumpulkan XP untuk naik level. Semakin tinggi levelmu, semakin jago!' },
+        { target: '#onboard-stats', icon: 'fas fa-chart-bar', color: '#3b82f6', title: 'Statistik Belajar', desc: 'Pantau progresmu di sini! Lihat berapa quiz yang sudah dikerjakan, huruf yang dikuasai, dan streak harianmu.' },
+        { target: '#onboard-modules', icon: 'fas fa-compass', color: '#10b981', title: 'Modul Belajar', desc: 'Pilih modul yang mau kamu pelajari! Ada Peta Quiz, Hiragana, Katakana, Kanji, Kosakata, Materi pelajaran, dan Visual Novel. Semuanya gratis!' },
+        { target: '#onboard-profile', icon: 'fas fa-cog', color: '#8b5cf6', title: 'Menu Profil', desc: 'Klik tombol ini untuk mengatur profil, mengganti tema (dark/light mode), atau logout dari akunmu.' },
+        { target: null, icon: 'fas fa-rocket', color: '#1cb0f6', title: 'Siap Belajar!', desc: 'Sekarang kamu sudah tahu semua fiturnya. Mulai petualangan belajar bahasa Jepangmu sekarang! Ganbare! (がんばれ!)' }
+    ];
+
+    var currentStep = 0;
+    var prevHighlight = null;
+    var stepping = false;
+
+    var overlay = document.getElementById('onboarding-overlay');
+    var backdrop = document.getElementById('onboard-backdrop');
+    var tooltip = document.getElementById('onboarding-tooltip');
+    var tooltipIcon = document.getElementById('tooltip-icon');
+    var tooltipStep = document.getElementById('tooltip-step');
+    var tooltipTitle = document.getElementById('tooltip-title');
+    var tooltipDesc = document.getElementById('tooltip-desc');
+    var dotsContainer = document.getElementById('onboard-dots');
+    var btnNext = document.getElementById('onboard-next');
+    var btnPrev = document.getElementById('onboard-prev');
+    var btnSkip = document.getElementById('onboard-skip');
+
+    function buildDots() {
+        dotsContainer.innerHTML = '';
+        for (var i = 0; i < steps.length; i++) {
+            var dot = document.createElement('div');
+            dot.className = 'onboard-dot' + (i === currentStep ? ' active' : '');
+            dotsContainer.appendChild(dot);
+        }
+    }
+
+    function hideTooltip() {
+        tooltip.classList.remove('tooltip-visible');
+        tooltip.classList.add('tooltip-hidden');
+    }
+
+    function showTooltipVisible() {
+        tooltip.classList.remove('tooltip-hidden');
+        tooltip.classList.add('tooltip-visible');
+    }
+
+    function positionTooltip(target) {
+        if (!target) {
+            tooltip.style.position = 'fixed';
+            tooltip.style.left = '50%';
+            tooltip.style.top = '50%';
+            tooltip.style.transform = 'translate(-50%, -50%)';
+            return;
+        }
+
+        tooltip.style.position = 'fixed';
+        tooltip.style.transform = 'none';
+
+        var rect = target.getBoundingClientRect();
+        var vw = window.innerWidth;
+        var vh = window.innerHeight;
+        var tw = tooltip.offsetWidth || (vw - 32);
+        var th = tooltip.offsetHeight || 200;
+        var gap = 12;
+        var safe = 8;
+
+        var spaceBelow = vh - rect.bottom;
+        var spaceAbove = rect.top;
+        var top;
+
+        if (spaceBelow >= th + gap + safe) {
+            top = rect.bottom + gap;
+        } else if (spaceAbove >= th + gap + safe) {
+            top = rect.top - th - gap;
+        } else {
+            top = vh - th - safe;
+        }
+        top = Math.max(safe, Math.min(top, vh - th - safe));
+
+        var left = rect.left + rect.width / 2 - tw / 2;
+        left = Math.max(safe, Math.min(left, vw - tw - safe));
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    }
+
+    function scrollToTarget(el, callback) {
+        var rect = el.getBoundingClientRect();
+        var vh = window.innerHeight;
+        var elH = el.offsetHeight;
+        var margin = 80;
+        var isVisible = rect.top >= -margin && rect.top < vh - margin;
+
+        if (isVisible) {
+            callback();
+            return;
+        }
+
+        var scrollBlock = elH > vh * 0.5 ? 'start' : 'center';
+        el.scrollIntoView({ behavior: 'smooth', block: scrollBlock });
+
+        var settled = false;
+        var lastY = window.scrollY;
+        var stableCount = 0;
+        var checkInterval = setInterval(function() {
+            var nowY = window.scrollY;
+            if (Math.abs(nowY - lastY) < 1) {
+                stableCount++;
+            } else {
+                stableCount = 0;
+            }
+            lastY = nowY;
+            if (stableCount >= 3) {
+                clearInterval(checkInterval);
+                if (!settled) { settled = true; callback(); }
+            }
+        }, 50);
+
+        setTimeout(function() {
+            clearInterval(checkInterval);
+            if (!settled) { settled = true; callback(); }
+        }, 1200);
+    }
+
+    function updateContent(index) {
+        var step = steps[index];
+        tooltipIcon.innerHTML = '<i class="' + step.icon + '"></i>';
+        tooltipIcon.style.background = step.color + '1a';
+        tooltipIcon.style.color = step.color;
+        tooltipIcon.style.borderColor = step.color + '33';
+        tooltipStep.textContent = 'Langkah ' + (index + 1) + ' dari ' + steps.length;
+        tooltipTitle.textContent = step.title;
+        tooltipDesc.textContent = step.desc;
+        btnPrev.style.display = index > 0 ? '' : 'none';
+        btnNext.innerHTML = index === steps.length - 1
+            ? '<i class="fas fa-check" style="margin-right:4px"></i> Mulai!'
+            : 'Lanjut <i class="fas fa-arrow-right" style="margin-left:4px"></i>';
+        btnSkip.style.display = index === steps.length - 1 ? 'none' : '';
+        buildDots();
+    }
+
+    function showStep(index) {
+        if (stepping) return;
+        stepping = true;
+        currentStep = index;
+        var step = steps[index];
+
+        hideTooltip();
+
+        if (prevHighlight) {
+            prevHighlight.classList.remove('onboard-highlight');
+            prevHighlight = null;
+        }
+
+        updateContent(index);
+
+        if (!step.target) {
+            backdrop.style.display = '';
+            positionTooltip(null);
+            requestAnimationFrame(function() {
+                showTooltipVisible();
+                stepping = false;
+            });
+            return;
+        }
+
+        var target = document.querySelector(step.target);
+        if (!target) {
+            backdrop.style.display = '';
+            positionTooltip(null);
+            requestAnimationFrame(function() {
+                showTooltipVisible();
+                stepping = false;
+            });
+            return;
+        }
+
+        backdrop.style.display = '';
+
+        scrollToTarget(target, function() {
+            target.classList.add('onboard-highlight');
+            prevHighlight = target;
+            backdrop.style.display = 'none';
+
+            requestAnimationFrame(function() {
+                positionTooltip(target);
+                requestAnimationFrame(function() {
+                    showTooltipVisible();
+                    stepping = false;
+                });
+            });
+        });
+    }
+
+    function finishOnboarding() {
+        if (prevHighlight) prevHighlight.classList.remove('onboard-highlight');
+        overlay.style.display = 'none';
+
+        fetch('{{ route("onboarding.complete") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        });
+    }
+
+    btnNext.addEventListener('click', function() {
+        if (currentStep < steps.length - 1) showStep(currentStep + 1);
+        else finishOnboarding();
+    });
+    btnPrev.addEventListener('click', function() {
+        if (currentStep > 0) showStep(currentStep - 1);
+    });
+    btnSkip.addEventListener('click', finishOnboarding);
+
+    var resizeTimer = null;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            if (prevHighlight) positionTooltip(prevHighlight);
+            else if (!steps[currentStep].target) positionTooltip(null);
+        }, 100);
+    });
+
+    var scrollTimer = null;
+    window.addEventListener('scroll', function() {
+        if (stepping || !prevHighlight) return;
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(function() {
+            if (prevHighlight) positionTooltip(prevHighlight);
+        }, 50);
+    });
+
+    setTimeout(function() {
+        overlay.style.display = '';
+        hideTooltip();
+        showStep(0);
+    }, 500);
+});
+</script>
+@endif
+
 @endsection

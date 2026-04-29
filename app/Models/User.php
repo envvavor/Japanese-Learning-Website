@@ -21,6 +21,7 @@ class User extends Authenticatable
         'verification_code',
         'verification_code_expires_at',
         'email_verified_at',
+        'has_seen_onboarding',
     ];
 
     protected $hidden = [
@@ -33,6 +34,7 @@ class User extends Authenticatable
         'email_verified_at'              => 'datetime',
         'verification_code_expires_at'   => 'datetime',
         'password'                       => 'hashed',
+        'has_seen_onboarding'            => 'boolean',
     ];
 
     public function isAdmin(): bool
