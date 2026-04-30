@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\AdminQuizController;
 use App\Http\Controllers\QuizNewController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\VocabularyController;
+use Illuminate\Support\Facades\Http;
 
 
 
@@ -339,3 +340,14 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/kosakata', [VocabularyController::class, 'index'])->name('vocabulary.index');
 Route::get('/kosakata/search', [VocabularyController::class, 'search'])->name('vocabulary.search');
+
+Route::get('/api/cnn-status', function () {
+    // Ambil IP AWS dari .env
+    $awsUrl = env('AI_PREDICT_URL') . '/status';
+    
+    // Laravel nge-hit server Python/Flask AWS
+    $response = Http::get($awsUrl);
+    
+    // Kembalikan hasilnya ke Frontend
+    return $response->json();
+});

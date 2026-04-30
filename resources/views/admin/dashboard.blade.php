@@ -368,8 +368,8 @@
         document.getElementById('chart-subtitle').innerText = 'Tren pengerjaan kuis dalam ' + days + ' hari terakhir';
     }
 
-    const AI_URL = '{{ env('AI_PREDICT_URL')."/status" }}';
-
+    const AI_URL = '/api/cnn-status';
+    
     async function checkAIStatus() {
         const badge = document.getElementById('ai-status-badge');
         const detail = document.getElementById('ai-status-detail');
