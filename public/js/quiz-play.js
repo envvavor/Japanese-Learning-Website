@@ -42,15 +42,18 @@ function buildDots(){
 function renderQuestion(){
   const q=questions[currentIdx];
   document.getElementById('questionNumber').textContent='Soal '+(currentIdx+1)+' dari '+questions.length;
+
   // Type badge
   const tb=document.getElementById('typeBadge');
   if(q.question_type==='multiple_choice'){tb.textContent='📝 Pilihan Ganda';tb.className='absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'}
   else if(q.question_type==='drawing'){tb.textContent='✏️ Menggambar';tb.className='absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'}
   else{tb.textContent='🔊 Mendengarkan';tb.className='absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'}
-  // Streak
+
+  // Streak badge
   const sb=document.getElementById('streakBadge');
   if(streak>=2){sb.classList.remove('hidden');document.getElementById('streakCount').textContent=streak}
   else{sb.classList.add('hidden')}
+
   // Question display
   const qd=document.getElementById('questionDisplay');
   const qt=document.getElementById('questionText');
@@ -73,17 +76,79 @@ function renderQuestion(){
     else{qd.innerHTML=''}
     qt.textContent=q.question_text;
   }
+
   // Content area
   const cc=document.getElementById('questionContent');
   if(answers[currentIdx]){renderAnswered(q,cc);return}
+
   if(q.question_type==='multiple_choice'||q.question_type==='listening'){renderMC(q,cc)}
   else if(q.question_type==='drawing'){renderDrawing(q,cc)}
-  // Audio
+
   if(q.question_type==='listening'&&q.audio_url){renderAudioPlayer(cc,q.audio_url)}
-  // Hint
-  document.getElementById('hintArea').style.display=answers[currentIdx]?'none':'block';
+
+  // Hint area — reset atau restore sesuai state soal ini
+  resetHintArea(q);
+
   updateNavButtons();updateProgress();buildDots();
 }
+
+// ── Hint helpers ──────────────────────────────────────────────
+
+function resetHintArea(q){
+  const hintArea=document.getElementById('hintArea');
+  if(!hintArea)return;
+
+  if(answers[currentIdx]){
+    hintArea.style.display='none';
+    return;
+  }
+
+  hintArea.style.display='block';
+
+  if(answers['_hint_'+currentIdx]){
+    // Hint sudah dipakai di soal ini → tampilkan kontennya langsung
+    showHintContent(q);
+  }else{
+    // Belum dipakai → reset tombol ke bentuk semula
+    hintArea.innerHTML=`
+      <button id="hintBtn" onclick="useHint()"
+        class="px-4 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 border border-amber-300 dark:border-amber-700 rounded-xl bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all">
+        💡 Bantuan <span class="kbd ml-2 border-amber-300 text-amber-600 dark:text-amber-400">H</span>
+      </button>`;
+  }
+}
+
+function showHintContent(q){
+  const hintArea=document.getElementById('hintArea');
+  if(!hintArea)return;
+
+  let html='<div class="inline-flex flex-col items-center px-5 py-3 border border-b-[4px] border-amber-300 dark:border-amber-700 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-center">';
+  html+='<span class="text-sm font-bold text-amber-600 dark:text-amber-400">💡 Hint: '+(q.meaning||q.correct_answer||'')+'</span>';
+
+  if(q.question_type==='drawing'){
+    if(q.stroke_order_image){
+      html+='<img src="'+q.stroke_order_image+'" class="mx-auto mt-3 max-h-28 rounded-lg bg-white p-1 border border-slate-200" alt="Stroke Order">';
+    }else if(q.character){
+      html+='<span class="text-5xl font-bold text-slate-800 dark:text-white block mt-3">'+q.character+'</span>';
+    }
+  }
+  html+='</div>';
+  hintArea.innerHTML=html;
+}
+
+function useHint(){
+  const q=questions[currentIdx];
+  // Guard: soal sudah dijawab atau hint sudah dipakai
+  if(answers[currentIdx]||answers['_hint_'+currentIdx])return;
+
+  answers['_hint_'+currentIdx]=true;
+  showHintContent(q);
+
+  // Untuk soal gambar, munculkan guide stroke sekarang
+  if(q.question_type==='drawing')drawGuide();
+}
+
+// ── MC Render ─────────────────────────────────────────────────
 
 function renderMC(q,container){
   let h='<div class="grid gap-3">';
@@ -94,6 +159,8 @@ function renderMC(q,container){
   h+='</div>';
   container.innerHTML=h;
 }
+
+// ── Drawing ───────────────────────────────────────────────────
 
 function renderDrawing(q,container){
   templateStrokes=q.strokes||[];
@@ -133,7 +200,8 @@ function initCanvas(){
 function dGetPos(e){
   const r=drawingCanvas.getBoundingClientRect();
   const sx=drawingCanvas.width/r.width,sy=drawingCanvas.height/r.height;
-  const cx=e.clientX||e.touches[0].clientX,cy=e.clientY||e.touches[0].clientY;
+  const cx=e.clientX||(e.touches&&e.touches[0].clientX)||0;
+  const cy=e.clientY||(e.touches&&e.touches[0].clientY)||0;
   return{x:(cx-r.left)*sx,y:(cy-r.top)*sy};
 }
 function dStart(e){
@@ -143,12 +211,19 @@ function dStart(e){
   const p=dGetPos(e);currentStroke.push(p);
   drawingCtx.beginPath();drawingCtx.moveTo(p.x,p.y);
 }
-function dMove(e){if(!isDrawing)return;e.preventDefault();const p=dGetPos(e);currentStroke.push(p);drawingCtx.lineTo(p.x,p.y);drawingCtx.stroke()}
-function dEnd(){if(!isDrawing)return;isDrawing=false;if(currentStroke.length>2)allStrokes.push(currentStroke)}
+function dMove(e){if(!isDrawing)return;e.preventDefault();const p=dGetPos(e);currentStroke.push(p);drawingCtx.lineTo(p.x,p.y);drawingCtx.stroke();}
+function dEnd(){if(!isDrawing)return;isDrawing=false;if(currentStroke.length>2)allStrokes.push(currentStroke);}
 
 function drawGuide(){
-  const gc=document.getElementById('guideCanvasQ');if(!gc||!templateStrokes||!templateStrokes.length)return;
-  const g=gc.getContext('2d');g.clearRect(0,0,300,300);
+  const gc=document.getElementById('guideCanvasQ');
+  if(!gc||!templateStrokes||!templateStrokes.length)return;
+
+  const g=gc.getContext('2d');
+  g.clearRect(0,0,300,300);
+
+  // Jangan render guide sebelum hint dipencet
+  if(!answers['_hint_'+currentIdx])return;
+
   const colors=['rgba(99,102,241,0.18)','rgba(234,179,8,0.18)','rgba(239,68,68,0.18)','rgba(16,185,129,0.18)','rgba(249,115,22,0.18)','rgba(168,85,247,0.18)'];
   templateStrokes.forEach((s,i)=>{
     if(!s||!s.length)return;
@@ -162,230 +237,133 @@ function drawGuide(){
   });
 }
 
-function clearDrawing(){allStrokes=[];currentStroke=[];if(drawingCtx)drawingCtx.clearRect(0,0,300,300);drawGuide()}
-function undoDrawing(){if(allStrokes.length>0){allStrokes.pop();redrawDrawing()}}
+function clearDrawing(){allStrokes=[];currentStroke=[];if(drawingCtx)drawingCtx.clearRect(0,0,300,300);drawGuide();}
+function undoDrawing(){if(allStrokes.length>0){allStrokes.pop();redrawDrawing();}}
 function redrawDrawing(){
   if(!drawingCtx)return;drawingCtx.clearRect(0,0,300,300);
   const dark=document.documentElement.classList.contains('dark');
   drawingCtx.strokeStyle=dark?'#f8fafc':'#2c3e50';
-  allStrokes.forEach(s=>{if(!s.length)return;drawingCtx.beginPath();drawingCtx.moveTo(s[0].x,s[0].y);for(let i=1;i<s.length;i++)drawingCtx.lineTo(s[i].x,s[i].y);drawingCtx.stroke()});
+  allStrokes.forEach(s=>{if(!s.length)return;drawingCtx.beginPath();drawingCtx.moveTo(s[0].x,s[0].y);for(let i=1;i<s.length;i++)drawingCtx.lineTo(s[i].x,s[i].y);drawingCtx.stroke();});
 }
-// === QUIZ PLAY PART 2: Answer, Results, Audio, Utilities ===
 
-// Stroke validation math (reused from list.blade.php)
-function getBBox(strokes){let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity;strokes.forEach(s=>s.forEach(p=>{if(p.x<a)a=p.x;if(p.y<b)b=p.y;if(p.x>c)c=p.x;if(p.y>d)d=p.y}));return{width:c-a,height:d-b}}
-function normStrokes(strokes){if(!strokes||!strokes.length)return[];const b=getBBox(strokes);const m=Math.max(b.width,b.height)||1;const sc=100/m;let cx=0,cy=0,n=0;strokes.forEach(s=>s.forEach(p=>{cx+=p.x;cy+=p.y;n++}));if(!n)return strokes;cx/=n;cy/=n;return strokes.map(s=>s.map(p=>({x:(p.x-cx)*sc,y:(p.y-cy)*sc})))}
-function getDist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
-function pathLen(pts){let d=0;for(let i=1;i<pts.length;i++)d+=getDist(pts[i-1],pts[i]);return d}
-function resamplePts(pts,n){if(!pts||!pts.length)return pts;let I=pathLen(pts)/(n-1),D=0,np=[pts[0]];for(let i=1;i<pts.length;i++){let d=getDist(pts[i-1],pts[i]);if((D+d)>=I){let qx=pts[i-1].x+((I-D)/d)*(pts[i].x-pts[i-1].x);let qy=pts[i-1].y+((I-D)/d)*(pts[i].y-pts[i-1].y);let q={x:qx,y:qy};np.push(q);pts.splice(i,0,q);D=0}else{D+=d}}while(np.length<n)np.push(pts[pts.length-1]);return np}
+// ── Stroke Validation ─────────────────────────────────────────
 
-function computeDrawingAccuracy(){
-  if(!allStrokes.length||!templateStrokes||!templateStrokes.length)return 0;
-  const nu=normStrokes(allStrokes),nt=normStrokes(templateStrokes);
-  const N=30,TOL=35,mc=Math.min(templateStrokes.length,allStrokes.length);
-  let total=0;
+function getBBox(strokes){let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity;strokes.forEach(s=>s.forEach(p=>{if(p.x<a)a=p.x;if(p.y<b)b=p.y;if(p.x>c)c=p.x;if(p.y>d)d=p.y}));return{width:c-a,height:d-b};}
+function normStrokes(strokes){if(!strokes||!strokes.length)return[];const b=getBBox(strokes);const m=Math.max(b.width,b.height)||1;const sc=100/m;let cx=0,cy=0,n=0;strokes.forEach(s=>s.forEach(p=>{cx+=p.x;cy+=p.y;n++;}));if(!n)return strokes;cx/=n;cy/=n;return strokes.map(s=>s.map(p=>({x:(p.x-cx)*sc,y:(p.y-cy)*sc})));}
+function getDist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+function pathLen(pts){let d=0;for(let i=1;i<pts.length;i++)d+=getDist(pts[i-1],pts[i]);return d;}
+function resamplePts(pts,n){if(!pts||!pts.length)return pts;let I=pathLen(pts)/(n-1),D=0,np=[pts[0]];for(let i=1;i<pts.length;i++){let d=getDist(pts[i-1],pts[i]);if((D+d)>=I){let qx=pts[i-1].x+((I-D)/d)*(pts[i].x-pts[i-1].x);let qy=pts[i-1].y+((I-D)/d)*(pts[i].y-pts[i-1].y);let q={x:qx,y:qy};np.push(q);pts.splice(i,0,q);D=0;}else{D+=d;}}while(np.length<n)np.push(pts[pts.length-1]);return np;}
+
+function highlightWrongStrokes(wrongStrokeIndices){
+  redrawDrawing();
+  const prevStyle=drawingCtx.strokeStyle,prevWidth=drawingCtx.lineWidth;
+  wrongStrokeIndices.forEach(strokeNum=>{
+    const stroke=allStrokes[strokeNum-1];
+    if(!stroke||!stroke.length)return;
+    drawingCtx.strokeStyle='rgba(239,68,68,0.75)';drawingCtx.lineWidth=18;
+    drawingCtx.beginPath();drawingCtx.moveTo(stroke[0].x,stroke[0].y);
+    for(let i=1;i<stroke.length;i++)drawingCtx.lineTo(stroke[i].x,stroke[i].y);
+    drawingCtx.stroke();
+    const bx=stroke[0].x,by=Math.max(stroke[0].y-16,12);
+    drawingCtx.fillStyle='rgba(239,68,68,0.9)';drawingCtx.beginPath();drawingCtx.arc(bx,by,10,0,Math.PI*2);drawingCtx.fill();
+    drawingCtx.fillStyle='#ffffff';drawingCtx.font='bold 11px sans-serif';drawingCtx.textAlign='center';drawingCtx.textBaseline='middle';
+    drawingCtx.fillText(strokeNum,bx,by);
+  });
+  drawingCtx.strokeStyle=prevStyle;drawingCtx.lineWidth=prevWidth;
+}
+
+function quizAutoSaveToDataset(normUser,targetChar){
+  try{
+    if(!targetChar)return;
+    const tc=document.createElement('canvas');tc.width=64;tc.height=64;
+    const tCtx=tc.getContext('2d');tCtx.fillStyle='#000';tCtx.fillRect(0,0,64,64);
+    tCtx.lineWidth=3;tCtx.lineCap='round';tCtx.lineJoin='round';tCtx.strokeStyle='#fff';
+    normUser.forEach(stroke=>{
+      if(!stroke.length)return;
+      tCtx.beginPath();tCtx.moveTo((stroke[0].x*0.45)+32,(stroke[0].y*0.45)+32);
+      for(let i=1;i<stroke.length;i++)tCtx.lineTo((stroke[i].x*0.45)+32,(stroke[i].y*0.45)+32);
+      tCtx.stroke();
+    });
+    fetch('/api/dataset/save',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},
+      body:JSON.stringify({character:targetChar,image_base64:tc.toDataURL('image/png')})
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+function submitDrawing(){
+  const statusEl=document.getElementById('drawStatus');
+  if(allStrokes.length===0){statusEl.innerHTML='<span class="text-amber-600 dark:text-amber-400 font-bold">Tulis hurufnya dulu!</span>';return;}
+  if(!templateStrokes||!templateStrokes.length){statusEl.innerHTML='<span class="text-rose-600 dark:text-rose-400 font-bold">Data template belum tersedia!</span>';return;}
+
+  const templateCount=templateStrokes.length,userCount=allStrokes.length;
+  const normUser=normStrokes(allStrokes),normTemp=normStrokes(templateStrokes);
+  const N=30,TOL=35,mc=Math.min(templateCount,userCount);
+  let totalScore=0,wrongStrokes=[];
+
   for(let i=0;i<mc;i++){
-    const up=resamplePts(nu[i],N),tp=resamplePts(nt[i],N);
+    const up=resamplePts(normUser[i],N),tp=resamplePts(normTemp[i],N);
     let cxU=0,cyU=0,cxT=0,cyT=0;
-    for(let j=0;j<N;j++){cxU+=up[j].x;cyU+=up[j].y;cxT+=tp[j].x;cyT+=tp[j].y}
+    for(let j=0;j<N;j++){cxU+=up[j].x;cyU+=up[j].y;cxT+=tp[j].x;cyT+=tp[j].y;}
     cxU/=N;cyU/=N;cxT/=N;cyT/=N;
     const posErr=getDist({x:cxU,y:cyU},{x:cxT,y:cyT});
     let shapeErr=0;
     for(let j=0;j<N;j++)shapeErr+=getDist({x:up[j].x-cxU+cxT,y:up[j].y-cyU+cyT},tp[j]);
     shapeErr/=N;
     let pct=100-(shapeErr+posErr*0.4)/TOL*100;
-    total+=Math.max(0,Math.min(100,pct));
+    pct=Math.max(0,Math.min(100,pct));
+    totalScore+=pct;
+    if(pct<65)wrongStrokes.push(i+1);
   }
-  return total/templateStrokes.length;
-}
-
-function highlightWrongStrokes(wrongStrokeIndices){
-  redrawDrawing();
-  const prevStyle=drawingCtx.strokeStyle;
-  const prevWidth=drawingCtx.lineWidth;
-  wrongStrokeIndices.forEach(strokeNum=>{
-    const stroke=allStrokes[strokeNum-1];
-    if(!stroke||!stroke.length)return;
-    // Overlay merah semi-transparan
-    drawingCtx.strokeStyle='rgba(239,68,68,0.75)';
-    drawingCtx.lineWidth=18;
-    drawingCtx.beginPath();
-    drawingCtx.moveTo(stroke[0].x,stroke[0].y);
-    for(let i=1;i<stroke.length;i++)drawingCtx.lineTo(stroke[i].x,stroke[i].y);
-    drawingCtx.stroke();
-    // Badge lingkaran merah berisi nomor goresan
-    const bx=stroke[0].x;
-    const by=Math.max(stroke[0].y-16,12);
-    drawingCtx.fillStyle='rgba(239,68,68,0.9)';
-    drawingCtx.beginPath();drawingCtx.arc(bx,by,10,0,Math.PI*2);drawingCtx.fill();
-    drawingCtx.fillStyle='#ffffff';
-    drawingCtx.font='bold 11px sans-serif';drawingCtx.textAlign='center';drawingCtx.textBaseline='middle';
-    drawingCtx.fillText(strokeNum,bx,by);
-  });
-  drawingCtx.strokeStyle=prevStyle;
-  drawingCtx.lineWidth=prevWidth;
-}
-
-// FUNGSI AUTO-SAVE DATASET (sama persis dari list.blade.php)
-function quizAutoSaveToDataset(normUser,targetChar){
-  try{
-    if(!targetChar)return;
-    const tempCanvas=document.createElement('canvas');
-    tempCanvas.width=64;tempCanvas.height=64;
-    const tCtx=tempCanvas.getContext('2d');
-    tCtx.fillStyle="#000000";
-    tCtx.fillRect(0,0,64,64);
-    tCtx.lineWidth=3;tCtx.lineCap='round';tCtx.lineJoin='round';tCtx.strokeStyle='#ffffff';
-    normUser.forEach(stroke=>{
-      if(!stroke.length)return;
-      tCtx.beginPath();
-      tCtx.moveTo((stroke[0].x*0.45)+32,(stroke[0].y*0.45)+32);
-      for(let i=1;i<stroke.length;i++){
-        tCtx.lineTo((stroke[i].x*0.45)+32,(stroke[i].y*0.45)+32);
-      }
-      tCtx.stroke();
-    });
-    const imageData=tempCanvas.toDataURL("image/png");
-    fetch('/api/dataset/save',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},
-      body:JSON.stringify({character:targetChar,image_base64:imageData})
-    }).then(()=>{console.log("Auto-Save berhasil")}).catch(e=>{console.error('Auto-Save gagal:',e)});
-  }catch(err){console.error('Error pada fungsi Auto-Save:',err)}
-}
-
-function submitDrawing(){
-  const statusEl=document.getElementById('drawStatus');
-  if(allStrokes.length===0){
-    statusEl.innerHTML='<span class="text-amber-600 dark:text-amber-400 font-bold">Tulis hurufnya dulu!</span>';
-    return;
-  }
-  if(!templateStrokes||!templateStrokes.length){
-    statusEl.innerHTML='<span class="text-rose-600 dark:text-rose-400 font-bold">Data template belum tersedia!</span>';
-    return;
-  }
-
-  const templateCount=templateStrokes.length;
-  const userCount=allStrokes.length;
-
-  console.log("%c=== MEMULAI VALIDASI STROKE ===","color: white; background: #4f46e5; font-size: 14px; padding: 4px; border-radius: 4px;");
-  console.log('Jumlah Goresan Template: '+templateCount+' | Pengguna: '+userCount);
-
-  const normUser=normStrokes(allStrokes);
-  const normTemp=normStrokes(templateStrokes);
-  const NUM_POINTS=30;
-  const TOLERANCE_ERROR=35;
-  const matchedCount=Math.min(templateCount,userCount);
-  let totalScore=0;
-  let wrongStrokes=[];
-
-  for(let i=0;i<matchedCount;i++){
-    const userPts=resamplePts(normUser[i],NUM_POINTS);
-    const tempPts=resamplePts(normTemp[i],NUM_POINTS);
-    let cxU=0,cyU=0,cxT=0,cyT=0;
-    for(let j=0;j<NUM_POINTS;j++){cxU+=userPts[j].x;cyU+=userPts[j].y;cxT+=tempPts[j].x;cyT+=tempPts[j].y}
-    cxU/=NUM_POINTS;cyU/=NUM_POINTS;cxT/=NUM_POINTS;cyT/=NUM_POINTS;
-    const posError=getDist({x:cxU,y:cyU},{x:cxT,y:cyT});
-    let shapeError=0;
-    for(let j=0;j<NUM_POINTS;j++){
-      const shifted={x:userPts[j].x-cxU+cxT,y:userPts[j].y-cyU+cyT};
-      shapeError+=getDist(shifted,tempPts[j]);
-    }
-    shapeError/=NUM_POINTS;
-    const totalError=shapeError+(posError*0.4);
-    let strokePct=100-(totalError/TOLERANCE_ERROR)*100;
-    strokePct=Math.max(0,Math.min(100,strokePct));
-
-    console.log('[DEBUG] Goresan ke-'+(i+1)+' | Akurasi: '+strokePct.toFixed(2)+'% (Bentuk: '+shapeError.toFixed(2)+', Posisi: '+posError.toFixed(2)+')');
-
-    totalScore+=strokePct;
-    if(strokePct<65)wrongStrokes.push(i+1);
-  }
-
-  if(userCount<templateCount){
-    for(let k=userCount+1;k<=templateCount;k++)wrongStrokes.push(k);
-  }
+  if(userCount<templateCount){for(let k=userCount+1;k<=templateCount;k++)wrongStrokes.push(k);}
 
   const overallPct=totalScore/templateCount;
   let msg='Akurasi Urutan: '+overallPct.toFixed(1)+'%';
+  if(userCount>templateCount)msg+='<br><span class="text-xs font-bold text-rose-600 dark:text-rose-400">Kelebihan '+(userCount-templateCount)+' goresan!</span>';
+  if(userCount<templateCount)msg+='<br><span class="text-xs font-bold text-rose-600 dark:text-rose-400">Kekurangan '+(templateCount-userCount)+' goresan!</span>';
+  if(wrongStrokes.length>0){msg+='<br><span class="text-xs font-bold text-rose-600 dark:text-rose-400">Cek lagi goresan ke: '+wrongStrokes.join(', ')+'</span>';highlightWrongStrokes(wrongStrokes);}
 
-  if(userCount>templateCount){
-    msg+='<br><span class="text-xs font-bold text-rose-600 dark:text-rose-400">Kelebihan '+(userCount-templateCount)+' goresan!</span>';
-  }
-  if(userCount<templateCount){
-    msg+='<br><span class="text-xs font-bold text-rose-600 dark:text-rose-400">Kekurangan '+(templateCount-userCount)+' goresan!</span>';
-  }
-  if(wrongStrokes.length>0){
-    msg+='<br><span class="text-xs font-bold text-rose-600 dark:text-rose-400">Cek lagi goresan ke: '+wrongStrokes.join(', ')+'</span>';
-    highlightWrongStrokes(wrongStrokes);
-  }
+  const q=questions[currentIdx];
+  const targetChar=q.character;
 
-  // KALO URUTAN BENAR, PANGGIL CNN DAN SIMPAN KE DATASET
   if(overallPct>=75&&userCount===templateCount&&wrongStrokes.length===0){
-    // Loading
     statusEl.innerHTML='<div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600 mr-2 mb-[-3px]"></div> Validating...';
-
-    const q=questions[currentIdx];
-    const targetChar=q.character;
-
-    // Auto-save dataset
     quizAutoSaveToDataset(normUser,targetChar);
 
-    // Buat kanvas bayangan untuk dikirim ke AI (64x64, background hitam)
-    const tempCanvas=document.createElement('canvas');
-    tempCanvas.width=64;tempCanvas.height=64;
-    const tCtx=tempCanvas.getContext('2d');
-    tCtx.fillStyle="#000000";
-    tCtx.fillRect(0,0,64,64);
-    tCtx.lineWidth=3;tCtx.lineCap='round';tCtx.strokeStyle='#ffffff';
-
+    const tc=document.createElement('canvas');tc.width=64;tc.height=64;
+    const tCtx=tc.getContext('2d');tCtx.fillStyle='#000';tCtx.fillRect(0,0,64,64);
+    tCtx.lineWidth=3;tCtx.lineCap='round';tCtx.strokeStyle='#fff';
     normUser.forEach(stroke=>{
       if(!stroke.length)return;
-      tCtx.beginPath();
-      tCtx.moveTo((stroke[0].x*0.45)+32,(stroke[0].y*0.45)+32);
-      for(let i=1;i<stroke.length;i++){
-        tCtx.lineTo((stroke[i].x*0.45)+32,(stroke[i].y*0.45)+32);
-      }
+      tCtx.beginPath();tCtx.moveTo((stroke[0].x*0.45)+32,(stroke[0].y*0.45)+32);
+      for(let i=1;i<stroke.length;i++)tCtx.lineTo((stroke[i].x*0.45)+32,(stroke[i].y*0.45)+32);
       tCtx.stroke();
     });
+    const imageData=tc.toDataURL('image/png');
 
-    const imageData=tempCanvas.toDataURL("image/png");
-
-    // Proses Fetch ke Laravel -> Python AI
-    fetch('/api/validate-ai',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},
-      body:JSON.stringify({character:targetChar,image_base64:imageData})
-    })
+    fetch('/api/validate-ai',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},
+      body:JSON.stringify({character:targetChar,image_base64:imageData})})
     .then(res=>res.json())
     .then(data=>{
       if(data.success){
         if(data.is_supported===false){
-          statusEl.innerHTML='<b>SEMPURNA!</b><br>Urutan goresan benar ('+overallPct.toFixed(1)+'%).<br><span class="text-xs text-indigo-600 dark:text-indigo-400 font-normal">Sistem AI belum dilatih untuk menilai bentuk huruf ini, namun urutan goresan Anda sudah tepat!</span>';
-          // Submit jawaban ke quiz backend
-          submitAnswer(targetChar,overallPct);
-          return;
+          statusEl.innerHTML='<b>SEMPURNA!</b><br>Urutan goresan benar ('+overallPct.toFixed(1)+'%).<br><span class="text-xs text-indigo-600 dark:text-indigo-400 font-normal">Sistem AI belum dilatih untuk huruf ini, namun urutan goresan sudah tepat!</span>';
+          submitAnswer(targetChar,overallPct);return;
         }
-
-        // Buat elemen Diagram Batang (Bar Chart) dari data Top 3
         let chartHtml='<div class="mt-3 pt-2 border-t border-slate-200 dark:border-gray-600 text-left">';
         chartHtml+='<p class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Analisis Probabilitas AI:</p>';
         data.top_3.forEach((item,index)=>{
           const barColor=index===0?'bg-indigo-500':'bg-slate-300 dark:bg-slate-600';
-          chartHtml+='<div class="flex items-center mb-1.5">';
-          chartHtml+='<span class="w-6 text-sm font-bold text-slate-700 dark:text-slate-300">'+item.char+'</span>';
+          chartHtml+='<div class="flex items-center mb-1.5"><span class="w-6 text-sm font-bold text-slate-700 dark:text-slate-300">'+item.char+'</span>';
           chartHtml+='<div class="flex-1 bg-slate-100 dark:bg-gray-800 h-2.5 rounded-full mx-2 overflow-hidden border border-slate-200 dark:border-gray-700">';
           chartHtml+='<div class="'+barColor+' h-2.5 rounded-full transition-all duration-700" style="width:'+item.prob+'%"></div></div>';
           chartHtml+='<span class="text-xs w-10 text-right font-mono text-slate-500">'+item.prob+'%</span></div>';
         });
         chartHtml+='</div>';
-
         if(data.is_match){
           statusEl.innerHTML='<b>SEMPURNA!</b><br>Urutan goresan benar ('+overallPct.toFixed(1)+'%).<br>AI yakin ini huruf <b>'+data.predicted_char+'</b>. '+chartHtml;
           submitAnswer(targetChar,overallPct);
         }else{
-          statusEl.innerHTML='<b>HAMPIR!</b><br>Urutan benar, tapi AI menebak ini huruf <b>'+data.predicted_char+'</b>.<br>Coba perbaiki proporsi garisnya! '+chartHtml;
-          // Tetap submit tapi dengan akurasi lebih rendah karena AI tidak cocok
+          statusEl.innerHTML='<b>HAMPIR!</b><br>Urutan benar, tapi AI menebak ini huruf <b>'+data.predicted_char+'</b>.<br>Coba perbaiki proporsi! '+chartHtml;
           submitAnswer(targetChar,Math.max(overallPct*0.6,50));
         }
       }else{
@@ -398,7 +376,6 @@ function submitDrawing(){
       submitAnswer(targetChar,overallPct);
     });
 
-  // JIKA URUTAN MASIH SALAH, JANGAN PANGGIL AI
   }else if(overallPct>=45&&userCount===templateCount){
     statusEl.innerHTML='<span class="text-amber-600 dark:text-amber-400 font-bold">⚠️ Hampir Benar!</span><br>'+msg;
   }else{
@@ -406,24 +383,25 @@ function submitDrawing(){
   }
 }
 
-function selectAnswer(ans){submitAnswer(ans,null)}
+// ── Answer ────────────────────────────────────────────────────
+
+function selectAnswer(ans){submitAnswer(ans,null);}
 
 async function submitAnswer(ans,accuracyScore){
   const q=questions[currentIdx];
   if(answers[currentIdx])return;
-  const startTime=answers['_start_'+currentIdx]||elapsedSeconds;
+  const startTime=answers['_start_'+currentIdx]||0;
   const timeTaken=elapsedSeconds-startTime;
-  const textRevealed=answers['_revealed_'+currentIdx]||false;
   const hintUsed=answers['_hint_'+currentIdx]||false;
   try{
     const res=await fetch('/quiz/answer',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},
-      body:JSON.stringify({question_id:q.id,user_answer:String(ans),accuracy_score:accuracyScore,time_taken_seconds:timeTaken,text_was_revealed:textRevealed,hint_was_used:hintUsed})});
+      body:JSON.stringify({question_id:q.id,user_answer:String(ans),accuracy_score:accuracyScore,time_taken_seconds:timeTaken,hint_was_used:hintUsed})});
     const data=await res.json();
     answers[currentIdx]={user_answer:ans,is_correct:data.is_correct,correct_answer:data.correct_answer,points_earned:data.points_earned,explanation:data.explanation,accuracy_score:accuracyScore};
-    if(data.is_correct){streak++;if(streak>maxStreak)maxStreak=streak}else{streak=0}
+    if(data.is_correct){streak++;if(streak>maxStreak)maxStreak=streak;}else{streak=0;}
     if(data.points_earned>0)showFloatingPoints(data.points_earned);
     renderQuestion();
-  }catch(e){console.error('Answer error:',e)}
+  }catch(e){console.error('Answer error:',e);}
 }
 
 function showFloatingPoints(pts){
@@ -441,7 +419,7 @@ function renderAnswered(q,container){
   if(q.question_type==='drawing'){
     let h='<div class="text-center p-6 rounded-xl '+(a.is_correct?'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800':'bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800')+'">';
     h+='<p class="text-lg font-bold '+(a.is_correct?'text-emerald-600 dark:text-emerald-400':'text-rose-600 dark:text-rose-400')+'">'+(a.is_correct?'✅ Benar!':'❌ Kurang Tepat')+'</p>';
-    h+='<p class="text-sm text-slate-600 dark:text-slate-300 mt-1">Akurasi: '+Math.round(a.accuracy_score)+'%</p>';
+    h+='<p class="text-sm text-slate-600 dark:text-slate-300 mt-1">Akurasi: '+Math.round(a.accuracy_score||0)+'%</p>';
     if(q.stroke_order_image)h+='<img src="'+q.stroke_order_image+'" class="mx-auto mt-3 max-h-32 rounded-lg" alt="stroke order">';
     h+='</div>';
     container.innerHTML=h;
@@ -468,7 +446,6 @@ function renderAnswered(q,container){
     }
     container.innerHTML=h;
   }
-  // Show reading info
   if(q.kunyomi||q.onyomi){
     let info='<div class="mt-3 flex gap-4 justify-center text-xs text-slate-500 dark:text-slate-400">';
     if(q.kunyomi)info+='<span>訓: <b class="text-slate-700 dark:text-slate-200">'+q.kunyomi+'</b></span>';
@@ -479,6 +456,8 @@ function renderAnswered(q,container){
   updateNavButtons();buildDots();
 }
 
+// ── Audio ─────────────────────────────────────────────────────
+
 function renderAudioPlayer(container,url){
   let h='<div class="flex justify-center mb-4"><button onclick="playAudio(\''+url+'\')" class="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-all shadow-sm hover:shadow-md">';
   h+='<i class="fas fa-play"></i></button></div>';
@@ -487,7 +466,7 @@ function renderAudioPlayer(container,url){
 
 let currentAudio=null;
 function playAudio(url){
-  if(currentAudio){currentAudio.pause();currentAudio=null}
+  if(currentAudio){currentAudio.pause();currentAudio=null;}
   currentAudio=new Audio(url);currentAudio.play().catch(e=>console.error('Audio error:',e));
 }
 
@@ -499,30 +478,25 @@ function toggleGlobalTextMode(){
   renderQuestion();
 }
 
-function useHint(){
-  const q=questions[currentIdx];
-  if(answers[currentIdx])return;
-  answers['_hint_'+currentIdx]=true;
-  const hintBtn=document.getElementById('hintBtn');
-  hintBtn.disabled=true;hintBtn.textContent='💡 Hint: '+q.meaning;
-  hintBtn.className='px-4 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 border border-amber-300 dark:border-amber-700 rounded-xl bg-amber-50 dark:bg-amber-900/20';
-}
+// ── Navigation ────────────────────────────────────────────────
 
 function nextQuestion(){
   if(!answers['_start_'+(currentIdx+1)])answers['_start_'+(currentIdx+1)]=elapsedSeconds;
-  if(currentIdx<questions.length-1){currentIdx++;renderQuestion()}
-  else if(allAnswered()){finishQuiz()}
+  if(currentIdx<questions.length-1){currentIdx++;renderQuestion();}
+  else if(allAnswered()){finishQuiz();}
 }
-function prevQuestion(){if(currentIdx>0){currentIdx--;renderQuestion()}}
+function prevQuestion(){if(currentIdx>0){currentIdx--;renderQuestion();}}
 
 function updateNavButtons(){
   document.getElementById('prevBtn').disabled=currentIdx===0;
   const nb=document.getElementById('nextBtn');
-  if(currentIdx===questions.length-1&&allAnswered()){nb.textContent='🏁 Selesai';nb.onclick=finishQuiz}
-  else{nb.innerHTML='Selanjutnya → <span class="kbd ml-1 border-indigo-400 text-indigo-200">→</span>';nb.onclick=nextQuestion}
+  if(currentIdx===questions.length-1&&allAnswered()){nb.textContent='🏁 Selesai';nb.onclick=finishQuiz;}
+  else{nb.innerHTML='Selanjutnya → <span class="kbd ml-1 border-indigo-400 text-indigo-200">→</span>';nb.onclick=nextQuestion;}
 }
 
-function allAnswered(){for(let i=0;i<questions.length;i++){if(!answers[i])return false}return true}
+function allAnswered(){for(let i=0;i<questions.length;i++){if(!answers[i])return false;}return true;}
+
+// ── Finish & Results ──────────────────────────────────────────
 
 async function finishQuiz(){
   clearInterval(timerInterval);
@@ -532,67 +506,101 @@ async function finishQuiz(){
     const data=await res.json();
     sessionStorage.removeItem('quizSession');
     showResults(data);
-  }catch(e){console.error('Finish error:',e)}
+  }catch(e){console.error('Finish error:',e);}
 }
 
 function showResults(data){
   document.getElementById('quizContainer').classList.add('hidden');
   document.querySelector('.quiz-bottom').classList.add('hidden');
   const rs=document.getElementById('resultsScreen');rs.classList.remove('hidden');
-  const pct=data.score;const passed=data.passed;const grade=data.grade;
-  const circ=2*Math.PI*54;const offset=circ-(pct/100)*circ;
-  const gradeColor=pct>=90?'text-emerald-500':pct>=70?'text-blue-500':pct>=50?'text-amber-500':'text-rose-500';
-  const strokeColor=pct>=90?'stroke-emerald-500':pct>=70?'stroke-blue-500':pct>=50?'stroke-amber-500':'stroke-rose-500';
-  let h='<div class="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-3xl shadow-2xl p-8 text-center relative overflow-hidden">';
-  h+='<div class="absolute top-0 left-0 w-full h-2 '+(passed?'bg-emerald-500':'bg-rose-500')+'"></div>';
-  h+='<h2 class="text-2xl font-bold text-slate-800 dark:text-white mt-4 mb-6">'+(passed?'🎉 Selamat!':'😤 Jangan Menyerah!')+'</h2>';
-  // Score circle
-  h+='<div class="flex justify-center mb-6"><div class="relative w-36 h-36">';
-  h+='<svg class="w-36 h-36 -rotate-90" viewBox="0 0 120 120">';
-  h+='<circle cx="60" cy="60" r="54" fill="none" stroke-width="8" class="stroke-slate-200 dark:stroke-gray-700"/>';
-  h+='<circle cx="60" cy="60" r="54" fill="none" stroke-width="8" stroke-linecap="round" class="score-circle '+strokeColor+'" stroke-dasharray="'+circ+'" stroke-dashoffset="'+circ+'"/>';
-  h+='</svg>';
-  h+='<div class="absolute inset-0 flex flex-col items-center justify-center">';
-  h+='<span class="text-3xl font-black '+gradeColor+'">'+grade+'</span>';
-  h+='<span class="text-sm font-bold text-slate-500 dark:text-slate-400">'+Math.round(pct)+'%</span>';
-  h+='</div></div></div>';
-  // Stats
-  h+='<div class="grid grid-cols-3 gap-4 mb-6">';
-  h+='<div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20"><p class="text-2xl font-black text-emerald-600 dark:text-emerald-400">'+data.correct+'</p><p class="text-xs text-slate-500">Benar</p></div>';
-  h+='<div class="p-3 rounded-xl bg-rose-50 dark:bg-rose-900/20"><p class="text-2xl font-black text-rose-600 dark:text-rose-400">'+(data.total-data.correct)+'</p><p class="text-xs text-slate-500">Salah</p></div>';
-  h+='<div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20"><p class="text-2xl font-black text-amber-600 dark:text-amber-400">'+data.total_points+'</p><p class="text-xs text-slate-500">Poin</p></div>';
-  h+='</div>';
-  if(maxStreak>=2)h+='<p class="text-sm text-amber-600 dark:text-amber-400 font-bold mb-4">🔥 Streak Terpanjang: '+maxStreak+' beruntun!</p>';
-  if(data.questions_with_text_revealed>0)h+='<p class="text-xs text-slate-400 mb-4">📖 '+data.questions_with_text_revealed+' soal menggunakan hint</p>';
-  // Question review
-  h+='<div class="text-left mt-6 border-t border-slate-200 dark:border-gray-700 pt-6">';
-  h+='<h3 class="text-sm font-bold text-slate-800 dark:text-white mb-4">📋 Detail Jawaban</h3>';
-  data.results.forEach((r,i)=>{
+
+  const pct=data.score,passed=data.passed,grade=data.grade;
+  const circ=2*Math.PI*54,offset=circ-(pct/100)*circ;
+  const gradeColor=pct>=90?'text-emerald-500':pct>=70?'text-indigo-500':pct>=50?'text-amber-500':'text-rose-500';
+  const strokeColor=pct>=90?'stroke-emerald-500':pct>=70?'stroke-indigo-500':pct>=50?'stroke-amber-500':'stroke-rose-500';
+
+  const headerIcon=passed?'<i class="fa-solid fa-trophy text-amber-400 text-4xl mb-3 animate-bounce block"></i>':'<i class="fa-solid fa-gamepad text-slate-400 text-4xl mb-3 block"></i>';
+  const headerText=passed?'Luar Biasa!':'Jangan Menyerah!';
+
+  let detailsHtml='';
+  data.results.forEach(r=>{
     const ic=r.is_correct;
-    h+='<div class="flex items-center gap-3 py-2 border-b border-slate-100 dark:border-gray-700 last:border-0">';
-    h+='<span class="text-lg">'+(ic?'✅':'❌')+'</span>';
-    h+='<span class="text-lg font-bold text-slate-800 dark:text-white w-8">'+r.character+'</span>';
-    h+='<span class="text-sm text-slate-600 dark:text-slate-300 flex-1">'+r.meaning+'</span>';
-    if(!ic)h+='<span class="text-xs text-rose-500">Jawaban: '+r.user_answer+'</span>';
-    if(r.points_earned>0)h+='<span class="text-xs font-bold text-emerald-500">+'+r.points_earned+'</span>';
-    h+='</div>';
+    const icon=ic?'<i class="fas fa-check text-emerald-500"></i>':'<i class="fas fa-times text-rose-500"></i>';
+    const bgClass=ic?'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50':'bg-rose-50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-800/50';
+    detailsHtml+=`
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-2xl border-2 border-b-4 ${bgClass} transition-transform hover:-translate-y-1">
+        <div class="flex items-center gap-4 flex-1">
+          <div class="w-12 h-12 shrink-0 bg-white dark:bg-gray-800 rounded-xl border-2 border-b-4 border-slate-200 dark:border-gray-700 flex items-center justify-center text-xl shadow-sm">${icon}</div>
+          <div>
+            <p class="text-2xl font-black text-slate-800 dark:text-white leading-none">${r.character}</p>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-500 mt-1.5 uppercase tracking-widest">${r.meaning}</p>
+          </div>
+        </div>
+        <div class="flex flex-col sm:items-end gap-2 mt-2 sm:mt-0">
+          ${!ic?`<span class="text-[10px] font-black text-rose-600 bg-rose-100 dark:bg-rose-900/30 px-3 py-1.5 rounded-lg border-2 border-rose-200 dark:border-rose-800 uppercase tracking-widest">Jawab: ${r.user_answer}</span>`:''}
+          ${r.points_earned>0?`<span class="text-xs font-black text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg border-2 border-amber-200 dark:border-amber-800 uppercase tracking-widest"><i class="fas fa-star mr-1"></i>+${r.points_earned} XP</span>`:''}
+        </div>
+      </div>`;
   });
-  h+='</div>';
-  // Buttons
-  h+='<div class="flex gap-3 mt-8">';
-  h+='<a href="/quiz" class="flex-1 py-3 rounded-xl text-sm font-bold border-2 border-slate-200 dark:border-gray-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-gray-700 transition-all text-center">↩ Menu Quiz</a>';
-  h+='<a href="/quiz/history" class="flex-1 py-3 rounded-xl text-sm font-bold border-2 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all text-center">📊 Riwayat</a>';
-  h+='</div></div>';
+
+  let h=`
+    <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] shadow-sm p-6 sm:p-10 text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-3 ${passed?'bg-emerald-500':'bg-rose-500'}"></div>
+      <div class="mt-4 mb-6">${headerIcon}
+        <h2 class="text-3xl sm:text-4xl font-black text-slate-800 dark:text-white uppercase tracking-wider mb-1">${headerText}</h2>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Hasil Latihan Kamu</p>
+      </div>
+      <div class="flex justify-center mb-8">
+        <div class="relative w-40 h-40">
+          <svg class="w-40 h-40 -rotate-90" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="54" fill="none" stroke-width="12" class="stroke-slate-100 dark:stroke-gray-700"/>
+            <circle cx="60" cy="60" r="54" fill="none" stroke-width="12" stroke-linecap="round" class="score-circle ${strokeColor} transition-all duration-1000 ease-out" stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-4xl font-black ${gradeColor}">${grade}</span>
+            <span class="text-sm font-bold text-slate-400 mt-1">${Math.round(pct)}%</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+        <div class="p-3 sm:p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 border-2 border-b-4 border-emerald-200 dark:border-emerald-800">
+          <p class="text-2xl sm:text-3xl font-black text-emerald-500">${data.correct}</p>
+          <p class="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mt-1">Benar</p>
+        </div>
+        <div class="p-3 sm:p-4 rounded-2xl bg-rose-50 dark:bg-rose-900/20 border-2 border-b-4 border-rose-200 dark:border-rose-800">
+          <p class="text-2xl sm:text-3xl font-black text-rose-500">${data.total-data.correct}</p>
+          <p class="text-[10px] sm:text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest mt-1">Salah</p>
+        </div>
+        <div class="p-3 sm:p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border-2 border-b-4 border-amber-200 dark:border-amber-800">
+          <p class="text-2xl sm:text-3xl font-black text-amber-500">${data.total_points}</p>
+          <p class="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest mt-1">Poin</p>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row justify-center items-center gap-3 mb-8">
+        ${maxStreak>=2?`<div class="inline-flex items-center px-4 py-2 bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-200 dark:border-amber-800 rounded-xl text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest"><i class="fas fa-fire mr-2"></i> ${maxStreak} Streak beruntun!</div>`:''}
+        ${data.questions_with_text_revealed>0?`<div class="inline-flex items-center px-4 py-2 bg-slate-100 dark:bg-gray-700/50 border-2 border-slate-200 dark:border-gray-600 rounded-xl text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest"><i class="fas fa-eye mr-2"></i> ${data.questions_with_text_revealed} Hint Dipakai</div>`:''}
+      </div>
+      <div class="text-left mt-8 border-t-2 border-dashed border-slate-200 dark:border-gray-700 pt-8">
+        <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-clipboard-list text-lg"></i> Detail Jawaban</h3>
+        <div class="space-y-3">${detailsHtml}</div>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-4 mt-10">
+        <a href="/quiz" class="w-full sm:flex-1 py-4 bg-slate-100 dark:bg-gray-800 border-2 border-b-[6px] border-slate-300 dark:border-gray-600 text-slate-600 dark:text-slate-300 font-black uppercase tracking-widest rounded-[1.25rem] hover:bg-slate-200 dark:hover:bg-gray-700 active:border-b-2 active:translate-y-1 transition-all shadow-sm flex items-center justify-center gap-2"><i class="fas fa-arrow-left"></i> Menu Quiz</a>
+        <a href="/quiz/history" class="w-full sm:flex-1 py-4 bg-[#1cb0f6] border-2 border-b-[6px] border-[#1899d6] text-white font-black uppercase tracking-widest rounded-[1.25rem] hover:brightness-110 active:border-b-2 active:translate-y-1 transition-all shadow-sm flex items-center justify-center gap-2"><i class="fas fa-chart-bar"></i> Lihat Riwayat</a>
+      </div>
+    </div>`;
+
   rs.innerHTML=h;
-  // Animate score circle
-  setTimeout(()=>{const c=rs.querySelector('.score-circle');if(c)c.style.strokeDashoffset=offset},100);
+  setTimeout(()=>{const c=rs.querySelector('.score-circle');if(c)c.style.strokeDashoffset=offset;},100);
 }
 
-// Keyboard shortcuts
+// ── Keyboard shortcuts ────────────────────────────────────────
+
 document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight')nextQuestion();
   else if(e.key==='ArrowLeft')prevQuestion();
-  else if(e.key.toLowerCase()==='h'&&!answers[currentIdx])useHint();
+  // Guard: jangan trigger kalau sudah dijawab atau hint sudah dipakai
+  else if(e.key.toLowerCase()==='h'&&!answers[currentIdx]&&!answers['_hint_'+currentIdx])useHint();
   else if(e.key>='1'&&e.key<='4'&&!answers[currentIdx]){
     const btns=document.querySelectorAll('.option-btn:not(:disabled)');
     const idx=parseInt(e.key)-1;
@@ -600,8 +608,7 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// Track start time per question
-answers['_start_0']=0;
+// ── Init ──────────────────────────────────────────────────────
 
-// Init on load
+answers['_start_0']=0;
 document.addEventListener('DOMContentLoaded',init);

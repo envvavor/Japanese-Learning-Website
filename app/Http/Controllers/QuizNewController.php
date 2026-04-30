@@ -158,11 +158,22 @@ class QuizNewController extends Controller
             'completed_at'    => now(),
         ]);
 
+        $xpEarned = $passed
+            ? $totalQuestions * 10
+            : $correctAnswers * 2;
+
+        if ($xpEarned > 0) {
+            Auth::user()->addXp($xpEarned);
+        }
+
         return response()->json([
-            'score'   => $score,
-            'passed'  => $passed,
-            'correct' => $correctAnswers,
-            'total'   => $totalQuestions,
+            'score'     => $score,
+            'passed'    => $passed,
+            'correct'   => $correctAnswers,
+            'total'     => $totalQuestions,
+            'xp_earned' => $xpEarned,
+            'new_level' => Auth::user()->level,
+            'new_xp'    => Auth::user()->xp,
         ]);
     }
 }

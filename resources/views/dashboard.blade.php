@@ -6,54 +6,59 @@
 {{-- Background Global (Warna cerah ceria) --}}
 <div class="min-h-screen bg-slate-50 dark:bg-slate-900 font-sans pb-20" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }">
 
-    {{-- Dark Mode Toggle removed (moved to profile dropdown) --}}
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {{-- Header Section --}}
-        <div id="onboard-header" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
-            <div class="flex items-center gap-4">
-                <div class="w-20 h-20 bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-3xl flex items-center justify-center p-2 shrink-0">
+        <div id="onboard-header" class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-10 gap-4 sm:gap-6">
+            
+            {{-- Wrapper Logo & Sapaan --}}
+            <div class="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-white dark:bg-gray-800 border-2 border-b-[4px] sm:border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl sm:rounded-3xl flex items-center justify-center p-1.5 sm:p-2 shrink-0 shadow-sm">
                     <img src="{{ asset('storage/images/logo_manabu.png') }}" alt="Logo" class="w-full h-full object-contain">
                 </div>
-                <div>
-                    <h1 class="text-3xl font-black text-slate-800 dark:text-white uppercase tracking-wider mb-1">
+                <div class="flex-1">
+                    <h1 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white uppercase tracking-wider mb-0.5 sm:mb-1 leading-tight">
                         Halo, <span class="text-[#1cb0f6]">{{ explode(' ', Auth::user()->name)[0] }}</span>!
                     </h1>
-                    <p class="text-lg font-bold text-slate-500 dark:text-slate-400">Selamat Datang Kembali di 学ぶ</p>
+                    <p class="text-sm sm:text-lg font-bold text-slate-500 dark:text-slate-400">Selamat Datang Kembali di 学ぶ</p>
                 </div>
             </div>
 
             {{-- Profile Dropdown --}}
-            <div id="onboard-profile" x-data="{ open: false }" class="relative z-50">
+            <div id="onboard-profile" x-data="{ open: false }" class="relative z-50 w-full sm:w-auto mt-2 sm:mt-0">
                 <button @click="open = !open" @click.away="open = false" 
-                    class="inline-flex items-center justify-center px-6 py-3 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl text-sm font-black text-slate-700 dark:text-slate-200 bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700 active:border-b-2 active:translate-y-1 transition-all uppercase tracking-widest gap-3 shadow-sm">
+                    class="w-full sm:w-auto flex items-center justify-center px-5 sm:px-6 py-3 sm:py-3.5 border-2 border-b-[4px] sm:border-b-[6px] border-slate-200 dark:border-gray-700 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-black text-slate-700 dark:text-slate-200 bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700 active:border-b-2 active:translate-y-1 transition-all uppercase tracking-widest gap-2 sm:gap-3 shadow-sm">
+                    
                     @if(Auth::user()->google_avatar)
-                        <img src="{{ Auth::user()->google_avatar }}" alt="Avatar" class="w-7 h-7 rounded-full border-2 border-[#1cb0f6] object-cover shrink-0" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=\'w-7 h-7 rounded-full bg-[#1cb0f6] text-white flex items-center justify-center font-bold text-xs shrink-0\'>{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>'">
+                        <img src="{{ Auth::user()->google_avatar }}" alt="Avatar" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 border-[#1cb0f6] object-cover shrink-0" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=\'w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#1cb0f6] text-white flex items-center justify-center font-bold text-[10px] sm:text-xs shrink-0\'>{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>'">
                     @else
-                        <div class="w-7 h-7 rounded-full bg-[#1cb0f6] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#1cb0f6] text-white flex items-center justify-center font-bold text-[10px] sm:text-xs shrink-0">
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                         </div>
                     @endif
-                    Profil
-                    <i class="fas fa-chevron-down text-sm transition-transform" :class="{'rotate-180': open}"></i>
+                    
+                    <span class="flex-1 text-left sm:flex-none">Profil</span>
+                    
+                    <i class="fas fa-chevron-down text-[10px] sm:text-sm transition-transform" :class="{'rotate-180': open}"></i>
                 </button>
 
                 {{-- Dropdown Menu --}}
                 <div x-show="open" x-transition.opacity x-transition:enter.duration.200ms x-transition:leave.duration.150ms 
-                     class="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 border-2 border-b-4 border-slate-200 dark:border-gray-700 rounded-2xl shadow-lg overflow-hidden" x-cloak>
+                     class="absolute right-0 left-0 sm:left-auto mt-2 sm:mt-3 w-full sm:w-56 bg-white dark:bg-gray-800 border-2 border-b-4 border-slate-200 dark:border-gray-700 rounded-2xl shadow-lg overflow-hidden" x-cloak>
                     
                     <div class="p-2 space-y-1">
                         {{-- Profil Saya --}}
-                        <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-[#1cb0f6] dark:hover:text-[#1cb0f6] transition-colors">
-                            <i class="fas fa-id-card w-5 text-center text-lg"></i> Profil Saya
+                        <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-[#1cb0f6] dark:hover:text-[#1cb0f6] transition-colors">
+                            <i class="fas fa-id-card w-5 text-center text-base sm:text-lg"></i> Profil Saya
                         </a>
 
                         {{-- Tema Web --}}
-                        <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode); document.documentElement.classList.toggle('dark', darkMode)" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors">
+                        <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode); document.documentElement.classList.toggle('dark', darkMode)" class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors">
                             <div class="flex items-center gap-3 hover:text-amber-500">
-                                <i class="fas fa-paint-brush w-5 text-center text-lg"></i> Tema Web
+                                <i class="fas fa-paint-brush w-5 text-center text-base sm:text-lg"></i> Tema Web
                             </div>
-                            <i class="fas text-lg" :class="darkMode ? 'fa-moon text-indigo-500' : 'fa-sun text-amber-500'"></i>
+                            <i class="fas text-base sm:text-lg" :class="darkMode ? 'fa-moon text-indigo-500' : 'fa-sun text-amber-500'"></i>
                         </button>
                         
                         <div class="h-0.5 bg-slate-100 dark:bg-gray-700 my-1 mx-2"></div>
@@ -61,8 +66,8 @@
                         {{-- Logout --}}
                         <form action="{{ route('logout') }}" method="POST" class="m-0">
                             @csrf
-                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
-                                <i class="fas fa-sign-out-alt w-5 text-center text-lg"></i> Keluar
+                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
+                                <i class="fas fa-sign-out-alt w-5 text-center text-base sm:text-lg"></i> Keluar
                             </button>
                         </form>
                     </div>
@@ -105,7 +110,7 @@
             <div class="bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
                 <div>
                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Quiz Yang Dikerjakan</p>
-                    <p class="text-4xl font-black text-blue-500">0</p>
+                    <p class="text-4xl font-black text-blue-500">{{ $quizCount }}</p>
                 </div>
                 <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 text-blue-500 rounded-2xl flex items-center justify-center text-2xl">
                     <i class="fas fa-map-marked-alt"></i>
@@ -116,7 +121,7 @@
             <div class="bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:border-emerald-200 dark:hover:border-emerald-800 transition-colors">
                 <div>
                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Huruf Dikuasai</p>
-                    <p class="text-4xl font-black text-emerald-500">0</p>
+                    <p class="text-4xl font-black text-emerald-500">{{ $masteredCount }}</p>
                 </div>
                 <div class="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-800 text-emerald-500 rounded-2xl flex items-center justify-center text-2xl">
                     <i class="fas fa-check-double"></i>
@@ -128,7 +133,7 @@
                 <div>
                     <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Streak</p>
                     <p class="text-4xl font-black text-amber-500 flex items-baseline gap-1">
-                        0 <span class="text-sm font-black text-slate-400 uppercase tracking-widest">Hari</span>
+                        {{ $streak }} <span class="text-sm font-black text-slate-400 uppercase tracking-widest">Hari</span>
                     </p>
                 </div>
                 <div class="w-14 h-14 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 text-amber-500 rounded-2xl flex items-center justify-center text-2xl">

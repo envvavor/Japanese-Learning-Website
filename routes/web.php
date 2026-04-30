@@ -34,9 +34,65 @@ Route::post('/register', [AuthController::class, 'register'])->middleware('guest
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// Protected routes - User dashboard
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = Auth::user();
+    $userId = $user->id;
+    
+    $quizCount = \App\Models\QuizAttempt::where('user_id', $userId)->count()
+               + \App\Models\QuizSession::where('user_id', $userId)
+                    ->whereNotNull('completed_at')->count();
+                    
+    $masteredCount = \App\Models\QuizQuestion::whereHas('quizSession', fn($q) => 
+                        $q->where('user_id', $userId))
+                    ->where('is_correct', true)
+                    ->distinct('kanji_id')
+                    ->count('kanji_id');
+
+    // MENGHITUNG STREAK (DUOLINGO STYLE)
+    // 1. Ambil semua tanggal dari QuizAttempt
+    $attemptDates = \App\Models\QuizAttempt::where('user_id', $userId)
+        ->whereNotNull('completed_at')
+        ->pluck('completed_at')
+        ->map(fn($d) => \Carbon\Carbon::parse($d)->toDateString());
+
+    // 2. Ambil semua tanggal dari QuizSession
+    $sessionDates = \App\Models\QuizSession::where('user_id', $userId)
+        ->whereNotNull('completed_at')
+        ->pluck('completed_at')
+        ->map(fn($d) => \Carbon\Carbon::parse($d)->toDateString());
+
+    // 3. Gabungkan, hapus duplikat, dan urutkan dari terbaru ke terlama (Descending)
+    $dates = $attemptDates->merge($sessionDates)
+        ->filter()
+        ->unique()
+        ->sortDesc()
+        ->values()
+        ->toArray();
+
+    $streak = 0;
+
+    if (!empty($dates)) {
+        $today = now()->toDateString();
+        $yesterday = now()->subDay()->toDateString();
+
+        // Duolingo Logic: Streak hidup JIKA rekor terbarunya adalah "Hari Ini" ATAU "Kemarin"
+        if ($dates[0] === $today || $dates[0] === $yesterday) {
+            $streak = 1;
+            $checkDate = \Carbon\Carbon::parse($dates[0]);
+
+            // Cek mundur ke belakang untuk melihat berapa hari beruntun
+            for ($i = 1; $i < count($dates); $i++) {
+                if ($dates[$i] === $checkDate->copy()->subDay()->toDateString()) {
+                    $streak++;
+                    $checkDate->subDay(); // Mundurkan target cek 1 hari
+                } else {
+                    break; // Streak putus!
+                }
+            }
+        }
+    }
+
+    return view('dashboard', compact('quizCount', 'masteredCount', 'streak'));
 })->name('dashboard')->middleware('auth');
 
 Route::post('/onboarding/complete', function () {

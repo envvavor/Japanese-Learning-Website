@@ -435,6 +435,13 @@ class QuizController extends Controller
         // Refresh to get updated values
         $session->refresh();
 
+        $totalPoints = $questions->sum('points_earned');
+        $xpEarned = $totalPoints * 3;
+
+        if ($xpEarned > 0) {
+            Auth::user()->addXp($xpEarned);
+        }
+
         $results = $questions->map(function ($q) {
             return [
                 'question_id' => $q->id,

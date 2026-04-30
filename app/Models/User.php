@@ -22,6 +22,9 @@ class User extends Authenticatable
         'verification_code_expires_at',
         'email_verified_at',
         'has_seen_onboarding',
+        'xp',
+        'level',
+        'next_level_xp',
     ];
 
     protected $hidden = [
@@ -50,5 +53,17 @@ class User extends Authenticatable
     public function isGoogleUser(): bool
     {
         return !is_null($this->google_id);
+    }
+
+    public function addXp(int $amount): void
+    {
+        $this->xp += $amount;
+
+        while ($this->xp >= $this->next_level_xp) {
+            $this->xp -= $this->next_level_xp;
+            $this->level += 1;
+        }
+
+        $this->save();
     }
 }
