@@ -49,20 +49,20 @@ Route::get('/dashboard', function () {
                     ->distinct('kanji_id')
                     ->count('kanji_id');
 
-    // MENGHITUNG STREAK (DUOLINGO STYLE)
-    // 1. Ambil semua tanggal dari QuizAttempt
+    // MENGHITUNG STREAK
+    // Ambil semua tanggal dari QuizAttempt
     $attemptDates = \App\Models\QuizAttempt::where('user_id', $userId)
         ->whereNotNull('completed_at')
         ->pluck('completed_at')
         ->map(fn($d) => \Carbon\Carbon::parse($d)->toDateString());
 
-    // 2. Ambil semua tanggal dari QuizSession
+    // Ambil semua tanggal dari QuizSession
     $sessionDates = \App\Models\QuizSession::where('user_id', $userId)
         ->whereNotNull('completed_at')
         ->pluck('completed_at')
         ->map(fn($d) => \Carbon\Carbon::parse($d)->toDateString());
 
-    // 3. Gabungkan, hapus duplikat, dan urutkan dari terbaru ke terlama (Descending)
+    // Gabungkan, hapus duplikat, dan urutkan dari terbaru ke terlama (Descending)
     $dates = $attemptDates->merge($sessionDates)
         ->filter()
         ->unique()
@@ -76,7 +76,7 @@ Route::get('/dashboard', function () {
         $today = now()->toDateString();
         $yesterday = now()->subDay()->toDateString();
 
-        // Duolingo Logic: Streak hidup JIKA rekor terbarunya adalah "Hari Ini" ATAU "Kemarin"
+        // Streak hidup JIKA rekor terbarunya adalah "Hari Ini" ATAU "Kemarin"
         if ($dates[0] === $today || $dates[0] === $yesterday) {
             $streak = 1;
             $checkDate = \Carbon\Carbon::parse($dates[0]);
@@ -261,9 +261,7 @@ Route::prefix('admin/dataset')->name('admin.dataset.')->middleware(['auth'])->gr
     Route::get('/download/{character}', [DatasetController::class, 'downloadZip'])->name('download');
 });
 
-// ================================================================
-// Admin Quiz Builder (Duolingo-style manual quiz management)
-// ================================================================
+
 Route::middleware(['auth', 'admin'])
     ->prefix('admin/quizzes')
     ->name('admin.quizzes.')

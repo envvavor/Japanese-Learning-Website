@@ -15,9 +15,14 @@ class VocabularyController extends Controller
         $level = $request->input('level', '');
         $search = $request->input('q', '');
 
-        $query = Vocabulary::query()->orderBy('jlpt_level')->orderBy('original');
+        $query = Vocabulary::query()
+            ->orderByRaw("CASE WHEN jlpt_level IS NULL THEN 1 ELSE 0 END")
+            ->orderBy('jlpt_level')
+            ->orderBy('original');
 
-        if ($level && in_array(strtoupper($level), ['N1','N2','N3','N4','N5'])) {
+        if ($level === 'none') {
+            $query->whereNull('jlpt_level');
+        } elseif ($level && in_array(strtoupper($level), ['N1','N2','N3','N4','N5'])) {
             $query->byLevel($level);
         }
 

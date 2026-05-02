@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kosakata JLPT — Manabu')
+@section('title', 'Kosakata Jepang — Manabu')
 
 @push('styles')
 <style>
@@ -30,10 +30,10 @@
             
             <div>
                 <h1 class="text-xl sm:text-3xl font-black text-slate-800 dark:text-white uppercase tracking-wider leading-tight">
-                    Kosakata <span class="text-indigo-500">JLPT</span>
+                    Kosakata <span class="text-indigo-500">Jepang</span>
                 </h1>
                 <p class="text-[10px] sm:text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                    {{ number_format($vocabularies->total()) }} Kata · N5 - N1
+                    {{ number_format($vocabularies->total()) }} Kata · JLPT & JMDict
                 </p>
             </div>
         </div>
@@ -42,21 +42,22 @@
         <div class="flex overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
             @php
                 $levelColors = [
-                    ''   => ['bg' => 'bg-slate-800 dark:bg-white',   'text' => 'text-white dark:text-slate-900',   'border' => 'border-slate-700 dark:border-gray-300', 'shadow' => 'border-b-slate-900 dark:border-b-gray-400'],
-                    'N5' => ['bg' => 'bg-sky-500',     'text' => 'text-white', 'border' => 'border-sky-600', 'shadow' => 'border-b-sky-700'],
-                    'N4' => ['bg' => 'bg-emerald-500', 'text' => 'text-white', 'border' => 'border-emerald-600', 'shadow' => 'border-b-emerald-700'],
-                    'N3' => ['bg' => 'bg-amber-500',   'text' => 'text-white', 'border' => 'border-amber-600', 'shadow' => 'border-b-amber-700'],
-                    'N2' => ['bg' => 'bg-orange-500',  'text' => 'text-white', 'border' => 'border-orange-600', 'shadow' => 'border-b-orange-700'],
-                    'N1' => ['bg' => 'bg-rose-500',    'text' => 'text-white', 'border' => 'border-rose-600', 'shadow' => 'border-b-rose-700'],
+                    ''     => ['bg' => 'bg-slate-800 dark:bg-white',   'text' => 'text-white dark:text-slate-900',   'border' => 'border-slate-700 dark:border-gray-300', 'shadow' => 'border-b-slate-900 dark:border-b-gray-400'],
+                    'N5'   => ['bg' => 'bg-sky-500',     'text' => 'text-white', 'border' => 'border-sky-600', 'shadow' => 'border-b-sky-700'],
+                    'N4'   => ['bg' => 'bg-emerald-500', 'text' => 'text-white', 'border' => 'border-emerald-600', 'shadow' => 'border-b-emerald-700'],
+                    'N3'   => ['bg' => 'bg-amber-500',   'text' => 'text-white', 'border' => 'border-amber-600', 'shadow' => 'border-b-amber-700'],
+                    'N2'   => ['bg' => 'bg-orange-500',  'text' => 'text-white', 'border' => 'border-orange-600', 'shadow' => 'border-b-orange-700'],
+                    'N1'   => ['bg' => 'bg-rose-500',    'text' => 'text-white', 'border' => 'border-rose-600', 'shadow' => 'border-b-rose-700'],
+                    'none' => ['bg' => 'bg-violet-500',  'text' => 'text-white', 'border' => 'border-violet-600', 'shadow' => 'border-b-violet-700'],
                 ];
-                $levelLabels = ['' => 'Semua', 'N5' => 'N5', 'N4' => 'N4', 'N3' => 'N3', 'N2' => 'N2', 'N1' => 'N1'];
+                $levelLabels = ['' => 'Semua', 'N5' => 'N5', 'N4' => 'N4', 'N3' => 'N3', 'N2' => 'N2', 'N1' => 'N1', 'none' => 'JMDict'];
             @endphp
 
             @foreach($levelLabels as $lvl => $label)
             @php
                 $isActive = ($level === $lvl);
                 $c = $levelColors[$lvl];
-                $count = $lvl ? ($counts[$lvl] ?? 0) : $vocabularies->total();
+                $count = $lvl === 'none' ? ($counts[''] ?? 0) : ($lvl ? ($counts[$lvl] ?? 0) : $vocabularies->total());
             @endphp
             <a href="{{ route('vocabulary.index', array_filter(['level' => $lvl, 'q' => $search])) }}"
                class="inline-flex shrink-0 items-center gap-1.5 sm:gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl sm:rounded-2xl border-2 font-black text-xs sm:text-sm uppercase tracking-widest transition-all active:translate-y-1 shadow-sm
@@ -66,7 +67,7 @@
                 {{ $label }}
                 @if($lvl)
                 <span class="text-[9px] sm:text-[10px] font-black opacity-80 bg-black/10 dark:bg-white/10 px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg">
-                    {{ number_format($counts[$lvl] ?? 0) }}
+                    {{ number_format($lvl === 'none' ? ($counts[''] ?? 0) : ($counts[$lvl] ?? 0)) }}
                 </span>
                 @endif
             </a>
@@ -118,7 +119,8 @@
                         'N4' => ['badge' => 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800', 'glow' => 'hover:border-emerald-300 dark:hover:border-emerald-700'],
                         'N5' => ['badge' => 'bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800',    'glow' => 'hover:border-sky-300 dark:hover:border-sky-700'],
                     ];
-                    $c = $colorMap[$vocab->jlpt_level] ?? $colorMap['N3'];
+                    $defaultColor = ['badge' => 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 border-violet-200 dark:border-violet-800', 'glow' => 'hover:border-violet-300 dark:hover:border-violet-700'];
+                    $c = $colorMap[$vocab->jlpt_level] ?? $defaultColor;
                 @endphp
                 
                 {{-- Vocab Card Gamified Compact --}}
@@ -127,7 +129,7 @@
                     {{-- Header Level & Copy --}}
                     <div class="flex items-start justify-between mb-3">
                         <span class="px-2 sm:px-2.5 py-1 rounded-lg sm:rounded-xl border-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest {{ $c['badge'] }}">
-                            {{ $vocab->jlpt_level }}
+                            {{ $vocab->jlpt_level ?? '辞書' }}
                         </span>
                         
                         <div class="flex gap-2">
@@ -195,13 +197,7 @@ function copyText(text) {
     });
 }
 
-function copyText(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        const toast = document.getElementById('copy-toast');
-        toast.classList.remove('translate-y-24', 'opacity-0');
-        setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 2000);
-    });
-}
+
 
 let synth = null;
 try { 

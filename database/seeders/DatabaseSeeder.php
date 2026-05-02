@@ -36,5 +36,6 @@ class DatabaseSeeder extends Seeder
         // Seed Visual Novel data
         $this->call(VisualNovelSeeder::class);
         $this->call(VocabularySeeder::class);
+        $this->call(JmDictSeeder::class);
     }
 }

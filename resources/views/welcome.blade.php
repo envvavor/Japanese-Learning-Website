@@ -44,7 +44,7 @@
                 </div>
                 <span class="text-xl sm:text-2xl font-black uppercase tracking-wider text-slate-800 dark:text-white">
                     <span class="text-[#1cb0f6]">学ぶ</span> 
-                    <span class="hidden sm:inline">Manabu</span> {{-- "Manabu" disembunyikan di layar HP kecil biar nggak kepanjangan --}}
+                    <span class="hidden sm:inline">Manabu</span>
                 </span>
             </a>
 
