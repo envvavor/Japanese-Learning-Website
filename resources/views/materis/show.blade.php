@@ -1,7 +1,5 @@
 @extends('layouts.app')
-
 @section('title', $materi->title . ' — Manabu')
-
 @push('styles')
 <script>
     tailwind.config = {
@@ -9,264 +7,223 @@
     }
 </script>
 <style>
-    /* 1. TYPOGRAPHY DASAR (GAMIFIED) */
+    /* 1. TYPOGRAPHY DASAR (BLOG STYLE) */
     .prose {
         color: #334155;
-        font-size: 1.1rem;
+        font-size: 1.125rem; /* Sedikit lebih besar untuk readability */
         line-height: 1.8;
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        -webkit-font-smoothing: antialiased;
+        font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; /* Menggunakan serif untuk body text lebih klasik/blog */
     }
-    .dark .prose { color: #cbd5e1; }
-    .prose.max-w-none { max-width: none; }
-
-    /* 2. HEADINGS (Judul) */
+    .dark .prose { color: #d1d5db; }
+    
+    /* Font sans-serif untuk elemen tertentu agar tetap modern */
+    .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6, .prose a, .prose th {
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    /* 2. HEADINGS */
     .prose h1, .prose h2, .prose h3, .prose h4 {
         color: #0f172a;
-        font-weight: 900; 
-        letter-spacing: -0.025em;
+        font-weight: 800; 
+        letter-spacing: -0.015em;
     }
     .dark .prose h1, .dark .prose h2, .dark .prose h3, .dark .prose h4 { color: #f8fafc; }
-    .prose h1 { font-size: 2.5em; margin-bottom: 0.8em; line-height: 1.2; }
-    .prose h2 { font-size: 1.75em; margin-top: 2em; margin-bottom: 1em; line-height: 1.3; padding-bottom: 0.3em; border-bottom: 4px solid #e2e8f0; border-radius: 2px; }
-    .dark .prose h2 { border-bottom-color: #334155; }
-    .prose h3 { font-size: 1.25em; margin-top: 1.6em; margin-bottom: 0.6em; }
-
-    /* 3. PARAGRAF & LINK */
-    .prose p { margin-top: 1.25em; margin-bottom: 1.25em; }
-    .prose a {
-        color: #06b6d4; 
-        text-decoration: none;
-        font-weight: 900;
-        border-bottom: 3px solid #cffafe;
-        transition: all 0.2s ease;
-        padding: 0 4px;
-        border-radius: 6px;
+    
+    .prose h2 { 
+        font-size: 1.875em; 
+        margin-top: 2em; 
+        margin-bottom: 1em; 
+        line-height: 1.3;
+        /* Dihilangkan border-bottom tebal gamified */
     }
-    .dark .prose a { color: #22d3ee; border-bottom-color: #164e63; }
-    .prose a:hover { background-color: #cffafe; border-bottom-color: #06b6d4; }
-    .dark .prose a:hover { background-color: #164e63; border-bottom-color: #22d3ee; color: #fff; }
-    .prose strong { color: #0f172a; font-weight: 900; }
+    .prose h3 { font-size: 1.5em; margin-top: 1.6em; margin-bottom: 0.6em; }
+    /* 3. PARAGRAF & LINK */
+    .prose p { margin-top: 1.5em; margin-bottom: 1.5em; }
+    .prose a {
+        color: #0ea5e9; 
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s ease;
+    }
+    .dark .prose a { color: #38bdf8; }
+    .prose a:hover { border-bottom-color: currentColor; }
+    .prose strong { color: #0f172a; font-weight: 700; }
     .dark .prose strong { color: #f8fafc; }
-
     /* 🇯🇵 4. KHUSUS BAHASA JEPANG (Furigana/Ruby) */
-    .prose ruby { ruby-align: center; margin-right: 0.1em; font-weight: 700; color: #1e293b; }
+    .prose ruby { 
+        ruby-align: center; 
+        margin-right: 0.1em; 
+        font-weight: 500; 
+        color: #1e293b;
+        font-family: "Hiragino Kaku Gothic Pro", "Meiryo", sans-serif; /* Font Jepang yang bagus */
+    }
     .dark .prose ruby { color: #f8fafc; }
     .prose rt { 
-        color: #06b6d4;
-        font-size: 0.6em;
-        font-weight: 900;
+        color: #64748b;
+        font-size: 0.55em;
+        font-weight: 600;
         line-height: 1;
         transform: translateY(-10%);
         user-select: none; 
         -webkit-user-select: none;
     }
-    .dark .prose rt { color: #22d3ee; }
-
-    /* 5. BLOCKQUOTE (Kotak Kutipan/Catatan Chunky) */
+    .dark .prose rt { color: #94a3b8; }
+    /* 5. BLOCKQUOTE (Kutipan Clean) */
     .prose blockquote {
-        position: relative;
-        font-weight: 700;
-        color: #0891b2; 
-        border: 2px solid #cffafe;
-        border-left: 8px solid #06b6d4;
-        background-color: #ecfeff;
+        font-style: italic;
+        color: #475569; 
+        border-left: 4px solid #cbd5e1;
+        padding-left: 1.25em;
         margin: 2em 0;
-        padding: 1.5em 1.5em;
-        border-radius: 1rem;
-        box-shadow: 0 4px 0 #cffafe;
     }
     .dark .prose blockquote {
-        color: #67e8f9;
-        border-color: #164e63;
-        border-left-color: #0891b2;
-        background-color: #083344;
-        box-shadow: 0 4px 0 #164e63;
+        color: #94a3b8;
+        border-left-color: #475569;
     }
-    .prose blockquote p { margin: 0; }
-
-    /* 6. LISTS (Daftar) */
+    /* 6. LISTS */
     .prose ul, .prose ol { margin-top: 1.25em; margin-bottom: 1.25em; padding-left: 1.5em; }
-    .prose li { margin-top: 0.5em; margin-bottom: 0.5em; padding-left: 0.375em; font-weight: 500; }
-    .prose ul li { list-style-type: none; position: relative; }
-    .prose ul li::before {
-        content: "\f00c"; /* FontAwesome check-circle */
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        position: absolute;
-        color: #06b6d4;
-        font-size: 0.8em;
-        top: 0.2em;
-        left: -1.5em;
-    }
-    .dark .prose ul li::before { color: #22d3ee; }
+    .prose li { margin-top: 0.5em; margin-bottom: 0.5em; }
+    .prose ul { list-style-type: disc; }
     .prose ol { list-style-type: decimal; }
-    .prose ol li::marker { color: #06b6d4; font-weight: 900; }
-
+    .prose ul::marker, .prose ol::marker { color: #64748b; }
+    .dark .prose ul::marker, .dark .prose ol::marker { color: #94a3b8; }
     /* 7. IMAGES & FIGURES */
     .prose img {
-        max-width: 100% !important; /* Paksa gambar tidak tumpah */
+        max-width: 100% !important;
         height: auto !important;
-        border-radius: 1.5rem;
-        border: 2px solid #e2e8f0;
-        border-bottom: 8px solid #cbd5e1;
-        margin: 2.5em auto;
+        border-radius: 0.75rem; /* Radius lebih halus */
+        margin: 2em auto;
         display: block;
-        transition: transform 0.2s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Shadow elegan */
     }
-    .dark .prose img { border-color: #334155; border-bottom-color: #1e293b; }
-    .prose img:hover { transform: translateY(-2px); }
     .prose figure { margin: 2.5em 0; }
-    .prose figcaption { text-align: center; color: #64748b; font-size: 0.875em; margin-top: 1em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .prose figcaption { text-align: center; color: #64748b; font-size: 0.875em; margin-top: 1em; }
     .dark .prose figcaption { color: #94a3b8; }
-
-    /* 8. TABLES (Tabel Data Gamified & Responsive) */
+    /* 8. TABLES (Clean Data Table) */
     .table-responsive-wrapper {
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        margin: 2.5em 0;
-        border-radius: 1rem;
-        border: 2px solid #e2e8f0;
-        border-bottom: 6px solid #cbd5e1;
-        background-color: #ffffff;
+        margin: 2em 0;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
     }
-    .dark .table-responsive-wrapper {
-        border-color: #334155;
-        border-bottom-color: #1e293b;
-        background-color: #0f172a;
-    }
+    .dark .table-responsive-wrapper { border-color: #334155; }
     .prose table {
         width: 100%;
-        min-width: max-content; /* Memaksa tabel tidak penyok di layar kecil */
-        border-collapse: separate;
-        border-spacing: 0;
-        margin: 0; /* Margin dipindah ke wrapper */
+        min-width: max-content;
+        border-collapse: collapse;
         font-size: 0.95em;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    .prose thead { background-color: #f8fafc; }
-    .dark .prose thead { background-color: #1e293b; }
-    .prose thead th { color: #0f172a; font-weight: 900; padding: 1.2em 1em; text-align: left; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; white-space: nowrap; }
-    .dark .prose thead th { color: #f8fafc; border-bottom-color: #334155; }
-    .prose tbody tr { transition: background-color 0.15s ease; }
-    .prose tbody tr:hover { background-color: #f1f5f9; }
-    .dark .prose tbody tr:hover { background-color: #020617; }
-    .prose tbody td { padding: 1em; border-bottom: 2px solid #f1f5f9; color: #475569; font-weight: 500; }
-    .dark .prose tbody td { border-bottom-color: #1e293b; color: #cbd5e1; }
-    .prose tbody tr:last-child td { border-bottom: none; }
-
-    /* 9. CODE & PRE (Blok Kode) */
+    .prose thead { background-color: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+    .dark .prose thead { background-color: #0f172a; border-bottom-color: #334155; }
+    .prose thead th { color: #334155; font-weight: 600; padding: 0.75em 1em; text-align: left; }
+    .dark .prose thead th { color: #cbd5e1; }
+    .prose tbody tr { border-bottom: 1px solid #e2e8f0; }
+    .dark .prose tbody tr { border-bottom-color: #1e293b; }
+    .prose tbody td { padding: 0.75em 1em; color: #475569; }
+    .dark .prose tbody td { color: #94a3b8; }
+    .prose tbody tr:last-child { border-bottom: none; }
+    /* 9. CODE & PRE */
     .prose code {
-        color: #be123c; 
-        font-weight: 800;
+        color: #db2777; 
         font-size: 0.875em;
-        background-color: #ffe4e6;
-        padding: 0.25em 0.5em;
-        border-radius: 0.5rem;
-        border: 2px solid #fecdd3;
-        border-bottom: 3px solid #fda4af;
-        font-family: ui-monospace, monospace;
+        background-color: #fdf2f8;
+        padding: 0.2em 0.4em;
+        border-radius: 0.25rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
-    .dark .prose code { color: #fda4af; background-color: #881337; border-color: #be123c; border-bottom-color: #9f1239; }
+    .dark .prose code { color: #f472b6; background-color: #4c1d9520; }
     .prose pre {
-        color: #f8fafc;
-        background-color: #0f172a;
+        color: #e2e8f0;
+        background-color: #1e293b;
         overflow-x: auto;
-        font-size: 0.9em;
+        font-size: 0.875em;
         line-height: 1.7;
         margin: 2em 0;
-        border-radius: 1rem;
-        padding: 1.5em;
-        border: 2px solid #334155;
-        border-bottom: 8px solid #1e293b;
+        border-radius: 0.5rem;
+        padding: 1.25em;
     }
-    .dark .prose pre { background-color: #020617; border-color: #1e293b; border-bottom-color: #000; }
-    .prose pre code { background-color: transparent; color: inherit; padding: 0; font-weight: 500; border: none; }
-
-    /* 10. DIVIDER (Garis Pemisah) */
-    .prose hr { border: 0; border-top: 4px dashed #cbd5e1; margin: 3em 0; border-radius: 2px; }
+    .dark .prose pre { background-color: #0f172a; border: 1px solid #1e293b; }
+    .prose pre code { background-color: transparent; color: inherit; padding: 0; }
+    /* 10. DIVIDER */
+    .prose hr { border: 0; border-top: 1px solid #e2e8f0; margin: 3em auto; width: 50%; }
     .dark .prose hr { border-top-color: #334155; }
     
     /* 11. YOUTUBE / IFRAME RESPONSIVE */
-    .prose iframe { max-width: 100% !important; border-radius: 1rem; }
+    .prose iframe { max-width: 100% !important; border-radius: 0.5rem; margin: 2em 0; }
 </style>
 @endpush
-
 @section('content')
-<div class="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-900 font-sans pb-20" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }">
-
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
-        {{-- Header Menu Dinamis --}}
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-6">
-            <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-500 border-2 border-b-4 border-cyan-200 dark:border-cyan-800 rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-sm">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                </div>
-                <div>
-                    <h1 class="text-3xl font-black text-slate-800 dark:text-white uppercase tracking-wider mb-1">
-                        Materi Pembelajaran
-                    </h1>
-                    <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Membaca materi bahasa Jepang.</p>
-                </div>
+<div class="min-h-screen bg-white dark:bg-slate-900 font-sans pb-24 pt-8" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }">
+    {{-- Top Navigation Bar (Kembali) --}}
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <a href="{{ route('materi.index') }}"
+            class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar Materi
+        </a>
+    </div>
+    {{-- Artikel Area --}}
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {{-- Article Header --}}
+        <header class="mb-14 text-center">
+            {{-- Kategori (Opsional, placeholder jika nanti ditambahkan) --}}
+            <div class="mb-6">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400">
+                    Materi Pembelajaran
+                </span>
             </div>
-
-            <a href="{{ route('materi.index') }}"
-                class="inline-flex items-center justify-center px-6 py-3 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 rounded-2xl text-sm font-black text-slate-600 dark:text-slate-300 bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 active:border-b-2 active:translate-y-1 transition-all uppercase tracking-widest shrink-0">
-                <i class="fas fa-arrow-left mr-2"></i> Kembali
-            </a>
-        </div>
-
-        {{-- Article Main Card --}}
-        <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] shadow-sm relative overflow-hidden transition-all duration-300">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight mb-8">
+                {{ $materi->title }}
+            </h1>
             
-            {{-- Top Accent Line --}}
-            <div class="absolute top-0 left-0 w-full h-3 bg-cyan-500"></div>
-
-            <div class="p-8 sm:p-12 mt-2">
-                {{-- Article Header --}}
-                <header class="mb-12">
-                    {{-- Date Badge --}}
-                    <div class="mb-4">
-                        <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border-2 border-cyan-100 dark:border-cyan-800">
-                            <i class="fas fa-calendar-day mr-2"></i> {{ $materi->created_at->translatedFormat('d M Y') }}
-                        </span>
+            {{-- Meta Info (Author, Date, Read Time) --}}
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm text-slate-500 dark:text-slate-400">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400">
+                        <i class="fas fa-user-ninja"></i>
                     </div>
-
-                    <h1 class="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mb-6">
-                        {{ $materi->title }}
-                    </h1>
-                    
-                    {{-- Decorative Divider --}}
-                    <div class="w-24 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"></div>
-                </header>
-
-                {{-- Article Content (Prose) --}}
-                <article class="prose prose-slate max-w-none" id="articleContent">
-                    {!! $materi->content !!}
-                </article>
+                    <span class="font-medium">Manabu Sensei</span>
+                </div>
+                <div class="hidden sm:block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+                <div class="flex items-center gap-2">
+                    <i class="far fa-calendar-alt"></i>
+                    <span>{{ $materi->created_at->translatedFormat('d F Y') }}</span>
+                </div>
+                <div class="hidden sm:block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+                <div class="flex items-center gap-2">
+                    <i class="far fa-clock"></i>
+                    <span>{{ ceil(str_word_count(strip_tags($materi->content)) / 200) }} min read</span>
+                </div>
             </div>
             
-            {{-- Footer / Bottom Area --}}
-            <div class="bg-slate-50 dark:bg-gray-900/50 p-8 sm:p-10 border-t-2 border-dashed border-slate-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-6">
-                <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                    <i class="fas fa-flag-checkered mr-2"></i> Selesai Membaca
-                </p>
+            <hr class="mt-10 border-slate-200 dark:border-slate-800">
+        </header>
+        {{-- Article Content (Prose) --}}
+        <article class="prose prose-slate dark:prose-invert max-w-none w-full mx-auto" id="articleContent">
+            {!! $materi->content !!}
+        </article>
+        {{-- Article Footer --}}
+        <footer class="mt-20 pt-8 border-t border-slate-200 dark:border-slate-800">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="text-center sm:text-left">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Selesai membaca?</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">Lanjutkan perjalanan belajarmu ke materi berikutnya.</p>
+                </div>
                 <a href="{{ route('materi.index') }}" 
-                   class="inline-flex items-center px-8 py-4 border-2 border-b-[6px] border-cyan-600 rounded-2xl text-sm font-black text-white bg-cyan-500 hover:brightness-110 active:border-b-2 active:translate-y-1 transition-all uppercase tracking-widest shadow-sm w-full sm:w-auto justify-center">
-                    <i class="fas fa-book-reader mr-2"></i> Materi Lainnya
+                   class="inline-flex items-center px-6 py-3 rounded-lg text-sm font-semibold text-white bg-cyan-600 hover:bg-cyan-700 transition-colors shadow-sm">
+                    Kembali ke Daftar Materi
                 </a>
             </div>
-
-        </div>
-
-    </div>
+        </footer>
+    </main>
 </div>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Otomatis membungkus semua tabel di dalam artikel dengan class wrapper
-        // Ini memastikan border tebal (chunky) kotak tabel tetap diam, dan hanya isinya yang ter-scroll di HP
+        // Ini memastikan tabel bisa discroll ke samping di layar HP (Responsive)
         const article = document.getElementById('articleContent');
         if (article) {
             const tables = article.querySelectorAll('table');

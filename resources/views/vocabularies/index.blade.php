@@ -164,8 +164,13 @@
                         </p>
                     @endif
 
-                    {{-- Arti --}}
-                    <p class="text-sm sm:text-base font-bold text-slate-600 dark:text-slate-300 leading-snug sm:leading-relaxed mt-auto border-t-2 border-dashed border-slate-100 dark:border-gray-700 pt-2 sm:pt-3">
+                    {{-- Arti Bahasa Indonesia (Utama) --}}
+                    <p class="text-sm sm:text-base font-black text-slate-700 dark:text-slate-200 leading-snug mt-auto border-t-2 border-dashed border-slate-100 dark:border-gray-700 pt-2 sm:pt-3">
+                        {{ $vocab->indonesian ?? 'Menerjemahkan...' }}
+                    </p>
+
+                    {{-- Arti Bahasa Inggris (Sub/Tambahan) --}}
+                    <p class="text-xs font-bold text-slate-400 dark:text-slate-500 mt-1 italic">
                         {{ $vocab->english }}
                     </p>
                 </div>

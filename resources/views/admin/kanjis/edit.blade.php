@@ -12,7 +12,7 @@
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-w-4xl">
     <div class="border-b border-gray-100 dark:border-gray-700 px-6 py-5 bg-gray-50 dark:bg-gray-800/50 flex justify-between items-center">
         <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-            <i class="fas fa-edit text-indigo-500 dark:text-indigo-400 mr-2 border dark:border-gray-600 bg-white dark:bg-gray-700 rounded-full p-2 shadow-sm"></i> Edit Kanji: {{ $kanji->character }}
+            <i class="fas fa-edit text-indigo-500 dark:text-indigo-400 mr-2 border dark:border-gray-600 bg-white dark:bg-gray-700 rounded-full p-2 shadow-sm"></i> Edit Huruf: {{ $kanji->character }}
         </h3>
     </div>
     <div class="p-6 md:p-8">

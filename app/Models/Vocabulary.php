@@ -10,6 +10,7 @@ class Vocabulary extends Model
         'original',
         'furigana',
         'english',
+        'indonesian',
         'jlpt_level',
     ];
 
@@ -29,7 +30,8 @@ class Vocabulary extends Model
         return $query->where(function ($sub) use ($q) {
             $sub->where('original',  'like', "%{$q}%")
                 ->orWhere('furigana', 'like', "%{$q}%")
-                ->orWhere('english',  'like', "%{$q}%");
+                ->orWhere('english',  'like', "%{$q}%")
+                ->orWhere('indonesian', 'like', "%{$q}%");
         });
     }
 
