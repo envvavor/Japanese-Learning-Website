@@ -113,7 +113,7 @@ class KanjiController extends Controller
             $levelOrder = ['N5' => 1, 'N4' => 2, 'N3' => 3, 'N2' => 4, 'N1' => 5];
     
             $vocab = Vocabulary::where('original', 'like', "%{$character}%")
-                ->select('id', 'original', 'furigana', 'english', 'jlpt_level')
+                ->select('id', 'original', 'furigana', 'english', 'jlpt_level', 'indonesian')
                 ->get()
                 ->sortBy(fn($v) => $levelOrder[$v->jlpt_level] ?? 99)
                 ->values();

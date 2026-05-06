@@ -124,7 +124,6 @@ class AdminQuizController extends Controller
             'order'          => 'required|integer|min:1',
         ]);
 
-        // Clean up options for MC & Listening
         if (in_array($validated['question_type'], ['multiple_choice', 'listening'])) {
             $options = array_values(array_filter($validated['options'] ?? [], fn($o) => !empty($o)));
             $validated['options'] = $options ?: null;
@@ -132,12 +131,16 @@ class AdminQuizController extends Controller
             $validated['options'] = null;
         }
 
-        // Drawing has no options
         if ($validated['question_type'] === 'drawing') {
             $validated['options'] = null;
         }
 
         $quiz->items()->create($validated);
+
+        if ($request->input('action') === 'save_and_add') {
+            return redirect()->route('admin.quizzes.items.create', $quiz)
+                ->with('success', 'Soal berhasil ditambahkan! Silakan tambah soal berikutnya.');
+        }
 
         return redirect()->route('admin.quizzes.show', $quiz)
             ->with('success', 'Soal berhasil ditambahkan!');

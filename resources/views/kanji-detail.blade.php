@@ -123,7 +123,7 @@
                     </div>
 
                     {{-- Daftar vocab --}}
-                    <div id="vocabList" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                    <div id="vocabList" class="hidden grid grid-cols-2 sm:grid-cols-2 gap-3"></div>
 
                     {{-- Load more --}}
                     <div id="vocabLoadMore" class="hidden mt-4 text-center">
@@ -233,41 +233,41 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         slice.forEach((v, i) => {
-            const badge = LEVEL_COLOR[v.jlpt_level] ?? LEVEL_COLOR['N3'];
-            const textToSpeak = (v.furigana || v.original).replace(/['"]/g, "\\'");
+            const badge      = LEVEL_COLOR[v.jlpt_level] ?? LEVEL_COLOR['N3'];
+            const textToSpeak = (v.furigana || v.original).replace(/['"\\]/g, '');
+            const copyTarget  = v.original.replace(/['"\\]/g, '');
+            const levelLabel  = v.jlpt_level || '辞書';
 
             const card = document.createElement('div');
-            card.className = 'vocab-card-enter bg-white dark:bg-gray-900 border-2 border-b-[5px] border-slate-200 dark:border-gray-700 rounded-2xl p-4 hover:border-[#1cb0f6] hover:-translate-y-1 transition-all h-fit w-full group';
+            card.className = 'vocab-card-enter bg-white dark:bg-gray-800 border-2 border-b-[5px] border-slate-200 dark:border-gray-700 rounded-2xl p-4 sm:p-5 hover:-translate-y-1 transition-all flex flex-col h-full group';
             card.style.animationDelay = `${i * 30}ms`;
 
             card.innerHTML = `
-                <div class="flex items-center justify-between gap-4">
-                    <div class="flex flex-col items-center justify-center shrink-0 min-w-[3.5rem]">
-                        <span class="text-3xl font-black text-slate-800 dark:text-white leading-none mb-1">${v.original}</span>
-                        ${v.furigana && v.furigana !== v.original
-                            ? `<span class="text-[10px] text-slate-500 font-bold leading-none">${v.furigana}</span>`
-                            : ''}
-                    </div>
-                    <div class="flex-1 min-w-0 border-l-2 border-slate-100 dark:border-gray-700 pl-4 py-1">
-                        ${v.indonesian
-                            ? `<p class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-tight">
-                                  <span class="text-[9px] text-rose-500 font-black mr-1.5 uppercase tracking-widest">ID</span>${v.indonesian}
-                               </p>
-                               <p class="text-[11px] text-slate-400 dark:text-slate-500 font-semibold leading-tight mt-1">
-                                  <span class="text-[9px] text-blue-500 font-black mr-1.5 uppercase tracking-widest">EN</span>${v.english}
-                               </p>`
-                            : `<p class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-tight">
-                                  <span class="text-[9px] text-blue-500 font-black mr-1.5 uppercase tracking-widest">EN</span>${v.english}
-                               </p>`}
-                    </div>
-                    <div class="flex flex-col items-end gap-2.5 shrink-0">
-                        <span class="px-2 py-0.5 rounded-lg border-2 text-[9px] font-black uppercase ${badge}">${v.jlpt_level}</span>
+                <div class="flex items-start justify-between mb-3">
+                    <span class="px-2 py-1 rounded-lg border-2 text-[9px] font-black uppercase tracking-widest ${badge}">${levelLabel}</span>
+                    <div class="flex gap-2">
                         <button onclick="window.speakText('${textToSpeak}')"
-                                class="w-8 h-8 rounded-xl flex items-center justify-center text-[#1cb0f6] bg-[#1cb0f6]/10 hover:bg-[#1cb0f6]/20 transition-all border-2 border-transparent">
-                            <i class="fas fa-volume-up text-sm"></i>
+                                title="Dengarkan"
+                                class="w-8 h-8 rounded-xl border-2 border-b-[3px] border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-700 text-slate-400 hover:text-[#1cb0f6] hover:border-[#1cb0f6]/30 active:border-b-2 active:translate-y-0.5 transition-all flex items-center justify-center">
+                            <i class="fas fa-volume-up text-xs"></i>
                         </button>
                     </div>
-                </div>`;
+                </div>
+
+                <p class="text-3xl font-black text-slate-800 dark:text-white mb-1 leading-tight tracking-wide break-words">${v.original}</p>
+
+                ${v.furigana && v.furigana !== v.original
+                    ? `<p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 bg-slate-50 dark:bg-gray-900/50 inline-block px-2 py-0.5 rounded-md border-2 border-dashed border-slate-200 dark:border-gray-700 self-start break-words">${v.furigana}</p>`
+                    : ''}
+
+                <p class="text-sm font-black text-slate-700 dark:text-slate-200 leading-snug mt-auto border-t-2 border-dashed border-slate-100 dark:border-gray-700 pt-2">
+                    ${v.indonesian || v.english}
+                </p>
+
+                ${v.indonesian
+                    ? `<p class="text-xs font-bold text-slate-400 dark:text-slate-500 mt-1 italic">${v.english}</p>`
+                    : ''}`;
+
             list.appendChild(card);
         });
         document.getElementById('vocabLoadMore').classList.toggle('hidden', shownCount >= filteredVocab.length);

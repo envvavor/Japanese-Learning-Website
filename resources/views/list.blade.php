@@ -8,7 +8,7 @@
     $cat = strtolower($category ?? '');
     $iconText = '';
     $iconClass = 'fas fa-font text-3xl';
-    $bgClass = 'bg-[#1cb0f6]/10 dark:bg-[#1899d6]/20 text-[#1cb0f6] dark:text-[#1899d6] border-[#1cb0f6]/20';
+    $bgClass = 'bg-amber-100 text-amber-500 border-amber-200 dark:bg-amber-900/30 dark:border-amber-800';
 
     if ($cat === 'hiragana') {
         $iconText = 'あ';

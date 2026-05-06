@@ -18,7 +18,7 @@ class TranslateVocab extends Command
 
         $this->info("Memulai proses terjemahan 200k data (Mode Aman)...");
 
-        // Ambil data perlahan, 50 kata per kelompok
+        // Ambil data perlahan, 200 kata per kelompok
         DB::table('vocabularies')->whereNull('indonesian')->chunkById(200, function ($vocabs) use ($translator) {
             
             foreach ($vocabs as $vocab) {

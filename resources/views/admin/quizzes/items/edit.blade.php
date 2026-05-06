@@ -497,16 +497,6 @@
         }
     });
 
-    // ─── Controller: tambah redirect di storeItem ─────────────────────────────
-    // Di AdminQuizController@storeItem, tambahkan:
-    //
-    //   if ($request->input('action') === 'save_and_add') {
-    //       return redirect()->route('admin.quizzes.items.create', $quiz)
-    //           ->with('success', 'Soal ditambahkan! Silakan tambah soal berikutnya.');
-    //   }
-    //   return redirect()->route('admin.quizzes.show', $quiz)->with('success', '...');
-
-    // ─── Init ─────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
         selectType(currentType);
 
