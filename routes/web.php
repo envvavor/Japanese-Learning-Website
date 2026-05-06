@@ -14,6 +14,7 @@ use App\Services\ElevenLabsService;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\Admin\AdminQuizController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\QuizNewController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\VocabularyController;
@@ -111,6 +112,7 @@ Route::middleware(['auth', 'admin'])
             $totalHiragana = \App\Models\Kanji::where('category', 'hiragana')->count();
             $totalKatakana = \App\Models\Kanji::where('category', 'katakana')->count();
             $totalMateri = \App\Models\Materi::count();
+            $totalUsers = \App\Models\User::count();
 
             $labels = [];
             $attemptData = [];
@@ -150,7 +152,7 @@ Route::middleware(['auth', 'admin'])
             $gradeLabels = array_keys($grades);
             $gradeData = array_values($grades);
 
-            return view('admin.dashboard', compact('totalKanji', 'totalHiragana', 'totalKatakana', 'totalMateri', 'labels', 'attemptData', 'sessionData', 'gradeLabels', 'gradeData'));
+            return view('admin.dashboard', compact('totalKanji', 'totalHiragana', 'totalKatakana', 'totalMateri', 'totalUsers', 'labels', 'attemptData', 'sessionData', 'gradeLabels', 'gradeData'));
         })->name('dashboard');
         
         Route::resource('kanjis', \App\Http\Controllers\Admin\AdminKanjiController::class);
@@ -158,6 +160,12 @@ Route::middleware(['auth', 'admin'])
         // Materi (Lesson/Article) routes
         Route::post('materis/upload-image', [MateriController::class, 'uploadImage'])->name('materis.uploadImage');
         Route::resource('materis', MateriController::class);
+
+        // User Management routes
+        Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
     });
 
 Route::get('/list/{category?}', function ($category = null) {

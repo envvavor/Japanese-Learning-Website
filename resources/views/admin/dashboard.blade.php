@@ -3,8 +3,8 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6 transition-transform transform hover:-translate-y-1 hover:shadow-md group col-span-1 md:col-span-2 lg:col-span-5">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6 transition-transform transform hover:-translate-y-1 hover:shadow-md group col-span-1 md:col-span-2 lg:col-span-6">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-4 w-full">
             
             <div class="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 w-full">
@@ -61,6 +61,14 @@
         </div>
         <h3 class="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wider mb-1">Total Materi</h3>
         <p class="text-4xl font-bold text-gray-800 dark:text-gray-100">{{ $totalMateri ?? 0 }}</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col items-center justify-center transition-transform transform hover:-translate-y-1 hover:shadow-md cursor-pointer group">
+        <div class="w-14 h-14 rounded-full bg-cyan-50 dark:bg-cyan-900/30 flex items-center justify-center mb-4 group-hover:bg-cyan-100 dark:group-hover:bg-cyan-900/50 transition-colors duration-300">
+            <i class="fas fa-users text-2xl text-cyan-600 dark:text-cyan-400"></i>
+        </div>
+        <h3 class="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wider mb-1">Total Pengguna</h3>
+        <p class="text-4xl font-bold text-gray-800 dark:text-gray-100">{{ $totalUsers ?? 0 }}</p>
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col justify-center transition-transform transform hover:-translate-y-1 hover:shadow-md cursor-pointer group">

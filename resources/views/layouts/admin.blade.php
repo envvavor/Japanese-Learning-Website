@@ -95,6 +95,11 @@
                 <i class="fas fa-layer-group w-5 text-center"></i>
                 <span class="font-medium">Manajemen Quiz</span>
             </a>
+
+            <a href="{{ route('admin.users.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 {{ request()->is('admin/users*') ? 'bg-indigo-700 dark:bg-indigo-600 text-white shadow-md' : 'text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white' }}">
+                <i class="fas fa-users w-5 text-center"></i>
+                <span class="font-medium">Manajemen Pengguna</span>
+            </a>
         </div>
     </aside>
 
@@ -146,6 +151,17 @@
                     <div class="mb-6 bg-white dark:bg-gray-800 border-l-4 border-green-500 text-green-700 dark:text-green-400 p-4 rounded-lg shadow-sm flex items-center justify-between" x-data="{ show: true }" x-show="show" x-transition.opacity>
                         <div class="font-medium">
                             <i class="fas fa-check-circle mr-2 text-green-500"></i> {{ session('success') }}
+                        </div>
+                        <button @click="show = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="mb-6 bg-white dark:bg-gray-800 border-l-4 border-red-500 text-red-700 dark:text-red-400 p-4 rounded-lg shadow-sm flex items-center justify-between" x-data="{ show: true }" x-show="show" x-transition.opacity>
+                        <div class="font-medium">
+                            <i class="fas fa-exclamation-circle mr-2 text-red-500"></i> {{ session('error') }}
                         </div>
                         <button @click="show = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none transition-colors">
                             <i class="fas fa-times"></i>
