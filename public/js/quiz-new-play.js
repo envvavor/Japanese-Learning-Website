@@ -324,14 +324,20 @@ async function submitAnswer(ans, accuracyScore) {
     try {
         const res = await fetch('/quizzes/' + QUIZ_ID + '/answer', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf() },
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf(), 'X-Requested-With': 'XMLHttpRequest' },
             body: JSON.stringify({ item_id: q.id, user_answer: String(ans), accuracy_score: accuracyScore })
         });
+        if (!res.ok) {
+            const errText = await res.text();
+            console.error('Answer HTTP error:', res.status, errText);
+            alert('Server error (' + res.status + '). Cek console untuk detail.');
+            return;
+        }
         const data = await res.json();
         answers[currentIdx] = { user_answer: ans, is_correct: data.is_correct, correct_answer: data.correct_answer, accuracy_score: accuracyScore };
         if (data.is_correct) streak++; else streak = 0;
         renderQuestion();
-    } catch (e) { console.error('Answer error:', e); }
+    } catch (e) { console.error('Answer error:', e); alert('Network error: ' + e.message); }
 }
 
 function renderAnswered(q, container) {

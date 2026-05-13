@@ -350,7 +350,17 @@ class QuizController extends Controller
         if ($question->question_type === 'drawing') {
             $isCorrect = $accuracyScore !== null && $accuracyScore >= 75;
         } else {
-            $isCorrect = $userAnswer === $question->correct_answer;
+            $isCorrect = trim($userAnswer) === trim($question->correct_answer);
+
+            if (!$isCorrect && function_exists('normalizer_normalize')) {
+                $normUser = \Normalizer::normalize(trim($userAnswer), \Normalizer::FORM_C);
+                $normCorrect = \Normalizer::normalize(trim($question->correct_answer), \Normalizer::FORM_C);
+                $isCorrect = $normUser === $normCorrect;
+            }
+
+            if (!$isCorrect && is_array($question->options) && in_array($userAnswer, $question->options, true)) {
+                $isCorrect = mb_strtolower(trim($userAnswer), 'UTF-8') === mb_strtolower(trim($question->correct_answer), 'UTF-8');
+            }
         }
 
         // Calculate points_earned

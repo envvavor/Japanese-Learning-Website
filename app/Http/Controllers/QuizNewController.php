@@ -121,7 +121,18 @@ class QuizNewController extends Controller
         if ($item->question_type === 'drawing') {
             $isCorrect = ($validated['accuracy_score'] ?? 0) >= 75;
         } else {
-            $isCorrect = $validated['user_answer'] === $item->correct_answer;
+            $userAnswer = $validated['user_answer'];
+            $isCorrect = trim($userAnswer) === trim($item->correct_answer);
+
+            if (!$isCorrect && function_exists('normalizer_normalize')) {
+                $normUser = \Normalizer::normalize(trim($userAnswer), \Normalizer::FORM_C);
+                $normCorrect = \Normalizer::normalize(trim($item->correct_answer), \Normalizer::FORM_C);
+                $isCorrect = $normUser === $normCorrect;
+            }
+
+            if (!$isCorrect && is_array($item->options) && in_array($userAnswer, $item->options, true)) {
+                $isCorrect = mb_strtolower(trim($userAnswer), 'UTF-8') === mb_strtolower(trim($item->correct_answer), 'UTF-8');
+            }
         }
 
         return response()->json([

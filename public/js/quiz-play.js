@@ -397,14 +397,20 @@ async function submitAnswer(ans,accuracyScore){
   const timeTaken=elapsedSeconds-startTime;
   const hintUsed=answers['_hint_'+currentIdx]||false;
   try{
-    const res=await fetch('/quiz/answer',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},
+    const res=await fetch('/quiz/answer',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrf(),'X-Requested-With':'XMLHttpRequest'},
       body:JSON.stringify({question_id:q.id,user_answer:String(ans),accuracy_score:accuracyScore,time_taken_seconds:timeTaken,hint_was_used:hintUsed})});
+    if(!res.ok){
+      const errText=await res.text();
+      console.error('Answer HTTP error:',res.status,errText);
+      alert('Server error ('+res.status+'). Cek console untuk detail.');
+      return;
+    }
     const data=await res.json();
     answers[currentIdx]={user_answer:ans,is_correct:data.is_correct,correct_answer:data.correct_answer,points_earned:data.points_earned,explanation:data.explanation,accuracy_score:accuracyScore};
     if(data.is_correct){streak++;if(streak>maxStreak)maxStreak=streak;}else{streak=0;}
     if(data.points_earned>0)showFloatingPoints(data.points_earned);
     renderQuestion();
-  }catch(e){console.error('Answer error:',e);}
+  }catch(e){console.error('Answer error:',e);alert('Network error: '+e.message);}
 }
 
 function showFloatingPoints(pts){
