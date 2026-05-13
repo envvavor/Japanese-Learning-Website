@@ -165,8 +165,8 @@
                     <div class="w-16 h-16 bg-[#1cb0f6]/10 text-[#1cb0f6] border-2 border-b-4 border-[#1cb0f6]/20 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
                         <i class="fas fa-map-marked-alt"></i>
                     </div>
-                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Quiz Duolingo-Style</h3>
-                    <p class="text-sm font-bold text-slate-400 leading-relaxed">Sistem quiz bertahap seperti Duolingo! Pilihan ganda, hearing, dan menulis huruf. Selesaikan satu baru bisa lanjut ke berikutnya.</p>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Quiz</h3>
+                    <p class="text-sm font-bold text-slate-400 leading-relaxed">Sistem quiz bertahap. Pilihan ganda, hearing, dan menulis huruf. Selesaikan satu baru bisa lanjut ke berikutnya.</p>
                 </div>
 
                 <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">

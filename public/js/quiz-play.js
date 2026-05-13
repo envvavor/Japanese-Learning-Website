@@ -153,11 +153,14 @@ function useHint(){
 function renderMC(q,container){
   let h='<div class="grid gap-3">';
   q.options.forEach((opt,i)=>{
-    h+='<button onclick="selectAnswer(\''+opt.replace(/'/g,"\\'")+'\')" class="option-btn w-full text-left px-5 py-4 rounded-xl border-2 border-slate-200 dark:border-gray-600 text-slate-700 dark:text-slate-200 font-medium hover:border-indigo-400 transition-all">';
+    h+='<button data-answer="'+encodeURIComponent(opt)+'" class="option-btn w-full text-left px-5 py-4 rounded-xl border-2 border-slate-200 dark:border-gray-600 text-slate-700 dark:text-slate-200 font-medium hover:border-indigo-400 transition-all">';
     h+='<span class="kbd mr-2 border-slate-300 dark:border-gray-500 text-slate-400">'+(i+1)+'</span>'+opt+'</button>';
   });
   h+='</div>';
   container.innerHTML=h;
+  container.querySelectorAll('.option-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>selectAnswer(decodeURIComponent(btn.dataset.answer)));
+  });
 }
 
 // ── Drawing ───────────────────────────────────────────────────
@@ -459,9 +462,10 @@ function renderAnswered(q,container){
 // ── Audio ─────────────────────────────────────────────────────
 
 function renderAudioPlayer(container,url){
-  let h='<div class="flex justify-center mb-4"><button onclick="playAudio(\''+url+'\')" class="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-all shadow-sm hover:shadow-md">';
+  let h='<div class="flex justify-center mb-4"><button data-audio-url="'+encodeURIComponent(url)+'" class="audio-play-btn w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-all shadow-sm hover:shadow-md">';
   h+='<i class="fas fa-play"></i></button></div>';
-  container.innerHTML=h+container.innerHTML;
+  container.insertAdjacentHTML('afterbegin',h);
+  container.querySelector('.audio-play-btn').addEventListener('click',function(){playAudio(decodeURIComponent(this.dataset.audioUrl));});
 }
 
 let currentAudio=null;

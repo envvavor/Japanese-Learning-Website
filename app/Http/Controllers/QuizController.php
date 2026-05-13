@@ -130,7 +130,7 @@ class QuizController extends Controller
                 'options' => $question->options,
                 'audio_url' => $question->audio_url,
                 'strokes' => $kanji->strokes,
-                'stroke_order_image' => $kanji->stroke_order_image ? Storage::url($kanji->stroke_order_image) : null,
+                'stroke_order_image' => $kanji->stroke_order_image ? '/storage/' . $kanji->stroke_order_image : null,
             ];
         }
 
@@ -459,7 +459,7 @@ class QuizController extends Controller
                 'text_was_revealed' => $q->text_was_revealed,
                 'kunyomi' => $q->kanji->kunyomi,
                 'onyomi' => $q->kanji->onyomi,
-                'stroke_order_image' => $q->kanji->stroke_order_image ? Storage::url($q->kanji->stroke_order_image) : null,
+                'stroke_order_image' => $q->kanji->stroke_order_image ? '/storage/' . $q->kanji->stroke_order_image : null,
                 'examples' => $q->kanji->examples->map(function ($ex) {
                     return [
                         'japanese_text' => $ex->japanese_text,
@@ -552,7 +552,7 @@ class QuizController extends Controller
 
         Storage::disk('public')->put($filename, file_get_contents($file));
 
-        $audioUrl = Storage::url($filename);
+        $audioUrl = '/storage/' . $filename;
 
         $question->update(['audio_url' => $audioUrl]);
 

@@ -62,7 +62,7 @@ class ElevenLabsService
 
         // Check if the file already exists in local storage
         if (Storage::disk('public')->exists($filename)) {
-            return Storage::url($filename);
+            return '/storage/' . $filename;
         }
 
         try {
@@ -80,7 +80,7 @@ class ElevenLabsService
 
             if ($response->successful()) {
                 Storage::disk('public')->put($filename, $response->body());
-                return Storage::url($filename);
+                return '/storage/' . $filename;
             }
 
             return null;

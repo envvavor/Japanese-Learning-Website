@@ -92,7 +92,7 @@ class QuizNewController extends Controller
                 $data['meaning']            = $item->kanji->meaning;
                 $data['strokes']            = $item->kanji->strokes;
                 $data['stroke_order_image'] = $item->kanji->stroke_order_image
-                    ? Storage::url($item->kanji->stroke_order_image)
+                    ? '/storage/' . $item->kanji->stroke_order_image
                     : null;
             }
 

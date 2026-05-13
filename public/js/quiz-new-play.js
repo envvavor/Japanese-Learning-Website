@@ -96,11 +96,14 @@ function renderQuestion() {
 function renderMC(q, container) {
     let h = '<div class="grid gap-3">';
     (q.options || []).forEach((opt, i) => {
-        h += '<button onclick="selectAnswer(\'' + opt.replace(/'/g, "\\'") + '\')" class="option-btn w-full text-left px-5 py-4 rounded-xl border-2 border-slate-200 dark:border-gray-600 text-slate-700 dark:text-slate-200 font-bold text-lg hover:border-[#1cb0f6]">';
+        h += '<button data-answer="' + encodeURIComponent(opt) + '" class="option-btn w-full text-left px-5 py-4 rounded-xl border-2 border-slate-200 dark:border-gray-600 text-slate-700 dark:text-slate-200 font-bold text-lg hover:border-[#1cb0f6]">';
         h += '<span class="kbd mr-3 border-slate-300 dark:border-gray-500 text-slate-400">' + (i + 1) + '</span>' + opt + '</button>';
     });
     h += '</div>';
     container.innerHTML = h;
+    container.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', () => selectAnswer(decodeURIComponent(btn.dataset.answer)));
+    });
 }
 
 // ── Drawing ───────────────────────────────────────────────────
@@ -362,9 +365,10 @@ function renderAnswered(q, container) {
 
 // ── Audio Player ──────────────────────────────────────────────
 function renderAudioPlayer(container, url) {
-    let h = '<div class="flex justify-center mb-6"><button onclick="playAudio(\'' + url + '\')" class="w-20 h-20 rounded-full border-2 border-b-[6px] border-[#1899d6] dark:border-[#1172a1] bg-[#1cb0f6] dark:bg-[#1899d6] text-white flex items-center justify-center text-3xl hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all shadow-md">';
+    let h = '<div class="flex justify-center mb-6"><button data-audio-url="' + encodeURIComponent(url) + '" class="audio-play-btn w-20 h-20 rounded-full border-2 border-b-[6px] border-[#1899d6] dark:border-[#1172a1] bg-[#1cb0f6] dark:bg-[#1899d6] text-white flex items-center justify-center text-3xl hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all shadow-md">';
     h += '<i class="fas fa-play ml-2"></i></button></div>';
-    container.innerHTML = h + container.innerHTML;
+    container.insertAdjacentHTML('afterbegin', h);
+    container.querySelector('.audio-play-btn').addEventListener('click', function(){ playAudio(decodeURIComponent(this.dataset.audioUrl)); });
 }
 
 let currentAudio = null;
