@@ -336,7 +336,7 @@ class QuizController extends Controller
         $question = QuizQuestion::with('kanji.examples')->findOrFail($validated['question_id']);
 
         // Ensure question belongs to auth user's session
-        if ($question->quizSession->user_id !== Auth::id()) {
+        if ((int) $question->quizSession->user_id !== (int) Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -425,7 +425,7 @@ class QuizController extends Controller
         $session = QuizSession::with(['quizQuestions.kanji.examples'])->findOrFail($validated['session_id']);
 
         // Ensure session belongs to auth user
-        if ($session->user_id !== Auth::id()) {
+        if ((int) $session->user_id !== (int) Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -552,7 +552,7 @@ class QuizController extends Controller
         $question = QuizQuestion::findOrFail($validated['question_id']);
 
         // Ensure question belongs to auth user's session
-        if ($question->quizSession->user_id !== Auth::id()) {
+        if ((int) $question->quizSession->user_id !== (int) Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
