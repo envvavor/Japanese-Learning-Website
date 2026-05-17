@@ -43,7 +43,7 @@ class AdminKanjiController extends Controller
     {
         // PERBAIKAN: Menggunakan variabel $validated agar seragam
         $validated = $request->validate([
-            'character' => 'required|string',
+            'character' => 'required|string|unique:kanjis,character',
             'meaning' => 'required|string',
             'strokes' => 'required|json', // Jika dari form admin dikirim sebagai JSON string
             'category' => 'required|in:hiragana,katakana,kanji',
