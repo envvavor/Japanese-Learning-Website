@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Daftar Akun - 学ぶ Manabu</title>
     <link rel="icon" href="{{ asset('storage/images/logo_manabu.png') }}" type="image/png">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -138,9 +139,37 @@
                     </div>
                 </div>
 
-                <button type="submit"
-                    class="w-full bg-emerald-500 border-2 border-b-[6px] border-emerald-700 text-white transition-all py-4 rounded-2xl font-black uppercase tracking-widest text-lg hover:brightness-110 active:border-b-2 active:translate-y-1 mt-6 flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fas fa-user-plus"></i> Daftar
+                <div>
+                    <label class="block text-[10px] font-black tracking-widest text-slate-400 dark:text-slate-500 mb-2 uppercase">
+                        Verifikasi Keamanan
+                    </label>
+
+                    <div class="w-full bg-slate-50 dark:bg-gray-900 border-2 border-b-[4px] border-slate-200 dark:border-gray-700 rounded-2xl p-3 flex justify-center overflow-hidden">
+                        <div class="cf-turnstile"
+                            data-sitekey="{{ config('services.turnstile.site_key') }}"
+                            data-theme="light">
+                        </div>
+                    </div>
+
+                    @error('cf-turnstile-response')
+                        <p class="mt-2 text-xs font-bold text-rose-500">
+                            <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <button type="submit" id="submitBtn"
+                    class="w-full bg-emerald-500 border-2 border-b-[6px] border-emerald-700 text-white transition-all py-4 rounded-2xl font-black uppercase tracking-widest text-lg hover:brightness-110 active:border-b-2 active:translate-y-1 mt-6 flex items-center justify-center gap-2 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed disabled:translate-y-0 disabled:border-b-[6px]">
+                    <span id="btnContent" class="flex items-center gap-2">
+                        <i class="fas fa-user-plus"></i> Daftar
+                    </span>
+                    <span id="btnLoading" class="hidden flex items-center gap-3">
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 12 0 12 0s0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Mendaftar...
+                    </span>
                 </button>
             </form>
 
@@ -168,5 +197,19 @@
             icon.classList.add('fa-eye');
         }
     }
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const btn = document.getElementById('submitBtn');
+        const content = document.getElementById('btnContent');
+        const loading = document.getElementById('btnLoading');
+
+        // Cek Turnstile sudah diisi
+        const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
+        if (turnstileResponse && !turnstileResponse.value) return;
+
+        btn.disabled = true;
+        content.classList.add('hidden');
+        loading.classList.remove('hidden');
+    });
 </script>
 </html>

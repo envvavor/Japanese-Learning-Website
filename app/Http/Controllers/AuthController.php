@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
@@ -71,6 +72,19 @@ class AuthController extends Controller
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
         ]);
+
+        // Verifikasi ke Cloudflare
+        $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            'secret'   => config('services.turnstile.secret_key'),
+            'response' => $request->input('cf-turnstile-response'),
+            'remoteip' => $request->ip(),
+        ]);
+
+        if (! $response->json('success')) {
+            return back()->withErrors([
+                'cf-turnstile-response' => 'Verifikasi CAPTCHA gagal. Coba lagi.',
+            ])->withInput();
+        }
 
         $user = User::create([
             'name'     => $validated['name'],
