@@ -146,7 +146,7 @@
             <div class="mt-8 z-20 flex flex-col items-center">
                 <i class="fas fa-flag-checkered text-4xl text-slate-400 dark:text-gray-500 mb-2 drop-shadow-sm"></i>
                 <div class="bg-white dark:bg-gray-800 px-6 py-2 rounded-full border-2 border-b-4 border-slate-200 dark:border-gray-700 font-black text-slate-500 dark:text-slate-400 text-sm uppercase tracking-widest shadow-sm flex items-center gap-2">
-                    Selesai
+                    Segera Dilanjutkan! ^^
                 </div>
             </div>
 

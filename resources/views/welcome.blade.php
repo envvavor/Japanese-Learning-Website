@@ -332,21 +332,31 @@
     <footer class="bg-white dark:bg-gray-900 border-t-2 border-slate-200 dark:border-gray-800 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-white dark:bg-gray-800 border-2 border-b-4 border-slate-200 dark:border-gray-700 rounded-xl flex items-center justify-center p-1.5">
                         <img src="{{ asset('storage/images/logo_manabu.png') }}" alt="Logo" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-lg font-black uppercase tracking-wider text-slate-800 dark:text-white"><span class="text-[#1cb0f6]">学ぶ</span> Manabu</span>
+                    <span class="text-lg font-black uppercase tracking-wider text-slate-800 dark:text-white">
+                        <span class="text-[#1cb0f6]">学ぶ</span> Manabu
+                    </span>
                 </div>
 
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">
-                    Dibuat untuk Tugas Akhir &bull; {{ date('Y') }}
+                    manabu &copy; {{ date('Y') }}
                 </p>
 
-                <a href="https://saweria.co/envvavor" target="_blank" rel="noopener noreferrer"
-                   class="flex items-center gap-2 px-5 py-3 bg-[#ffc82c] border-2 border-b-[6px] border-[#d8a110] text-slate-900 font-black uppercase tracking-widest text-xs rounded-2xl hover:brightness-105 hover:-translate-y-1 active:border-b-2 active:translate-y-1 transition-all shadow-sm">
-                    <i class="fas fa-money-bill-wave"></i> Traktir Kopi
-                </a>
+                <div class="flex items-center gap-3">
+                    <a href="https://mail.google.com/mail/?view=cm&to=arya.zusu@gmail.com" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center gap-2 px-5 py-3 bg-white dark:bg-gray-800 border-2 border-b-[6px] border-slate-200 dark:border-gray-700 text-slate-700 dark:text-slate-200 font-black uppercase tracking-widest text-xs rounded-2xl hover:brightness-95 dark:hover:brightness-110 active:border-b-2 active:translate-y-1 transition-all shadow-sm">
+                        <i class="fas fa-envelope"></i> Support
+                    </a>
+                    <a href="https://trakteer.id/arya_surya_syaputra" target="_blank" rel="noopener noreferrer"
+                    class="flex items-center gap-2 px-5 py-3 bg-[#ffc82c] border-2 border-b-[6px] border-[#d8a110] text-slate-900 font-black uppercase tracking-widest text-xs rounded-2xl hover:brightness-105 active:border-b-2 active:translate-y-1 transition-all shadow-sm">
+                        <i class="fas fa-coffee"></i> Traktir
+                    </a>
+                </div>
+
             </div>
         </div>
     </footer>
