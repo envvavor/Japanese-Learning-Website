@@ -244,7 +244,7 @@
                     const sortedLevels = Object.keys(kanjiGroups).sort((a, b) => {
                         if (a === 'Lainnya') return 1; 
                         if (b === 'Lainnya') return -1;
-                        return a - b; 
+                        return b - a; 
                     });
 
                     sortedLevels.forEach(lvl => {
