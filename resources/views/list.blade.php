@@ -248,7 +248,7 @@
                     });
 
                     sortedLevels.forEach(lvl => {
-                        const title = lvl === 'Lainnya' ? 'Kanji Ekstra (Tanpa Bab)' : `Kanji Bab ${lvl}`;
+                        const title = lvl === 'Lainnya' ? 'Kanji Ekstra (Tanpa Bab)' : `Kanji Level N${lvl}`;
                         const badgeColor = lvl === 'Lainnya' ? 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-gray-800 dark:text-slate-400 dark:border-gray-700' : 'bg-emerald-100 text-emerald-500 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800';
                         htmlContent += `
                             <div class="mb-12">
