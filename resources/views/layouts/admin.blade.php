@@ -62,6 +62,25 @@
                 </div>
             </div>
 
+            <!-- Kosakata Dropdown -->
+            <div x-data="{ expanded: {{ request()->routeIs('admin.vocabularies.*') ? 'true' : 'false' }} }">
+                <button @click="expanded = !expanded" class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 text-left {{ request()->routeIs('admin.vocabularies.*') ? 'bg-indigo-800 dark:bg-indigo-700 text-white shadow-inner' : 'text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white' }}">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-spell-check w-5 text-center"></i>
+                        <span class="font-medium text-left">Manajemen Kosakata</span>
+                    </div>
+                    <i class="fas fa-chevron-down text-sm transition-transform duration-300" :class="{'rotate-180': expanded}"></i>
+                </button>
+                <div x-show="expanded" x-transition.opacity class="mt-2 pl-4 pr-2 space-y-1 border-l-2 border-indigo-700 dark:border-indigo-500 ml-5 py-1" x-cloak>
+                    <a href="{{ route('admin.vocabularies.index') }}" class="flex items-center space-x-2 px-4 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.vocabularies.index') || request()->routeIs('admin.vocabularies.edit') ? 'bg-indigo-700 dark:bg-indigo-600 text-white font-medium' : 'text-indigo-300 hover:text-white hover:bg-indigo-700 dark:hover:bg-gray-700' }}">
+                        <i class="fas fa-list-ul w-4 text-xs"></i> <span>Daftar Kosakata</span>
+                    </a>
+                    <a href="{{ route('admin.vocabularies.create') }}" class="flex items-center space-x-2 px-4 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.vocabularies.create') ? 'bg-indigo-700 dark:bg-indigo-600 text-white font-medium' : 'text-indigo-300 hover:text-white hover:bg-indigo-700 dark:hover:bg-gray-700' }}">
+                        <i class="fas fa-plus w-4 text-xs"></i> <span>Tambah Kosakata</span>
+                    </a>
+                </div>
+            </div>
+
             <!-- Materi Dropdown -->
             <div x-data="{ expanded: {{ request()->routeIs('admin.materis.*') ? 'true' : 'false' }} }">
                 <button @click="expanded = !expanded" class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.materis.*') ? 'bg-indigo-800 dark:bg-indigo-700 text-white shadow-inner' : 'text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white' }}">

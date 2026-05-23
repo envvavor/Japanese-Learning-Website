@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\QuizNewController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\VocabularyController;
+use App\Http\Controllers\Admin\AdminVocabularyController;
 use Illuminate\Support\Facades\Http;
 
 
@@ -156,6 +157,8 @@ Route::middleware(['auth', 'admin'])
         })->name('dashboard');
         
         Route::resource('kanjis', \App\Http\Controllers\Admin\AdminKanjiController::class);
+
+        Route::resource('vocabularies', AdminVocabularyController::class);
 
         // Materi (Lesson/Article) routes
         Route::post('materis/upload-image', [MateriController::class, 'uploadImage'])->name('materis.uploadImage');
