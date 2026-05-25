@@ -268,6 +268,7 @@ Route::prefix('quiz')->name('quiz.')->middleware('auth')->group(function () {
 
 Route::prefix('admin/dataset')->name('admin.dataset.')->middleware(['auth'])->group(function () {
     Route::get('/', [DatasetController::class, 'index'])->name('index');
+    Route::get('/files/{character}', [DatasetController::class, 'files'])->name('files');
     Route::delete('/destroy', [DatasetController::class, 'destroy'])->name('destroy');
     Route::get('/download-all', [DatasetController::class, 'downloadAllZip'])->name('download.all');
     Route::get('/download/{character}', [DatasetController::class, 'downloadZip'])->name('download');

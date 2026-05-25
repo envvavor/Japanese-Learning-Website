@@ -55,21 +55,59 @@ class DatasetController extends Controller
         }
     }
 
-    // READ: Menampilkan daftar dataset
+    // READ: Menampilkan daftar dataset (hanya summary, tanpa load semua file)
     public function index()
     {
-        // Ambil semua folder di dalam public/dataset
         $directories = Storage::disk('public')->directories('dataset');
         $datasets = [];
 
         foreach ($directories as $dir) {
-            $char = basename($dir); // Mendapatkan nama huruf (contoh: 日)
-            // Ambil semua file gambar di dalam folder tersebut
-            $files = Storage::disk('public')->files($dir);
-            $datasets[$char] = $files;
+            $char = basename($dir);
+            $fileCount = count(Storage::disk('public')->files($dir));
+            $datasets[$char] = $fileCount;
         }
 
+        // Urutkan berdasarkan nama huruf
+        ksort($datasets);
+
         return view('admin.dataset.index', compact('datasets'));
+    }
+
+    // API: Ambil file gambar per karakter (lazy load)
+    public function files(Request $request, $character)
+    {
+        $folderPath = 'dataset/' . $character;
+
+        if (!Storage::disk('public')->exists($folderPath)) {
+            return response()->json(['files' => [], 'total' => 0]);
+        }
+
+        $allFiles = Storage::disk('public')->files($folderPath);
+        $total = count($allFiles);
+
+        // Pagination sederhana
+        $page = max(1, (int) $request->query('page', 1));
+        $perPage = 30;
+        $offset = ($page - 1) * $perPage;
+
+        $pagedFiles = array_slice($allFiles, $offset, $perPage);
+
+        $result = [];
+        foreach ($pagedFiles as $file) {
+            $result[] = [
+                'path' => $file,
+                'name' => basename($file),
+                'url'  => asset('storage/' . $file),
+            ];
+        }
+
+        return response()->json([
+            'files'    => $result,
+            'total'    => $total,
+            'page'     => $page,
+            'per_page' => $perPage,
+            'has_more' => ($offset + $perPage) < $total,
+        ]);
     }
 
     // DELETE: Menghapus gambar
@@ -92,7 +130,15 @@ class DatasetController extends Controller
                 Storage::disk('public')->deleteDirectory($dir);
             }
 
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Gambar dataset berhasil dihapus!']);
+            }
+
             return back()->with('success', 'Gambar dataset berhasil dihapus!');
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => false, 'message' => 'Gambar tidak ditemukan.'], 404);
         }
 
         return back()->withErrors(['Gambar tidak ditemukan.']);
