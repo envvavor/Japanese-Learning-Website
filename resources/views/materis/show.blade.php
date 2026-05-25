@@ -153,6 +153,13 @@
     
     /* 11. YOUTUBE / IFRAME RESPONSIVE */
     .prose iframe { max-width: 100% !important; border-radius: 0.5rem; margin: 2em 0; }
+    
+    /* 12. TTS BUTTON */
+    .btn-inline-tts { background: #e0e7ff; color: #4f46e5; border: 1px solid #c7d2fe; padding: 3px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; text-decoration: none; margin: 0 2px; transition: all 0.2s; display: inline-flex; align-items: center;}
+    .btn-inline-tts:hover { background: #4f46e5; color: white; }
+    .btn-inline-tts svg { pointer-events: none; display: inline-block; width: 14px; height: 14px; flex-shrink: 0; }
+    .dark .btn-inline-tts { background: #3730a3; color: #818cf8; border: 1px solid #4f46e5; }
+    .dark .btn-inline-tts:hover { background: #4f46e5; color: white; }
 </style>
 @endpush
 @section('content')
@@ -233,6 +240,29 @@
                 table.parentNode.insertBefore(wrapper, table);
                 wrapper.appendChild(table);
             });
+        }
+    });
+
+    // Fungsi untuk memutar suara Web Speech API
+    function playTTS(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // Hentikan suara sebelumnya
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP'; // Set aksen Jepang
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Browser Anda tidak mendukung fitur Text-to-Speech.");
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-inline-tts');
+        if (btn) {
+            const textToSpeak = btn.getAttribute('data-speech');
+            if (textToSpeak) {
+                playTTS(textToSpeak);
+            }
         }
     });
 </script>

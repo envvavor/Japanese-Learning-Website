@@ -3,6 +3,7 @@
 @section('title', 'Tambah Materi')
 
 @section('content')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <div class="mb-6">
     <a href="{{ route('admin.materis.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors flex items-center">
         <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar Materi
@@ -52,24 +53,36 @@
 <script>
     const isDark = document.documentElement.classList.contains('dark');
     
+    // Fungsi untuk memutar suara Web Speech API
+    function playTTS(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // Hentikan suara sebelumnya
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP'; // Set aksen Jepang
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Browser Anda tidak mendukung fitur Text-to-Speech.");
+        }
+    }
+    
     tinymce.init({
         selector: '#materiEditor',
         license_key: 'gpl',
         
-        // Dark mode skin detection
+        extended_valid_elements: 'svg[*],path[*]',
+        custom_elements: 'svg,path',
+
         skin: isDark ? 'oxide-dark' : 'oxide',
         content_css: isDark ? 'dark' : 'default',
         
-        // TAMBAH 'autosave' DI PLUGINS
         plugins: 'autosave image lists link table code wordcount fullscreen',
         
-        // TAMBAH 'restoredraft' DI TOOLBAR PALING DEPAN
-        toolbar: 'restoredraft | undo redo | blocks | bold italic underline strikethrough | add_furigana | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | code fullscreen | removeformat',
+        toolbar: 'restoredraft | undo redo | blocks | bold italic underline strikethrough | add_furigana add_tts | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | code fullscreen | removeformat',
         
-        // KONFIGURASI AUTOSAVE
-        autosave_interval: '15s', // Simpan setiap 15 detik
-        autosave_restore_when_empty: true, // Pulihkan otomatis jika kosong saat refresh
-        autosave_retention: '120m', // Simpan di browser selama 120 menit
+        autosave_interval: '15s',
+        autosave_restore_when_empty: true,
+        autosave_retention: '120m',
         
         menubar: 'file edit view insert format tools table',
         height: 500,
@@ -91,8 +104,24 @@
                 editor.getBody().style.lineHeight = '1.7';
             });
 
+            // SUNTIK EVENT CLICK: Bikin tombol TTS bisa diklik langsung di Editor Admin
+            editor.on('click', function(e) {
+                const btn = e.target.closest('.btn-inline-tts');
+                if (btn) {
+                    const textToSpeak = btn.getAttribute('data-speech');
+                    if (textToSpeak) {
+                        playTTS(textToSpeak);
+                    }
+                }
+            });
+
+            // Register Ikon Kustom untuk Furigana (Huruf 'A' Jepang)
+            editor.ui.registry.addIcon('furigana-icon', '<svg width="24" height="24" viewBox="0 0 24 24"><text x="4" y="18" font-family="sans-serif" font-size="16" fill="currentColor">あ</text></svg>');
+            
+            // TOMBOL FURIGANA
             editor.ui.registry.addButton('add_furigana', {
-                text: '🇯🇵 Furigana',
+                text: 'Furigana',
+                icon: 'furigana-icon', 
                 tooltip: 'Tambah Huruf Kecil di atas Kanji',
                 onAction: function () {
                     editor.windowManager.open({
@@ -118,50 +147,82 @@
                     });
                 }
             });
+
+            // TOMBOL TTS 
+            editor.ui.registry.addButton('add_tts', {
+                text: 'TTS',
+                // Gunakan ikon 'non-existent' agar TinyMCE tidak memaksakan ikon bawaannya
+                tooltip: 'Jadikan Teks Bersuara (Klik di editor untuk tes)',
+                onAction: function () {
+                    const selectedText = editor.selection.getContent({format: 'text'});
+                    
+                    editor.windowManager.open({
+                        title: 'Sisipkan Tombol Suara',
+                        body: {
+                            type: 'panel',
+                            items: [
+                                { type: 'input', name: 'displayText', label: 'Teks yang Ditampilkan' },
+                                { type: 'input', name: 'speechText', label: 'Teks untuk Dibunyikan' }
+                            ]
+                        },
+                        initialData: {
+                            displayText: selectedText,
+                            speechText: selectedText
+                        },
+                        buttons: [
+                            { type: 'cancel', text: 'Batal' },
+                            { type: 'submit', text: 'Sisipkan Tombol', primary: true }
+                        ],
+                        onSubmit: function (api) {
+                            var data = api.getData();
+                            if (data.displayText) {
+                                // SVG Speaker Murni
+                                const iconSVG = `<svg width="14" height="14" viewBox="0 0 512 512" style="margin-right:6px; vertical-align:middle; fill:currentColor"><path d="M215.03 71.05L126.06 160H24c-13.26 0-24 10.74-24 24v144c0 13.25 10.74 24 24 24h102.06l88.97 88.95c15.03 15.03 40.97 4.47 40.97-16.97V88.02c0-21.46-25.96-31.98-40.97-16.97zm233.32-51.08c-11.17-7.56-26.37-4.6-33.93 6.57l-17.02 25.13c-7.56 11.17-4.6 26.38 6.57 33.94C428.52 101.99 448 126.79 448 156v199.96c0 29.17-19.46 53.97-43.98 70.36-11.17 7.56-14.13 22.77-6.57 33.94l17.02 25.13c7.56 11.17 22.77 14.13 33.93 6.57C486.58 466.58 512 423.82 512 355.96V156c0-67.81-25.4-110.59-63.65-136.03z"/></svg>`;
+                                
+                                const html = `<button type="button" class="btn-inline-tts" data-speech="${data.speechText || data.displayText}" title="Dengarkan pengucapan">${iconSVG}${data.displayText}</button>&nbsp;`;
+                                editor.insertContent(html);
+                            }
+                            api.close();
+                        }
+                    });
+                }
+            });
         },
         
         images_upload_handler: function (blobInfo, progress) {
             return new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '{{ route("admin.materis.uploadImage") }}');
-
                 xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
-
                 xhr.upload.onprogress = function (e) {
                     progress(e.loaded / e.total * 100);
                 };
-
                 xhr.onload = function () {
                     if (xhr.status === 422) {
                         reject({ message: 'Validasi gagal: ' + xhr.responseText, remove: true });
                         return;
                     }
-
                     if (xhr.status < 200 || xhr.status >= 300) {
                         reject('HTTP Error: ' + xhr.status);
                         return;
                     }
-
                     var json = JSON.parse(xhr.responseText);
-
                     if (!json || typeof json.location !== 'string') {
                         reject('Invalid JSON response: ' + xhr.responseText);
                         return;
                     }
-
                     resolve(json.location);
                 };
-
                 xhr.onerror = function () {
-                    reject('Image upload failed. Please check your connection and try again.');
+                    reject('Image upload failed.');
                 };
-
                 var formData = new FormData();
                 formData.append('file', blobInfo.blob(), blobInfo.filename());
                 xhr.send(formData);
             });
         },
         
+        // CSS Iframe: Membuat kursor menjadi 'pointer' agar Admin tahu tombol bisa diklik
         content_style: isDark 
             ? `body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 15px; line-height: 1.7; color: #e2e8f0; background-color: #1e293b; padding: 8px 12px; }
                img { max-width: 100%; height: auto; border-radius: 8px; margin: 1em 0; }
@@ -170,35 +231,36 @@
                h1, h2, h3, h4 { font-weight: 700; margin: 1em 0 0.5em; color: #f1f5f9; }
                ruby { margin-right: 0.1em; ruby-align: center; }
                rt { color: #94a3b8; font-size: 0.65em; font-weight: 500; transform: translateY(-10%); }
-               a { color: #818cf8; }`
+               a { color: #818cf8; }
+               .btn-inline-tts { background: #3730a3; color: #818cf8; border: 1px solid #4f46e5; padding: 3px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; text-decoration: none; margin: 0 2px; transition: all 0.2s; display: inline-flex; align-items: center;}
+               .btn-inline-tts:hover { background: #4f46e5; color: white; }
+               .btn-inline-tts svg { pointer-events: none; display: inline-block; width: 14px; height: 14px; flex-shrink: 0; }`
             : `body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 15px; line-height: 1.7; color: #1e293b; padding: 8px 12px; }
                img { max-width: 100%; height: auto; border-radius: 8px; margin: 1em 0; }
                p { margin: 0.75em 0; }
                ul, ol { padding-left: 1.5em; }
                h1, h2, h3, h4 { font-weight: 700; margin: 1em 0 0.5em; color: #0f172a; }
                ruby { margin-right: 0.1em; ruby-align: center; }
-               rt { color: #64748b; font-size: 0.65em; font-weight: 500; transform: translateY(-10%); }`
+               rt { color: #64748b; font-size: 0.65em; font-weight: 500; transform: translateY(-10%); }
+               .btn-inline-tts { background: #e0e7ff; color: #4f46e5; border: 1px solid #c7d2fe; padding: 3px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; text-decoration: none; margin: 0 2px; transition: all 0.2s; display: inline-flex; align-items: center;}
+               .btn-inline-tts:hover { background: #4f46e5; color: white; }
+               .btn-inline-tts svg { pointer-events: none; display: inline-block; width: 14px; height: 14px; flex-shrink: 0; }`
     });
 
-    // 4. SCRIPT PENYIMPANAN JUDUL (AUTOSAVE TITLE)
     document.addEventListener('DOMContentLoaded', function () {
         const titleInput = document.getElementById('title');
         const form = document.querySelector('form');
 
-        // Cek dan kembalikan judul dari memori saat halaman dimuat
         if (localStorage.getItem('draft_materi_title')) {
-            // Jangan timpa jika old('title') dari error validasi Laravel sudah ada
             if (!titleInput.value) {
                 titleInput.value = localStorage.getItem('draft_materi_title');
             }
         }
 
-        // Simpan setiap kali ada ketikan
         titleInput.addEventListener('input', function() {
             localStorage.setItem('draft_materi_title', this.value);
         });
 
-        // Hapus draf dari memori ketika tombol submit ditekan
         form.addEventListener('submit', function() {
             localStorage.removeItem('draft_materi_title');
         });
