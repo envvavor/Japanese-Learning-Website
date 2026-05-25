@@ -100,7 +100,12 @@
                         <div class="absolute top-0.5 left-2 right-2 h-1 bg-white/40 rounded-full"></div>
                     </div>
                 </div>
-                <p class="text-xs font-bold text-slate-400 mt-3 uppercase tracking-widest"><i class="fas fa-bolt text-amber-400 mr-1"></i> Selesaikan Quiz untuk dapat XP!</p>
+                <div class="flex items-center justify-between mt-3">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fas fa-bolt text-amber-400 mr-1"></i> Selesaikan Quiz untuk dapat XP!</p>
+                    <a href="{{ route('leaderboard') }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-2 border-b-[4px] border-amber-200 dark:border-amber-700 rounded-xl text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest hover:bg-amber-100 dark:hover:bg-amber-900/40 active:border-b-2 active:translate-y-0.5 transition-all shrink-0">
+                        <i class="fas fa-trophy"></i> Leaderboard
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -225,6 +230,7 @@
                     <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide group-hover:text-violet-500 transition-colors">Visual Novel</h3>
                     <p class="text-xs font-bold text-slate-400 mt-2 line-clamp-2">Belajar bahasa Jepang via cerita interaktif!</p>
                 </a>
+
             </div>
             {{-- Alert Tugas Akhir & GForm --}}
             <div class="bg-indigo-100 dark:bg-indigo-900/30 border-2 border-b-[8px] border-indigo-200 dark:border-indigo-800 rounded-[2rem] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 shadow-sm mt-10 mb-8 relative overflow-hidden">

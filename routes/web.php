@@ -19,6 +19,7 @@ use App\Http\Controllers\QuizNewController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\VocabularyController;
 use App\Http\Controllers\Admin\AdminVocabularyController;
+use App\Http\Controllers\LeaderboardController;
 use Illuminate\Support\Facades\Http;
 
 
@@ -349,6 +350,8 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/kosakata', [VocabularyController::class, 'index'])->name('vocabulary.index');
 Route::get('/kosakata/search', [VocabularyController::class, 'search'])->name('vocabulary.search');
+
+Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard')->middleware('auth');
 
 Route::get('/api/cnn-status', function () {
     // Ambil IP AWS dari .env
