@@ -168,6 +168,15 @@
                     <p class="text-xs font-bold text-[#bae6fd] mt-2 line-clamp-2 relative z-10">Uji kemampuanmu di mode petualangan!</p>
                 </a>
 
+                {{-- Modul: Materi --}}
+                <a href="{{ route('materi.index') }}" class="block bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 hover:bg-slate-50 dark:hover:bg-gray-700/50 hover:-translate-y-1 active:translate-y-1 active:border-b-2 transition-all group">
+                    <div class="w-16 h-16 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-500 border-2 border-b-4 border-cyan-200 dark:border-cyan-800 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide group-hover:text-cyan-500 transition-colors">Materi</h3>
+                    <p class="text-xs font-bold text-slate-400 mt-2 line-clamp-2">Baca materi pelajaran bahasa Jepang terbaru.</p>
+                </a>
+
                 {{-- Modul: Semua Huruf --}}
                 <a href="/list" class="block bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 hover:bg-slate-50 dark:hover:bg-gray-700/50 hover:-translate-y-1 active:translate-y-1 active:border-b-2 transition-all group">
                     <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-500 border-2 border-b-4 border-amber-200 dark:border-amber-800 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">
@@ -213,15 +222,6 @@
                     <p class="text-xs font-bold text-slate-400 mt-2 line-clamp-2">Perkaya perbendaharaan kata bahasa Jepangmu.</p>
                 </a>
 
-                {{-- Modul: Materi --}}
-                <a href="{{ route('materi.index') }}" class="block bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 hover:bg-slate-50 dark:hover:bg-gray-700/50 hover:-translate-y-1 active:translate-y-1 active:border-b-2 transition-all group">
-                    <div class="w-16 h-16 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-500 border-2 border-b-4 border-cyan-200 dark:border-cyan-800 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide group-hover:text-cyan-500 transition-colors">Materi</h3>
-                    <p class="text-xs font-bold text-slate-400 mt-2 line-clamp-2">Baca materi pelajaran bahasa Jepang terbaru.</p>
-                </a>
-
                 {{-- Modul: Visual Novel --}}
                 <a href="{{ route('vn.scenes') }}" class="block bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 hover:bg-slate-50 dark:hover:bg-gray-700/50 hover:-translate-y-1 active:translate-y-1 active:border-b-2 transition-all group">
                     <div class="w-16 h-16 bg-violet-100 dark:bg-violet-900/30 text-violet-500 border-2 border-b-4 border-violet-200 dark:border-violet-800 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">
@@ -258,7 +258,7 @@
                 <div class="w-full sm:w-auto shrink-0 z-10">
                     <a href="https://docs.google.com/forms/d/e/1FAIpQLSeYMIs2BYbEhI_ySnVbS-1_8y7T9eIeFZk5cilJ6qMQfjPcWA/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer"
                     class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-indigo-500 border-2 border-b-[6px] border-indigo-700 text-white transition-all rounded-2xl font-black uppercase tracking-widest text-sm hover:brightness-110 active:border-b-2 active:translate-y-1 shadow-sm">
-                        <i class="fas fa-clipboard-check mr-2 text-lg"></i> Isi Kuesioner
+                        <i class="fas fa-clipboard-check mr-2 text-lg"></i> Isi Form
                     </a>
                 </div>
             </div>

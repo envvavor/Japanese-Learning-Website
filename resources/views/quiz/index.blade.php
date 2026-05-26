@@ -13,9 +13,10 @@
             </div>
             <div>
                 <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-wide uppercase">
-                    Latihan Bebas
+                    Latihan Bebas (Beta)
                 </h1>
                 <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-1">Uji pemahamanmu secara acak tanpa mengikuti Roadmap.</p>
+                <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-1">Fitur ini masih dalam pengembangan.</p>
             </div>
         </div>
         <a href="{{ route('quizzes.index') }}"

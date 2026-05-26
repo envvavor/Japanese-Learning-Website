@@ -301,7 +301,7 @@
 
                 templateKanji = typeof data.strokes === 'string' ? JSON.parse(data.strokes) : data.strokes; 
                 
-                document.getElementById('targetTitle').innerText = `Latihan: ${data.character} (${data.meaning})`;
+                document.getElementById('targetTitle').innerText = `Latihan: ${data.character}`;
                 document.getElementById('menuArea').style.display = 'none';
                 document.getElementById('practiceArea').style.display = 'block';
                 
