@@ -529,8 +529,8 @@
         const normUser = normalizeStrokes(allStrokes);
         const normTemp = normalizeStrokes(templateKanji);
 
-        const NUM_POINTS = 30;
-        const TOLERANCE_ERROR = 35;
+        const NUM_POINTS = 40;
+        const TOLERANCE_ERROR = 42;
 
         const matchedCount = Math.min(templateCount, userCount);
         let totalScore = 0;
@@ -560,7 +560,7 @@
             }
             shapeError /= NUM_POINTS;
 
-            const totalError = shapeError + (posError * 0.4);
+            const totalError = shapeError + (posError * 0.25);
             let strokePct = 100 - (totalError / TOLERANCE_ERROR) * 100;
             strokePct = Math.max(0, Math.min(100, strokePct)); 
             
@@ -759,7 +759,7 @@
                 if (p.x > maxX) maxX = p.x; if (p.y > maxY) maxY = p.y;
             });
         });
-        return { width: maxX - minX, height: maxY - minY };
+        return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
     }
 
     function normalizeStrokes(strokes) {
@@ -768,12 +768,10 @@
         const maxDim = Math.max(box.width, box.height) || 1;
         const scale = 100 / maxDim; 
 
-        let cx = 0, cy = 0, pts = 0;
-        strokes.forEach(stroke => {
-            stroke.forEach(p => { cx += p.x; cy += p.y; pts++; });
-        });
-        if(pts === 0) return strokes;
-        cx /= pts; cy /= pts;
+        // Gunakan bounding box center (stabil, tidak terpengaruh kecepatan gambar)
+        // Centroid (rata-rata titik) tidak stabil karena titik lebih padat di area lambat
+        const cx = (box.minX + box.maxX) / 2;
+        const cy = (box.minY + box.maxY) / 2;
 
         return strokes.map(stroke => stroke.map(p => ({
             x: (p.x - cx) * scale,
@@ -827,33 +825,23 @@
         const previousFont = ctx.font;
         const previousLineDash = ctx.getLineDash();
         
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        let cx = 0, cy = 0, pts = 0;
-
-        allStrokes.forEach(stroke => {
-            stroke.forEach(p => {
-                if (p.x < minX) minX = p.x; if (p.y < minY) minY = p.y;
-                if (p.x > maxX) maxX = p.x; if (p.y > maxY) maxY = p.y;
-                cx += p.x; cy += p.y; pts++;
-            });
-        });
-
-        const maxDim = Math.max(maxX - minX, maxY - minY) || 1;
+        const userBox = getBoundingBox(allStrokes);
+        const maxDim = Math.max(userBox.width, userBox.height) || 1;
+        // Gunakan bounding box center (konsisten dengan normalizeStrokes)
+        const cx = (userBox.minX + userBox.maxX) / 2;
+        const cy = (userBox.minY + userBox.maxY) / 2;
 
         ctx.strokeStyle = '#10b981'; 
         ctx.lineWidth = 2;
         ctx.setLineDash([6, 6]); 
-        ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+        ctx.strokeRect(userBox.minX, userBox.minY, userBox.width, userBox.height);
 
-        if (pts > 0) {
-            cx /= pts; cy /= pts;
-            ctx.fillStyle = '#10b981';
-            ctx.beginPath();
-            ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.font = "bold 12px sans-serif";
-            ctx.fillText("Center", cx + 10, cy - 10);
-        }
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = "bold 12px sans-serif";
+        ctx.fillText("Center", cx + 10, cy - 10);
 
         ctx.setLineDash([]);
         ctx.fillStyle = '#ef4444'; 

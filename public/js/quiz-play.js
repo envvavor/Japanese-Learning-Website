@@ -251,8 +251,8 @@ function redrawDrawing(){
 
 // ── Stroke Validation ─────────────────────────────────────────
 
-function getBBox(strokes){let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity;strokes.forEach(s=>s.forEach(p=>{if(p.x<a)a=p.x;if(p.y<b)b=p.y;if(p.x>c)c=p.x;if(p.y>d)d=p.y}));return{width:c-a,height:d-b};}
-function normStrokes(strokes){if(!strokes||!strokes.length)return[];const b=getBBox(strokes);const m=Math.max(b.width,b.height)||1;const sc=100/m;let cx=0,cy=0,n=0;strokes.forEach(s=>s.forEach(p=>{cx+=p.x;cy+=p.y;n++;}));if(!n)return strokes;cx/=n;cy/=n;return strokes.map(s=>s.map(p=>({x:(p.x-cx)*sc,y:(p.y-cy)*sc})));}
+function getBBox(strokes){let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity;strokes.forEach(s=>s.forEach(p=>{if(p.x<a)a=p.x;if(p.y<b)b=p.y;if(p.x>c)c=p.x;if(p.y>d)d=p.y}));return{minX:a,minY:b,maxX:c,maxY:d,width:c-a,height:d-b};}
+function normStrokes(strokes){if(!strokes||!strokes.length)return[];const b=getBBox(strokes);const m=Math.max(b.width,b.height)||1;const sc=100/m;const cx=(b.minX+b.maxX)/2;const cy=(b.minY+b.maxY)/2;return strokes.map(s=>s.map(p=>({x:(p.x-cx)*sc,y:(p.y-cy)*sc})));}
 function getDist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
 function pathLen(pts){let d=0;for(let i=1;i<pts.length;i++)d+=getDist(pts[i-1],pts[i]);return d;}
 function resamplePts(pts,n){if(!pts||!pts.length)return pts;let I=pathLen(pts)/(n-1),D=0,np=[pts[0]];for(let i=1;i<pts.length;i++){let d=getDist(pts[i-1],pts[i]);if((D+d)>=I){let qx=pts[i-1].x+((I-D)/d)*(pts[i].x-pts[i-1].x);let qy=pts[i-1].y+((I-D)/d)*(pts[i].y-pts[i-1].y);let q={x:qx,y:qy};np.push(q);pts.splice(i,0,q);D=0;}else{D+=d;}}while(np.length<n)np.push(pts[pts.length-1]);return np;}
@@ -300,7 +300,7 @@ function submitDrawing(){
 
   const templateCount=templateStrokes.length,userCount=allStrokes.length;
   const normUser=normStrokes(allStrokes),normTemp=normStrokes(templateStrokes);
-  const N=30,TOL=35,mc=Math.min(templateCount,userCount);
+  const N=40,TOL=42,mc=Math.min(templateCount,userCount);
   let totalScore=0,wrongStrokes=[];
 
   for(let i=0;i<mc;i++){
@@ -312,7 +312,7 @@ function submitDrawing(){
     let shapeErr=0;
     for(let j=0;j<N;j++)shapeErr+=getDist({x:up[j].x-cxU+cxT,y:up[j].y-cyU+cyT},tp[j]);
     shapeErr/=N;
-    let pct=100-(shapeErr+posErr*0.4)/TOL*100;
+    let pct=100-(shapeErr+posErr*0.25)/TOL*100;
     pct=Math.max(0,Math.min(100,pct));
     totalScore+=pct;
     if(pct<65)wrongStrokes.push(i+1);
