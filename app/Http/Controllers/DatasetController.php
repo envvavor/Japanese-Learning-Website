@@ -8,8 +8,48 @@ use ZipArchive;
 
 class DatasetController extends Controller
 {
+    private function settingsPath()
+    {
+        return storage_path('app/dataset_settings.json');
+    }
+
+    private function getSettings()
+    {
+        if (file_exists($this->settingsPath())) {
+            return json_decode(file_get_contents($this->settingsPath()), true) ?: [];
+        }
+        return ['auto_save' => true]; // default ON
+    }
+
+    private function saveSettings(array $settings)
+    {
+        file_put_contents($this->settingsPath(), json_encode($settings));
+    }
+
+    // API: Get auto-save status
+    public function autoSaveStatus()
+    {
+        $settings = $this->getSettings();
+        return response()->json(['auto_save' => $settings['auto_save'] ?? true]);
+    }
+
+    // API: Toggle auto-save on/off
+    public function toggleAutoSave(Request $request)
+    {
+        $settings = $this->getSettings();
+        $settings['auto_save'] = (bool) $request->input('enabled', true);
+        $this->saveSettings($settings);
+        return response()->json(['success' => true, 'auto_save' => $settings['auto_save']]);
+    }
+
     public function store(Request $request)
     {
+        // Check if auto-save is enabled
+        $settings = $this->getSettings();
+        if (!($settings['auto_save'] ?? true)) {
+            return response()->json(['success' => false, 'message' => 'Auto-save dataset dinonaktifkan.']);
+        }
+
         // Validasi data yang masuk
         $request->validate([
             'character' => 'required|string',

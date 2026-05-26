@@ -11,7 +11,24 @@
             <p class="text-gray-600 dark:text-gray-400">Total Karakter: {{ count($datasets) }} &middot; Total Gambar: {{ array_sum($datasets) }}</p>
         </div>
         
-        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
+            {{-- Auto-Save Toggle --}}
+            <div x-data="autoSaveToggle()" class="flex items-center gap-3 px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <i class="fas fa-save mr-1" :class="enabled ? 'text-green-500' : 'text-gray-400'"></i> Auto-Save
+                </span>
+                <button @click="toggle()" 
+                        :class="enabled ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'"
+                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        :disabled="loading">
+                    <span :class="enabled ? 'translate-x-6' : 'translate-x-1'"
+                          class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"></span>
+                </button>
+                <span x-text="loading ? '...' : (enabled ? 'ON' : 'OFF')" 
+                      :class="loading ? 'text-gray-300' : (enabled ? 'text-green-600 dark:text-green-400' : 'text-gray-400')"
+                      class="text-xs font-bold uppercase tracking-wider w-6"></span>
+            </div>
+
             <div class="relative w-full sm:w-64">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="fas fa-search text-gray-400"></i>
@@ -218,6 +235,40 @@ function datasetAccordion(char, initialCount) {
             } catch (err) {
                 console.error('Gagal menghapus:', err);
                 alert('Gagal menghapus gambar.');
+            }
+        }
+    };
+}
+
+function autoSaveToggle() {
+    return {
+        enabled: false, // Default ke false agar tidak flash "ON"
+        loading: true,
+        
+        init() {
+            fetch('/api/dataset/auto-save-status')
+                .then(r => r.json())
+                .then(data => { this.enabled = data.auto_save; this.loading = false; })
+                .catch(() => { this.loading = false; });
+        },
+        
+        async toggle() {
+            this.loading = true;
+            try {
+                const res = await fetch('/api/dataset/auto-save-toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ enabled: !this.enabled })
+                });
+                const data = await res.json();
+                this.enabled = data.auto_save;
+            } catch (e) {
+                console.error('Toggle failed:', e);
+            } finally {
+                this.loading = false;
             }
         }
     };

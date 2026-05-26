@@ -19,5 +19,9 @@ Route::get('/kanjis/{character}/vocabulary', [KanjiController::class, 'vocabular
 // Route untuk menerima kiriman gambar Auto-Save dari JavaScript
 Route::post('/dataset/save', [DatasetController::class, 'store']);
 
+// Auto-save toggle API
+Route::get('/dataset/auto-save-status', [DatasetController::class, 'autoSaveStatus']);
+Route::post('/dataset/auto-save-toggle', [DatasetController::class, 'toggleAutoSave']);
+
 // Endpoint untuk Jembatan AI
 Route::post('/validate-ai', [AiValidationController::class, 'check']);
