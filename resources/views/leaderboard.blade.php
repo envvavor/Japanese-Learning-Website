@@ -145,14 +145,6 @@
                 </div>
             @endforelse
         </div>
-
-        {{-- Footer Info --}}
-        <div class="text-center mt-8">
-            <p class="text-xs font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">
-                <i class="fas fa-info-circle mr-1"></i> Peringkat diperbarui secara real-time berdasarkan Level & XP
-            </p>
-        </div>
-
     </div>
 </div>
 

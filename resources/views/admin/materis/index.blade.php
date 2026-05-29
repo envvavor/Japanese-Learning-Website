@@ -16,7 +16,6 @@
             <thead class="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
                 <tr>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Judul</th>
-                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Slug</th>
                     <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dibuat</th>
                     <th scope="col" class="px-6 py-4 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Aksi</th>
                 </tr>
@@ -33,9 +32,6 @@
                                     <div class="text-sm font-bold text-gray-800 dark:text-gray-100">{{ $materi->title }}</div>
                                 </div>
                             </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{{ $materi->slug }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                             {{ $materi->created_at->translatedFormat('d M Y, H:i') }}
