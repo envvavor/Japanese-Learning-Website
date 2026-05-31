@@ -382,7 +382,7 @@
             if (!stroke || stroke.length === 0) return;
 
             gCtx.beginPath();
-            gCtx.lineWidth = 22;
+            gCtx.lineWidth = 12;
             gCtx.lineCap = 'round';
             gCtx.lineJoin = 'round';
             gCtx.strokeStyle = strokeColors[index % strokeColors.length];

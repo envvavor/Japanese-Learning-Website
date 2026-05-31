@@ -170,7 +170,7 @@ function drawGuide() {
     const colors = ['rgba(99,102,241,0.18)', 'rgba(234,179,8,0.18)', 'rgba(239,68,68,0.18)', 'rgba(16,185,129,0.18)', 'rgba(249,115,22,0.18)', 'rgba(168,85,247,0.18)'];
     templateStrokes.forEach((s, i) => {
         if (!s || !s.length) return;
-        g.beginPath(); g.lineWidth = 22; g.lineCap = 'round'; g.lineJoin = 'round';
+        g.beginPath(); g.lineWidth = 12; g.lineCap = 'round'; g.lineJoin = 'round';
         g.strokeStyle = colors[i % colors.length]; g.moveTo(s[0].x, s[0].y);
         for (let j = 1; j < s.length; j++) g.lineTo(s[j].x, s[j].y);
         g.stroke();
