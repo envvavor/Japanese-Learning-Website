@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vocabulary;
+use App\Models\VocabularyFolder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VocabularyController extends Controller
 {
@@ -38,7 +40,20 @@ class VocabularyController extends Controller
             ->groupBy('jlpt_level')
             ->pluck('total', 'jlpt_level');
 
-        return view('vocabularies.index', compact('vocabularies', 'level', 'search', 'counts'));
+        // Ambil folder milik user + folder admin (public) untuk tombol simpan
+        $folders = collect();
+        if (Auth::check()) {
+            $user = Auth::user();
+            $query = VocabularyFolder::withCount('items')->orderBy('name');
+            
+            if ($user->role === 'admin') {
+                $folders = $query->whereNull('user_id')->get();
+            } else {
+                $folders = $query->where('user_id', $user->id)->get();
+            }
+        }
+
+        return view('vocabularies.index', compact('vocabularies', 'level', 'search', 'counts', 'folders'));
     }
 
     /**

@@ -81,6 +81,12 @@
                 </div>
             </div>
 
+            <!-- Folder Kosakata -->
+            <a href="{{ route('admin.vocabulary-folders.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.vocabulary-folders.*') ? 'bg-indigo-700 dark:bg-indigo-600 text-white shadow-md' : 'text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white' }}">
+                <i class="fas fa-folder-open w-5 text-center"></i>
+                <span class="font-medium">Folder Kosakata</span>
+            </a>
+
             <!-- Materi Dropdown -->
             <div x-data="{ expanded: {{ request()->routeIs('admin.materis.*') ? 'true' : 'false' }} }">
                 <button @click="expanded = !expanded" class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 {{ request()->routeIs('admin.materis.*') ? 'bg-indigo-800 dark:bg-indigo-700 text-white shadow-inner' : 'text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white' }}">

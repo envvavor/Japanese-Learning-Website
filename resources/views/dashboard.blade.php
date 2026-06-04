@@ -222,6 +222,15 @@
                     <p class="text-xs font-bold text-slate-400 mt-2 line-clamp-2">Perkaya perbendaharaan kata bahasa Jepangmu.</p>
                 </a>
 
+                {{-- Modul: Folder Kosakata --}}
+                <a href="{{ route('vocabulary-folders.index') }}" class="block bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 hover:bg-slate-50 dark:hover:bg-gray-700/50 hover:-translate-y-1 active:translate-y-1 active:border-b-2 transition-all group">
+                    <div class="w-16 h-16 bg-teal-100 dark:bg-teal-900/30 text-teal-500 border-2 border-b-4 border-teal-200 dark:border-teal-800 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide group-hover:text-teal-500 transition-colors">Folder Kosakata</h3>
+                    <p class="text-xs font-bold text-slate-400 mt-2 line-clamp-2">Kelompokkan & latih kosakata dengan flashcard.</p>
+                </a>
+
                 {{-- Modul: Visual Novel --}}
                 <a href="{{ route('vn.scenes') }}" class="block bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-6 hover:bg-slate-50 dark:hover:bg-gray-700/50 hover:-translate-y-1 active:translate-y-1 active:border-b-2 transition-all group">
                     <div class="w-16 h-16 bg-violet-100 dark:bg-violet-900/30 text-violet-500 border-2 border-b-4 border-violet-200 dark:border-violet-800 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">

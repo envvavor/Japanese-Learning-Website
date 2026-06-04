@@ -19,6 +19,8 @@ use App\Http\Controllers\QuizNewController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\VocabularyController;
 use App\Http\Controllers\Admin\AdminVocabularyController;
+use App\Http\Controllers\Admin\AdminVocabularyFolderController;
+use App\Http\Controllers\VocabularyFolderController;
 use App\Http\Controllers\LeaderboardController;
 use Illuminate\Support\Facades\Http;
 
@@ -160,6 +162,11 @@ Route::middleware(['auth', 'admin'])
         Route::resource('kanjis', \App\Http\Controllers\Admin\AdminKanjiController::class);
 
         Route::resource('vocabularies', AdminVocabularyController::class);
+
+        Route::resource('vocabulary-folders', AdminVocabularyFolderController::class);
+        Route::post('vocabulary-folders/{vocabulary_folder}/add-word', [AdminVocabularyFolderController::class, 'addWord'])->name('vocabulary-folders.add-word');
+        Route::delete('vocabulary-folders/{vocabulary_folder}/remove-word/{vocabulary}', [AdminVocabularyFolderController::class, 'removeWord'])->name('vocabulary-folders.remove-word');
+        Route::get('vocabulary-folders-api/search', [AdminVocabularyFolderController::class, 'searchVocabulary'])->name('vocabulary-folders.api.search');
 
         // Materi (Lesson/Article) routes
         Route::post('materis/upload-image', [MateriController::class, 'uploadImage'])->name('materis.uploadImage');
@@ -351,6 +358,23 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/kosakata', [VocabularyController::class, 'index'])->name('vocabulary.index');
 Route::get('/kosakata/search', [VocabularyController::class, 'search'])->name('vocabulary.search');
+
+Route::middleware('auth')->prefix('folder-kosakata')->name('vocabulary-folders.')->group(function () {
+    Route::get('/', [VocabularyFolderController::class, 'index'])->name('index');
+    Route::get('/buat', [VocabularyFolderController::class, 'create'])->name('create');
+    Route::post('/', [VocabularyFolderController::class, 'store'])->name('store');
+    Route::get('/api/search', [VocabularyFolderController::class, 'searchVocabulary'])->name('api.search');
+    Route::get('/{folder}', [VocabularyFolderController::class, 'show'])->name('show');
+    Route::get('/{folder}/edit', [VocabularyFolderController::class, 'edit'])->name('edit');
+    Route::put('/{folder}', [VocabularyFolderController::class, 'update'])->name('update');
+    Route::delete('/{folder}', [VocabularyFolderController::class, 'destroy'])->name('destroy');
+    Route::post('/{folder}/add-word', [VocabularyFolderController::class, 'addWord'])->name('add-word');
+    Route::post('/{folder}/add-word-api', [VocabularyFolderController::class, 'addWordApi'])->name('add-word-api');
+    Route::delete('/{folder}/remove-word/{vocabulary}', [VocabularyFolderController::class, 'removeWord'])->name('remove-word');
+    Route::get('/{folder}/latihan', [VocabularyFolderController::class, 'practice'])->name('practice');
+    Route::post('/{folder}/progress', [VocabularyFolderController::class, 'recordProgress'])->name('progress');
+    Route::post('/{folder}/finish', [VocabularyFolderController::class, 'finishPractice'])->name('finish');
+});
 
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard')->middleware('auth');
 

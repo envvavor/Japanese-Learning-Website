@@ -126,7 +126,7 @@
                 {{-- Vocab Card Gamified Compact --}}
                 <div class="bg-white dark:bg-gray-800 border-2 border-b-[4px] sm:border-b-[6px] border-slate-200 dark:border-gray-700 {{ $c['glow'] }} rounded-2xl sm:rounded-[1.5rem] p-4 sm:p-5 transition-all hover:-translate-y-1 active:border-b-2 active:translate-y-[2px] sm:active:translate-y-[4px] group relative shadow-sm flex flex-col h-full">
                     
-                    {{-- Header Level & Copy --}}
+                    {{-- Header Level & Save --}}
                     <div class="flex items-start justify-between mb-3">
                         <span class="px-2 sm:px-2.5 py-1 rounded-lg sm:rounded-xl border-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest {{ $c['badge'] }}">
                             {{ $vocab->jlpt_level ?? '辞書' }}
@@ -137,12 +137,43 @@
                             @php
                                 $textToSpeak = addslashes($vocab->furigana ?: $vocab->original);
                             @endphp
-                            {{-- Tombol Salin --}}
-                            <button onclick="copyText('{{ $vocab->original }}')"
-                                    class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border-2 border-b-[3px] border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-700 text-slate-400 hover:text-indigo-500 hover:border-indigo-300 dark:hover:border-indigo-600 active:border-b-2 active:translate-y-0.5 transition-all flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shrink-0"
-                                    title="Salin Kosakata">
-                                <i class="fas fa-copy text-xs"></i>
-                            </button>
+                            {{-- Tombol Simpan ke Folder --}}
+                            @auth
+                            <div class="relative" x-data="{ open: false }">
+                                <button @click.stop="open = !open"
+                                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border-2 border-b-[3px] border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-700 text-slate-400 hover:text-teal-500 hover:border-teal-300 dark:hover:border-teal-600 active:border-b-2 active:translate-y-0.5 transition-all flex items-center justify-center shrink-0"
+                                        title="Simpan ke Folder">
+                                    <i class="fas fa-bookmark text-xs"></i>
+                                </button>
+                                <div x-show="open" x-transition @click.away="open = false"
+                                     class="absolute right-0 top-full mt-1 w-48 sm:w-56 bg-white dark:bg-gray-800 border-2 border-b-4 border-slate-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden" x-cloak>
+                                    <div class="px-3 py-2 border-b-2 border-slate-100 dark:border-gray-700">
+                                        <p class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">Simpan ke Folder</p>
+                                    </div>
+                                    <div class="max-h-48 overflow-y-auto">
+                                        @forelse($folders as $f)
+                                        <button @click.stop="saveToFolder({{ $f->id }}, {{ $vocab->id }}, $el); open = false;"
+                                                class="w-full text-left px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 border-b border-slate-100 dark:border-gray-700 last:border-0">
+                                            <span class="w-6 h-6 rounded-lg bg-{{ $f->color }}-500 flex items-center justify-center shrink-0">
+                                                <i class="fas fa-folder text-white text-[8px]"></i>
+                                            </span>
+                                            <span class="text-xs font-bold text-slate-700 dark:text-slate-200 truncate flex-1">{{ $f->name }}</span>
+                                            @if($f->user_id === null)
+                                            <span class="text-[8px] font-black text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded uppercase shrink-0">Modul</span>
+                                            @endif
+                                        </button>
+                                        @empty
+                                        <div class="px-3 py-4 text-center">
+                                            <p class="text-[10px] font-bold text-slate-400 mb-2">Belum ada folder</p>
+                                            <a href="{{ route('vocabulary-folders.create') }}" class="text-[10px] font-black text-indigo-500 hover:text-indigo-600 uppercase tracking-widest">
+                                                <i class="fas fa-plus mr-1"></i> Buat Folder
+                                            </a>
+                                        </div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
+                            @endauth
                             
                             <button onclick="window.speakText('{{ $textToSpeak }}')"
                                     class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border-2 border-b-[3px] border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-700 text-slate-400 hover:text-[#1cb0f6] hover:border-[#1cb0f6]/30 active:border-b-2 active:translate-y-0.5 transition-all flex items-center justify-center shrink-0"
@@ -186,23 +217,59 @@
     </div>
 </div>
 
-{{-- Toast copy notif --}}
-<div id="copy-toast"
-     class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 px-5 py-3 sm:px-6 sm:py-4 bg-emerald-500 border-2 border-b-[6px] border-emerald-700 text-white text-xs sm:text-sm font-black uppercase tracking-widest rounded-2xl shadow-xl translate-y-24 opacity-0 transition-all duration-300 pointer-events-none z-50 flex items-center gap-2 sm:gap-3">
-    <i class="fas fa-check-circle text-lg sm:text-xl"></i> <span>Teks Disalin!</span>
+{{-- Toast save notif --}}
+<div id="save-toast"
+     class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 px-5 py-3 sm:px-6 sm:py-4 border-2 border-b-[6px] text-white text-xs sm:text-sm font-black uppercase tracking-widest rounded-2xl shadow-xl translate-y-24 opacity-0 transition-all duration-300 pointer-events-none z-50 flex items-center gap-2 sm:gap-3">
+    <i id="save-toast-icon" class="fas fa-check-circle text-lg sm:text-xl"></i> <span id="save-toast-text"></span>
 </div>
 
 @push('scripts')
 <script>
-function copyText(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        const toast = document.getElementById('copy-toast');
-        toast.classList.remove('translate-y-24', 'opacity-0');
-        setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 2000);
+function saveToFolder(folderId, vocabId, el) {
+    const url = `{{ url('folder-kosakata') }}/${folderId}/add-word-api`;
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ vocabulary_id: vocabId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        showSaveToast(data.message, data.is_new ? 'success' : 'info');
+    })
+    .catch(() => {
+        showSaveToast('Gagal menyimpan!', 'error');
     });
 }
 
-
+function showSaveToast(message, type) {
+    const toast = document.getElementById('save-toast');
+    const icon = document.getElementById('save-toast-icon');
+    const text = document.getElementById('save-toast-text');
+    
+    // Reset classes
+    toast.className = toast.className.replace(/bg-\S+/g, '').replace(/border-\S+/g, '');
+    
+    if (type === 'success') {
+        toast.classList.add('bg-emerald-500', 'border-emerald-700');
+        icon.className = 'fas fa-check-circle text-lg sm:text-xl';
+    } else if (type === 'info') {
+        toast.classList.add('bg-sky-500', 'border-sky-700');
+        icon.className = 'fas fa-info-circle text-lg sm:text-xl';
+    } else {
+        toast.classList.add('bg-rose-500', 'border-rose-700');
+        icon.className = 'fas fa-exclamation-circle text-lg sm:text-xl';
+    }
+    
+    text.textContent = message;
+    toast.classList.add('border-2', 'border-b-[6px]');
+    toast.classList.remove('translate-y-24', 'opacity-0');
+    setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 2500);
+}
 
 let synth = null;
 try { 
