@@ -115,12 +115,12 @@
     <div class="max-w-3xl mx-auto flex items-center justify-between gap-4">
         
         <button id="prevBtn" onclick="prevQuestion()" disabled
-                class="flex-shrink-0 px-4 h-14 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-gray-700 rounded-2xl border-2 border-b-[6px] border-slate-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200 dark:hover:bg-gray-600 active:translate-y-1 active:border-b-2 transition-all font-black uppercase tracking-wider text-sm hidden sm:flex">
-            <i class="fas fa-arrow-left"></i> Kembali
+                class="flex-shrink-0 px-4 h-14 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-gray-700 rounded-2xl border-2 border-b-[6px] border-slate-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-200 dark:hover:bg-gray-600 active:translate-y-1 active:border-b-2 transition-all font-black uppercase tracking-wider text-sm">
+            <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Kembali</span>
         </button>
 
-        <div id="dotIndicators" class="flex-1 flex items-center gap-2 flex-wrap justify-center overflow-hidden px-2"></div>
-        
+
+
         <button id="nextBtn" onclick="nextQuestion()"
                 class="flex-shrink-0 px-6 h-14 flex items-center justify-center gap-3 text-white bg-[#1cb0f6] dark:bg-[#1899d6] rounded-2xl border-2 border-b-[6px] border-[#1899d6] dark:border-[#1172a1] hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all font-black uppercase tracking-wider text-sm sm:text-base">
             Lanjut <i class="fas fa-arrow-right"></i>

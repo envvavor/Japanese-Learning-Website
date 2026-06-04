@@ -30,7 +30,7 @@ function updateProgress(){
 }
 
 function buildDots(){
-  const c=document.getElementById('dotIndicators');c.innerHTML='';
+  const c=document.getElementById('dotIndicators');if(!c)return;c.innerHTML='';
   questions.forEach((_,i)=>{
     const d=document.createElement('div');
     d.className='dot-indicator '+(i===currentIdx?'dot-current':(answers[i]?
@@ -168,11 +168,11 @@ function renderMC(q,container){
 function renderDrawing(q,container){
   templateStrokes=q.strokes||[];
   let h='<div class="flex justify-center mb-4">';
-  h+='<div class="relative bg-white dark:bg-gray-900 border-4 border-slate-700 dark:border-slate-500 rounded-lg shadow-inner overflow-hidden" style="width:300px;height:300px">';
+  h+='<div class="relative bg-white dark:bg-gray-900 border-4 border-slate-700 dark:border-slate-500 rounded-lg shadow-inner overflow-hidden" style="max-width:300px;width:100%;aspect-ratio:1">';
   h+='<div class="absolute pointer-events-none border-l-2 border-dashed border-red-300 h-full left-1/2 opacity-60"></div>';
   h+='<div class="absolute pointer-events-none border-t-2 border-dashed border-red-300 w-full top-1/2 opacity-60"></div>';
-  h+='<canvas id="guideCanvasQ" width="300" height="300" class="block absolute top-0 left-0 z-0 pointer-events-none" style="width:300px;height:300px"></canvas>';
-  h+='<canvas id="drawCanvasQ" width="300" height="300" class="block relative z-10 cursor-crosshair touch-none" style="width:300px;height:300px"></canvas>';
+  h+='<canvas id="guideCanvasQ" width="300" height="300" class="block absolute top-0 left-0 z-0 pointer-events-none" style="width:100%;height:100%"></canvas>';
+  h+='<canvas id="drawCanvasQ" width="300" height="300" class="block relative z-10 cursor-crosshair touch-none" style="width:100%;height:100%"></canvas>';
   h+='</div></div>';
   h+='<div class="flex justify-center gap-3 mb-4">';
   h+='<button onclick="clearDrawing()" class="px-4 py-2 text-sm font-semibold rounded-xl border-2 border-slate-200 dark:border-gray-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-gray-700 transition-all">Reset</button>';

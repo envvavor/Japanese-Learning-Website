@@ -110,11 +110,11 @@ function renderMC(q, container) {
 function renderDrawing(q, container) {
     templateStrokes = q.strokes || [];
     let h = '<div class="flex justify-center mb-4">';
-    h += '<div class="relative bg-white dark:bg-gray-900 border-4 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-3xl shadow-sm overflow-hidden" style="width:300px;height:300px">';
+    h += '<div class="relative bg-white dark:bg-gray-900 border-4 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-3xl shadow-sm overflow-hidden" style="max-width:300px;width:100%;aspect-ratio:1">';
     h += '<div class="absolute pointer-events-none border-l-2 border-dashed border-rose-200 dark:border-rose-900/50 h-full left-1/2 opacity-60"></div>';
     h += '<div class="absolute pointer-events-none border-t-2 border-dashed border-rose-200 dark:border-rose-900/50 w-full top-1/2 opacity-60"></div>';
-    h += '<canvas id="guideCanvasQ" width="300" height="300" class="block absolute top-0 left-0 z-0 pointer-events-none" style="width:300px;height:300px"></canvas>';
-    h += '<canvas id="drawCanvasQ" width="300" height="300" class="block relative z-10 cursor-crosshair touch-none" style="width:300px;height:300px"></canvas>';
+    h += '<canvas id="guideCanvasQ" width="300" height="300" class="block absolute top-0 left-0 z-0 pointer-events-none" style="width:100%;height:100%"></canvas>';
+    h += '<canvas id="drawCanvasQ" width="300" height="300" class="block relative z-10 cursor-crosshair touch-none" style="width:100%;height:100%"></canvas>';
     h += '</div></div>';
     h += '<div class="flex justify-center gap-3 mb-4">';
     h += '<button onclick="clearDrawing()" class="px-5 py-2 text-sm font-black rounded-xl border-2 border-b-4 border-slate-200 dark:border-gray-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-700 active:translate-y-1 active:border-b-2 transition-all"><i class="fas fa-trash-alt mr-1"></i> Reset</button>';
