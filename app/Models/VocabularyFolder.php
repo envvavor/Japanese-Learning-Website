@@ -19,6 +19,7 @@ class VocabularyFolder extends Model
 
     protected $casts = [
         'is_public' => 'boolean',
+        'user_id' => 'integer',
     ];
 
     public function user(): BelongsTo
