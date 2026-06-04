@@ -82,6 +82,11 @@
                     </template>
                 </div>
             </div>
+            <div class="mt-3 text-right">
+                <a href="{{ route('vocabulary.index') }}" class="inline-block text-xs font-bold text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">
+                    atau ke halaman daftar kosakata <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
         </div>
         @endif
 
@@ -113,12 +118,22 @@
                 $borderColor = $hasProgress ? ($isCorrect ? 'border-emerald-300 dark:border-emerald-700' : 'border-rose-300 dark:border-rose-700') : 'border-slate-200 dark:border-gray-700';
             @endphp
             <div class="bg-white dark:bg-gray-800 border-2 border-b-[4px] sm:border-b-[6px] {{ $borderColor }} rounded-2xl sm:rounded-[1.5rem] p-4 sm:p-5 transition-all hover:-translate-y-1 active:border-b-2 active:translate-y-[2px] group relative shadow-sm flex flex-col h-full">
-                <div class="flex items-start justify-between mb-3">
+                <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
                     <span class="px-2 py-1 rounded-lg border-2 text-[9px] font-black uppercase tracking-widest
                         {{ $vocab->jlpt_level ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800' : 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 border-violet-200 dark:border-violet-800' }}">
                         {{ $vocab->jlpt_level ?? 'JMDict' }}
                     </span>
                     <div class="flex gap-1.5">
+                        {{-- Tombol Suara --}}
+                        @php
+                            $textToSpeak = addslashes($vocab->furigana ?: $vocab->original);
+                        @endphp
+                        <button onclick="window.speakText('{{ $textToSpeak }}')"
+                                class="w-7 h-7 rounded-lg border-2 border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-700 text-slate-400 hover:text-[#1cb0f6] hover:border-[#1cb0f6]/30 active:translate-y-0.5 transition-all flex items-center justify-center shrink-0"
+                                title="Dengarkan Cara Baca">
+                            <i class="fas fa-volume-up text-[10px]"></i>
+                        </button>
+                        
                         @if($hasProgress)
                         <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs {{ $isCorrect ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500' : 'bg-rose-100 dark:bg-rose-900/30 text-rose-500' }}">
                             <i class="fas {{ $isCorrect ? 'fa-check' : 'fa-times' }}"></i>
@@ -127,7 +142,7 @@
                         @if($canEdit)
                         <form method="POST" action="{{ route('vocabulary-folders.remove-word', [$folder, $vocab]) }}" class="inline">
                             @csrf @method('DELETE')
-                            <button type="submit" class="w-7 h-7 rounded-lg border-2 border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-700 text-slate-400 hover:text-rose-500 hover:border-rose-300 active:translate-y-0.5 transition-all flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                            <button type="submit" class="w-7 h-7 rounded-lg border-2 border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-700 text-slate-400 hover:text-rose-500 hover:border-rose-300 active:translate-y-0.5 transition-all flex items-center justify-center"
                                     onclick="return confirm('Hapus kata ini dari folder?')">
                                 <i class="fas fa-trash text-[10px]"></i>
                             </button>
@@ -202,6 +217,23 @@ function folderShow() {
         }
     }
 }
+
+let synth = null;
+try { 
+    if ('speechSynthesis' in window) synth = window.speechSynthesis; 
+} catch(e) {}
+
+window.speakText = function(text) {
+    if (!text || !synth) return;
+    try { 
+        synth.cancel(); 
+        const u = new SpeechSynthesisUtterance(text); 
+        u.lang = 'ja-JP'; 
+        synth.speak(u); 
+    } catch(e) { 
+        console.error("Gagal memutar suara:", e); 
+    }
+};
 </script>
 @endpush
 @endsection

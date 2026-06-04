@@ -110,9 +110,6 @@
                         <div class="w-12 h-12 sm:w-14 sm:h-14 bg-{{ $folder->color }}-100 dark:bg-{{ $folder->color }}-900/30 text-{{ $folder->color }}-500 border-2 border-b-4 border-{{ $folder->color }}-200 dark:border-{{ $folder->color }}-800 rounded-2xl flex items-center justify-center text-xl sm:text-2xl group-hover:scale-110 transition-transform">
                             <i class="fas fa-folder-open"></i>
                         </div>
-                        <span class="px-2.5 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-800 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
-                            Admin
-                        </span>
                     </div>
                     <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white uppercase tracking-wide mb-1 group-hover:text-{{ $folder->color }}-500 transition-colors">
                         {{ $folder->name }}

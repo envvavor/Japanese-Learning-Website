@@ -124,10 +124,12 @@
                 @endphp
                 
                 {{-- Vocab Card Gamified Compact --}}
-                <div class="bg-white dark:bg-gray-800 border-2 border-b-[4px] sm:border-b-[6px] border-slate-200 dark:border-gray-700 {{ $c['glow'] }} rounded-2xl sm:rounded-[1.5rem] p-4 sm:p-5 transition-all hover:-translate-y-1 active:border-b-2 active:translate-y-[2px] sm:active:translate-y-[4px] group relative shadow-sm flex flex-col h-full">
+                <div x-data="{ folderOpen: false }"
+                     :class="folderOpen ? 'z-50' : 'z-10'"
+                     class="bg-white dark:bg-gray-800 border-2 border-b-[4px] sm:border-b-[6px] border-slate-200 dark:border-gray-700 {{ $c['glow'] }} rounded-2xl sm:rounded-[1.5rem] p-4 sm:p-5 transition-all hover:-translate-y-1 active:border-b-2 active:translate-y-[2px] sm:active:translate-y-[4px] group relative shadow-sm flex flex-col h-full">
                     
                     {{-- Header Level & Save --}}
-                    <div class="flex items-start justify-between mb-3">
+                    <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
                         <span class="px-2 sm:px-2.5 py-1 rounded-lg sm:rounded-xl border-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest {{ $c['badge'] }}">
                             {{ $vocab->jlpt_level ?? '辞書' }}
                         </span>
@@ -139,20 +141,20 @@
                             @endphp
                             {{-- Tombol Simpan ke Folder --}}
                             @auth
-                            <div class="relative" x-data="{ open: false }">
-                                <button @click.stop="open = !open"
+                            <div>
+                                <button @click.stop="folderOpen = !folderOpen"
                                         class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border-2 border-b-[3px] border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-700 text-slate-400 hover:text-teal-500 hover:border-teal-300 dark:hover:border-teal-600 active:border-b-2 active:translate-y-0.5 transition-all flex items-center justify-center shrink-0"
                                         title="Simpan ke Folder">
                                     <i class="fas fa-bookmark text-xs"></i>
                                 </button>
-                                <div x-show="open" x-transition @click.away="open = false"
-                                     class="absolute right-0 top-full mt-1 w-48 sm:w-56 bg-white dark:bg-gray-800 border-2 border-b-4 border-slate-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden" x-cloak>
+                                <div x-show="folderOpen" x-transition @click.away="folderOpen = false"
+                                     class="absolute left-2 right-2 top-14 sm:top-16 mt-1 w-auto bg-white dark:bg-gray-800 border-2 border-b-4 border-slate-200 dark:border-gray-700 rounded-xl shadow-xl z-[60] overflow-hidden" x-cloak>
                                     <div class="px-3 py-2 border-b-2 border-slate-100 dark:border-gray-700">
                                         <p class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">Simpan ke Folder</p>
                                     </div>
                                     <div class="max-h-48 overflow-y-auto">
                                         @forelse($folders as $f)
-                                        <button @click.stop="saveToFolder({{ $f->id }}, {{ $vocab->id }}, $el); open = false;"
+                                        <button @click.stop="saveToFolder({{ $f->id }}, {{ $vocab->id }}, $el); folderOpen = false;"
                                                 class="w-full text-left px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 border-b border-slate-100 dark:border-gray-700 last:border-0">
                                             <span class="w-6 h-6 rounded-lg bg-{{ $f->color }}-500 flex items-center justify-center shrink-0">
                                                 <i class="fas fa-folder text-white text-[8px]"></i>
