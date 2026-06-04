@@ -129,5 +129,5 @@
     </div>
 </div>
 
-<script src="{{ asset('js/quiz-play.js') }}"></script>
+<script src="{{ asset('js/quiz-play.js') }}?v={{ time() }}"></script>
 @endsection

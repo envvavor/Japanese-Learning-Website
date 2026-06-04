@@ -423,7 +423,7 @@ function showFloatingPoints(pts){
 }
 
 function renderAnswered(q,container){
-  document.getElementById('hintArea').style.display='none';
+  const hintEl=document.getElementById('hintArea');if(hintEl)hintEl.style.display='none';
   const a=answers[currentIdx];
   if(q.question_type==='drawing'){
     let h='<div class="text-center p-6 rounded-xl '+(a.is_correct?'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800':'bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800')+'">';
@@ -463,6 +463,7 @@ function renderAnswered(q,container){
     container.innerHTML+=info;
   }
   updateNavButtons();buildDots();
+  const hintEl2=document.getElementById('hintArea');if(hintEl2)hintEl2.style.display='none';
 }
 
 // ── Audio ─────────────────────────────────────────────────────
