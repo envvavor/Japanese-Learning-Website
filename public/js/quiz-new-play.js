@@ -37,14 +37,14 @@ function renderQuestion() {
     document.getElementById('questionNumber').textContent = 'Soal ' + (currentIdx + 1) + ' dari ' + QUESTIONS.length;
 
     const tb = document.getElementById('typeBadge');
-    if (q.question_type === 'multiple_choice') { 
-        tb.innerHTML = '<i class="fas fa-list-ul mr-1"></i> Pilihan Ganda'; 
+    if (q.question_type === 'multiple_choice') {
+        tb.innerHTML = '<i class="fas fa-list-ul mr-1"></i> Pilihan Ganda';
     }
-    else if (q.question_type === 'drawing') { 
-        tb.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Menggambar'; 
+    else if (q.question_type === 'drawing') {
+        tb.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Menggambar';
     }
-    else { 
-        tb.innerHTML = '<i class="fas fa-headphones mr-1"></i> Mendengarkan'; 
+    else {
+        tb.innerHTML = '<i class="fas fa-headphones mr-1"></i> Mendengarkan';
     }
 
     const qd = document.getElementById('questionDisplay');
@@ -65,10 +65,10 @@ function renderQuestion() {
     const hintArea = document.getElementById('hintArea');
 
     // Jika sudah dijawab, langsung tampilkan hasil & sembunyikan hint
-    if (answers[currentIdx]) { 
+    if (answers[currentIdx]) {
         hintArea.style.display = 'none';
-        renderAnswered(q, cc); 
-        return; 
+        renderAnswered(q, cc);
+        return;
     }
 
     if (q.question_type === 'multiple_choice' || q.question_type === 'listening') { renderMC(q, cc); }
@@ -159,10 +159,10 @@ function dMove(e) { if (!isDrawing) return; e.preventDefault(); const p = dGetPo
 function dEnd() { if (!isDrawing) return; isDrawing = false; if (currentStroke.length > 2) allStrokes.push(currentStroke); }
 
 function drawGuide() {
-    const gc = document.getElementById('guideCanvasQ'); 
+    const gc = document.getElementById('guideCanvasQ');
     if (!gc || !templateStrokes || !templateStrokes.length) return;
-    
-    const g = gc.getContext('2d'); 
+
+    const g = gc.getContext('2d');
     g.clearRect(0, 0, 300, 300);
 
     if (!answers['_hint_' + currentIdx]) return;
@@ -220,8 +220,8 @@ function quizAutoSaveToDataset(normUser, targetChar) {
         const tCtx = tc.getContext('2d'); tCtx.fillStyle = '#000'; tCtx.fillRect(0, 0, 64, 64);
         tCtx.lineWidth = 3; tCtx.lineCap = 'round'; tCtx.lineJoin = 'round'; tCtx.strokeStyle = '#fff';
         normUser.forEach(stroke => { if (!stroke.length) return; tCtx.beginPath(); tCtx.moveTo((stroke[0].x * 0.45) + 32, (stroke[0].y * 0.45) + 32); for (let i = 1; i < stroke.length; i++) { tCtx.lineTo((stroke[i].x * 0.45) + 32, (stroke[i].y * 0.45) + 32); } tCtx.stroke(); });
-        fetch('/api/dataset/save', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf() }, body: JSON.stringify({ character: targetChar, image_base64: tc.toDataURL('image/png') }) }).catch(() => {});
-    } catch (e) {}
+        fetch('/api/dataset/save', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf() }, body: JSON.stringify({ character: targetChar, image_base64: tc.toDataURL('image/png') }) }).catch(() => { });
+    } catch (e) { }
 }
 
 function submitDrawing() {
@@ -287,7 +287,7 @@ function useHint() {
     const q = QUESTIONS[currentIdx];
     // Cegah pencet hint berulang
     if (answers[currentIdx] || answers['_hint_' + currentIdx]) return;
-    
+
     // Tandai hint sudah dipakai
     answers['_hint_' + currentIdx] = true;
     showHintContent(q, document.getElementById('hintArea'));
@@ -374,13 +374,13 @@ function renderAudioPlayer(container, url) {
     let h = '<div class="flex justify-center mb-6"><button data-audio-url="' + encodeURIComponent(url) + '" class="audio-play-btn w-20 h-20 rounded-full border-2 border-b-[6px] border-[#1899d6] dark:border-[#1172a1] bg-[#1cb0f6] dark:bg-[#1899d6] text-white flex items-center justify-center text-3xl hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all shadow-md">';
     h += '<i class="fas fa-play ml-2"></i></button></div>';
     container.insertAdjacentHTML('afterbegin', h);
-    container.querySelector('.audio-play-btn').addEventListener('click', function(){ playAudio(decodeURIComponent(this.dataset.audioUrl)); });
+    container.querySelector('.audio-play-btn').addEventListener('click', function () { playAudio(decodeURIComponent(this.dataset.audioUrl)); });
 }
 
 let currentAudio = null;
 function playAudio(url) {
     if (currentAudio) { currentAudio.pause(); currentAudio = null; }
-    currentAudio = new Audio(url); currentAudio.play().catch(() => {});
+    currentAudio = new Audio(url); currentAudio.play().catch(() => { });
 }
 
 // ── Navigation ────────────────────────────────────────────────
@@ -393,12 +393,12 @@ function prevQuestion() { if (currentIdx > 0) { currentIdx--; renderQuestion(); 
 function updateNavButtons() {
     document.getElementById('prevBtn').disabled = currentIdx === 0;
     const nb = document.getElementById('nextBtn');
-    if (currentIdx === QUESTIONS.length - 1 && allAnswered()) { 
-        nb.innerHTML = '<i class="fas fa-flag-checkered mr-2"></i> Selesai'; 
-        nb.onclick = finishQuiz; 
-    } else { 
-        nb.innerHTML = 'Lanjut <i class="fas fa-chevron-right ml-2"></i>'; 
-        nb.onclick = nextQuestion; 
+    if (currentIdx === QUESTIONS.length - 1 && allAnswered()) {
+        nb.innerHTML = '<i class="fas fa-flag-checkered mr-2"></i> Selesai';
+        nb.onclick = finishQuiz;
+    } else {
+        nb.innerHTML = 'Lanjut <i class="fas fa-chevron-right ml-2"></i>';
+        nb.onclick = nextQuestion;
     }
 }
 
@@ -460,7 +460,7 @@ function showResults(data) {
         if (data.wrong_item_ids && data.wrong_item_ids.length > 0) {
             retryUrl += '?retry=' + data.wrong_item_ids.join(',');
         }
-        h += '<button onclick="window.location.href=\'' + retryUrl + '\'" class="flex-1 py-4 rounded-2xl text-sm font-black border-2 border-b-[6px] border-[#1899d6] bg-[#1cb0f6] text-white hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all uppercase tracking-widest"><i class="fas fa-redo-alt mr-2"></i> Coba Lagi</button>';
+        h += '<button onclick="window.location.href=\'' + retryUrl + '\'" class="flex-1 py-4 rounded-2xl text-sm font-black border-2 border-b-[6px] border-[#1899d6] bg-[#1cb0f6] text-white hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all uppercase tracking-widest"><i class="fas fa-redo-alt mr-2"></i> Benerin Salahnya</button>';
     } else {
         h += '<a href="/quizzes" class="flex-1 py-4 rounded-2xl text-sm font-black border-2 border-b-[6px] border-emerald-600 bg-emerald-500 text-white hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all text-center uppercase tracking-widest"><i class="fas fa-forward mr-2"></i> Lanjut</a>';
     }
