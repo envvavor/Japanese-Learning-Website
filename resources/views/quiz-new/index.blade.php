@@ -155,7 +155,305 @@
     </div>
 </div>
 
+{{-- Tutorial/Help Modal --}}
+<div id="quizTutorialOverlay" class="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto" style="display:none;">
+    {{-- Backdrop --}}
+    <div id="tutorialBackdrop" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
+
+    {{-- Modal Card --}}
+    <div id="tutorialModal" class="relative z-10 w-full max-w-md max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] shadow-2xl transform transition-all duration-300 scale-95 opacity-0 my-auto">
+
+        {{-- Progress Bar --}}
+        <div class="h-1.5 bg-slate-100 dark:bg-gray-700">
+            <div id="tutorialProgressBar" class="h-full bg-[#1cb0f6] rounded-r-full transition-all duration-500" style="width:0%"></div>
+        </div>
+
+        {{-- Content Area --}}
+        <div class="p-6 sm:p-8">
+            {{-- Icon + Step Label --}}
+            <div class="flex items-center gap-3 mb-4">
+                <div id="tutorialStepIcon" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 border-2 border-b-4 transition-colors duration-300">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div>
+                    <p id="tutorialStepLabel" class="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400"></p>
+                    <h3 id="tutorialStepTitle" class="text-lg font-black uppercase tracking-wide text-slate-800 dark:text-white"></h3>
+                </div>
+            </div>
+
+            {{-- Description --}}
+            <div id="tutorialStepDesc" class="text-sm font-bold text-slate-500 dark:text-slate-400 leading-relaxed mb-6"></div>
+
+            {{-- Visual Illustration --}}
+            <div id="tutorialStepVisual" class="mb-6"></div>
+
+            {{-- Footer --}}
+            <div class="space-y-3">
+                {{-- Dots --}}
+                <div id="tutorialDots" class="flex items-center justify-center gap-1.5"></div>
+
+                {{-- Buttons --}}
+                <div class="flex items-center justify-between gap-2">
+                    <button id="tutorialSkipBtn" class="px-3 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors shrink-0">
+                        Lewati
+                    </button>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button id="tutorialPrevBtn" class="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-b-4 border-slate-200 dark:border-gray-600 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-gray-700 active:translate-y-1 active:border-b-2 transition-all" style="display:none;">
+                            <i class="fas fa-arrow-left text-sm"></i>
+                        </button>
+
+                        <button id="tutorialNextBtn" class="px-5 py-2.5 rounded-xl border-2 border-b-4 border-[#1899d6] bg-[#1cb0f6] text-white text-xs font-black uppercase tracking-[0.15em] hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all whitespace-nowrap">
+                            Lanjut <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Floating Help Button --}}
+<div class="fixed bottom-[5.5rem] right-4 sm:bottom-6 sm:right-6 z-50">
+    <button onclick="openQuizTutorial()" class="flex items-center justify-center w-14 h-14 rounded-full bg-white dark:bg-gray-800 border-2 border-b-[4px] border-[#1cb0f6] dark:border-[#1899d6] text-[#1cb0f6] dark:text-[#1899d6] hover:bg-[#1cb0f6]/10 dark:hover:bg-[#1899d6]/20 active:translate-y-[2px] active:border-b-2 transition-all shadow-lg" title="Cara Main Quiz">
+        <i class="fas fa-question text-xl"></i>
+    </button>
+</div>
+
+<style>
+    #quizTutorialOverlay.tutorial-active #tutorialModal {
+        transform: scale(1);
+        opacity: 1;
+    }
+    .tutorial-visual-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border: 2px solid #e2e8f0;
+        border-bottom-width: 6px;
+        border-radius: 1.25rem;
+        padding: 1rem 1.25rem;
+    }
+    html.dark .tutorial-visual-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-color: #334155;
+    }
+    .tutorial-visual-card .visual-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+        border: 2px solid;
+        border-bottom-width: 4px;
+    }
+    .tutorial-mini-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.625rem;
+        font-size: 0.625rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-radius: 0.5rem;
+        border: 2px solid;
+        border-bottom-width: 3px;
+    }
+    @keyframes tutorialPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    .tutorial-pulse {
+        animation: tutorialPulse 2s ease-in-out infinite;
+    }
+</style>
+
 <script>
+    // Tutorial Steps Data
+    const tutorialSteps = [
+        {
+            icon: 'fas fa-torii-gate',
+            color: '#1cb0f6',
+            title: 'Selamat Datang!',
+            desc: 'Ini adalah <b>Peta Quiz</b> — petualanganmu belajar bahasa Jepang! Setiap lingkaran di peta adalah sebuah <b>misi quiz</b> yang harus kamu selesaikan untuk membuka misi berikutnya.',
+            visual: `
+                <div class="tutorial-visual-card flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-[#1cb0f6] border-2 border-b-4 border-[#1899d6] flex items-center justify-center text-white text-lg tutorial-pulse">
+                        <i class="fas fa-play ml-0.5"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-wide">Misi Saat Ini</p>
+                        <p class="text-[10px] font-bold text-slate-400">Tekan tombol biru untuk memulai!</p>
+                    </div>
+                </div>
+            `
+        },
+        {
+            icon: 'fas fa-list-ul',
+            color: '#6366f1',
+            title: 'Pilihan Ganda',
+            desc: 'Untuk soal <b>pilihan ganda</b>, kamu akan melihat pertanyaan dan beberapa opsi jawaban. <b>Pilih jawaban yang benar</b> dari opsi yang tersedia.',
+            visual: `
+                <div class="tutorial-visual-card space-y-2">
+                    <p class="text-xs font-black text-slate-600 dark:text-slate-300 mb-2"><i class="fas fa-question-circle text-indigo-500 mr-1"></i> Apa arti dari "あ" ?</p>
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-slate-200 dark:border-gray-600 text-xs font-bold text-slate-500 dark:text-slate-400"><span class="tutorial-mini-btn border-slate-300 dark:border-gray-500 text-slate-400">1</span> Ka</div>
+                        <div class="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 text-xs font-black text-emerald-600 dark:text-emerald-400"><span class="tutorial-mini-btn border-emerald-400 text-emerald-500">2</span> A <i class="fas fa-check-circle ml-auto text-emerald-500"></i></div>
+                        <div class="flex items-center gap-2 px-3 py-2 rounded-lg border-2 border-slate-200 dark:border-gray-600 text-xs font-bold text-slate-500 dark:text-slate-400"><span class="tutorial-mini-btn border-slate-300 dark:border-gray-500 text-slate-400">3</span> I</div>
+                    </div>
+                </div>
+            `
+        },
+        {
+            icon: 'fas fa-pencil-alt',
+            color: '#10b981',
+            title: 'Soal Menggambar',
+            desc: 'Untuk soal <b>menggambar</b>, kamu harus <b>menulis huruf Jepang</b> di kanvas. Ikuti urutan goresan yang benar, lalu tekan tombol <b>"Periksa"</b> untuk mengecek jawabanmu.',
+            visual: `
+                <div class="tutorial-visual-card">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-16 h-16 rounded-xl border-2 border-b-4 border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900 flex items-center justify-center relative">
+                            <span class="text-2xl text-slate-300 dark:text-gray-600 font-bold">あ</span>
+                            <i class="fas fa-pen absolute -bottom-1 -right-1 text-emerald-500 text-xs bg-white dark:bg-gray-800 rounded-full p-1 border border-emerald-300"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs font-black text-slate-600 dark:text-slate-300">Tulis huruf di kanvas</p>
+                            <p class="text-[10px] font-bold text-slate-400">Ikuti urutan goresan!</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-center gap-2">
+                        <span class="tutorial-mini-btn border-slate-300 dark:border-gray-500 text-slate-400 bg-white dark:bg-gray-700"><i class="fas fa-trash-alt"></i> Reset</span>
+                        <span class="tutorial-mini-btn border-slate-300 dark:border-gray-500 text-slate-400 bg-white dark:bg-gray-700"><i class="fas fa-undo"></i> Undo</span>
+                        <span class="tutorial-mini-btn border-[#1899d6] bg-[#1cb0f6] text-white tutorial-pulse"><i class="fas fa-check"></i> Periksa</span>
+                    </div>
+                </div>
+            `
+        },
+        {
+            icon: 'fas fa-lightbulb',
+            color: '#f59e0b',
+            title: 'Gunakan Bantuan',
+            desc: 'Bingung? Kamu bisa menekan tombol <b>"Gunakan Bantuan"</b> untuk melihat <b>hint/petunjuk</b>. Untuk soal menggambar, hint akan menampilkan <b>garis panduan goresan</b> di kanvas.',
+            visual: `
+                <div class="tutorial-visual-card flex items-center gap-3">
+                    <div class="visual-icon bg-amber-100 dark:bg-amber-900/30 text-amber-500 border-amber-200 dark:border-amber-700">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-wide">Gunakan Bantuan</p>
+                        <p class="text-[10px] font-bold text-slate-400">Muncul petunjuk arti huruf / goresan</p>
+                    </div>
+                    <span class="tutorial-mini-btn border-amber-300 text-amber-500 bg-amber-50 dark:bg-amber-900/30">H</span>
+                </div>
+            `
+        },
+        {
+            icon: 'fas fa-arrows-alt-h',
+            color: '#8b5cf6',
+            title: 'Navigasi Soal',
+            desc: 'Gunakan tombol <b>"Lanjut"</b> dan <b>"Kembali"</b> untuk berpindah antar soal. Semua soal harus dijawab sebelum bisa menyelesaikan quiz. Kamu harus mendapat <b>skor 100%</b> untuk lulus misi!',
+            visual: `
+                <div class="tutorial-visual-card">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="tutorial-mini-btn border-slate-300 dark:border-gray-500 text-slate-400 bg-white dark:bg-gray-700"><i class="fas fa-chevron-left"></i></span>
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#1cb0f6] ring-2 ring-[#1cb0f6]/30"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-gray-600"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-gray-600"></div>
+                        </div>
+                        <span class="tutorial-mini-btn border-[#1899d6] bg-[#1cb0f6] text-white">Lanjut <i class="fas fa-chevron-right"></i></span>
+                    </div>
+                    <p class="text-[10px] font-bold text-center text-slate-400 mt-2 uppercase tracking-wider">3 / 5 Soal</p>
+                </div>
+            `
+        },
+        {
+            icon: 'fas fa-rocket',
+            color: '#1cb0f6',
+            title: 'Siap Bermain!',
+            desc: 'Sekarang kamu sudah paham cara mainnya! Pilih misi di peta dan mulai petualanganmu. <b>Ganbare! (がんばれ!)</b> 🎌',
+            visual: `
+                <div class="tutorial-visual-card text-center py-4">
+                    <div class="text-4xl mb-2">🏯</div>
+                    <p class="text-sm font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest">Selamat Berpetualang!</p>
+                    <p class="text-xs font-bold text-slate-400 mt-1">Selesaikan semua misi untuk jadi master!</p>
+                </div>
+            `
+        }
+    ];
+
+    let tutorialCurrentStep = 0;
+
+    function openQuizTutorial() {
+        tutorialCurrentStep = 0;
+        const overlay = document.getElementById('quizTutorialOverlay');
+        overlay.style.display = 'flex';
+        requestAnimationFrame(() => {
+            overlay.classList.add('tutorial-active');
+            renderTutorialStep(0);
+        });
+    }
+
+    function closeQuizTutorial() {
+        const overlay = document.getElementById('quizTutorialOverlay');
+        overlay.classList.remove('tutorial-active');
+        setTimeout(() => { overlay.style.display = 'none'; }, 300);
+        localStorage.setItem('hasSeenQuizTutorial', 'true');
+    }
+
+    function renderTutorialStep(idx) {
+        tutorialCurrentStep = idx;
+        const step = tutorialSteps[idx];
+        const total = tutorialSteps.length;
+
+        // Progress bar
+        document.getElementById('tutorialProgressBar').style.width = ((idx + 1) / total * 100) + '%';
+
+        // Icon
+        const iconEl = document.getElementById('tutorialStepIcon');
+        iconEl.innerHTML = '<i class="' + step.icon + '"></i>';
+        iconEl.style.background = step.color + '1a';
+        iconEl.style.color = step.color;
+        iconEl.style.borderColor = step.color + '33';
+
+        // Text
+        document.getElementById('tutorialStepLabel').textContent = 'Langkah ' + (idx + 1) + ' dari ' + total;
+        document.getElementById('tutorialStepTitle').textContent = step.title;
+        document.getElementById('tutorialStepDesc').innerHTML = step.desc;
+
+        // Visual
+        document.getElementById('tutorialStepVisual').innerHTML = step.visual;
+
+        // Prev button
+        document.getElementById('tutorialPrevBtn').style.display = idx > 0 ? '' : 'none';
+
+        // Next button
+        const nextBtn = document.getElementById('tutorialNextBtn');
+        if (idx === total - 1) {
+            nextBtn.innerHTML = '<i class="fas fa-check mr-1"></i> Mengerti!';
+        } else {
+            nextBtn.innerHTML = 'Lanjut <i class="fas fa-arrow-right ml-1"></i>';
+        }
+
+        // Skip button
+        document.getElementById('tutorialSkipBtn').style.display = idx === total - 1 ? 'none' : '';
+
+        // Dots
+        const dotsEl = document.getElementById('tutorialDots');
+        dotsEl.innerHTML = '';
+        for (let i = 0; i < total; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'rounded-full transition-all duration-200 ' +
+                (i === idx ? 'w-2.5 h-2.5 bg-[#1cb0f6]' : 'w-2 h-2 bg-slate-300 dark:bg-gray-600');
+            dotsEl.appendChild(dot);
+        }
+    }
+
+    // Event listeners
     document.addEventListener('DOMContentLoaded', function() {
         // Auto-scroll to current mission
         const currentMission = document.getElementById('current-mission');
@@ -163,6 +461,31 @@
             setTimeout(() => {
                 currentMission.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 300);
+        }
+
+        // Tutorial buttons
+        document.getElementById('tutorialNextBtn').addEventListener('click', function() {
+            if (tutorialCurrentStep < tutorialSteps.length - 1) {
+                renderTutorialStep(tutorialCurrentStep + 1);
+            } else {
+                closeQuizTutorial();
+            }
+        });
+
+        document.getElementById('tutorialPrevBtn').addEventListener('click', function() {
+            if (tutorialCurrentStep > 0) {
+                renderTutorialStep(tutorialCurrentStep - 1);
+            }
+        });
+
+        document.getElementById('tutorialSkipBtn').addEventListener('click', closeQuizTutorial);
+        document.getElementById('tutorialBackdrop').addEventListener('click', closeQuizTutorial);
+
+        // Auto-show tutorial on first visit
+        if (!localStorage.getItem('hasSeenQuizTutorial')) {
+            setTimeout(() => {
+                openQuizTutorial();
+            }, 600);
         }
     });
 </script>
