@@ -107,5 +107,5 @@ const QUIZ_TITLE = @json($quiz->title);
 const QUESTIONS  = @json($questions);
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
 </script>
-<script src="{{ asset('js/quiz-new-play.js') }}"></script>
+<script src="{{ asset('js/quiz-new-play.js') }}?v={{ filemtime(public_path('js/quiz-new-play.js')) }}"></script>
 @endsection
