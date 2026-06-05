@@ -11,7 +11,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
     <script>
-        if (localStorage.getItem('darkMode') !== 'false') {
+        if (localStorage.getItem('darkMode') === 'true') {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -19,7 +19,7 @@
     </script>
 </head>
 <body class="min-h-screen flex bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans p-4 sm:p-6 transition-colors duration-300 relative overflow-x-hidden overflow-y-auto"
-      x-data="{ darkMode: localStorage.getItem('darkMode') !== 'false' }"
+      x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }"
       x-init="if(darkMode) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark')">
 
     {{-- Background ornaments --}}
