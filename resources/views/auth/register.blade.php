@@ -145,11 +145,19 @@
                     </label>
 
                     <div class="w-full bg-slate-50 dark:bg-gray-900 border-2 border-b-[4px] border-slate-200 dark:border-gray-700 rounded-2xl p-3 flex justify-center overflow-hidden">
-                        <div class="cf-turnstile"
+                        <div id="turnstile-container"
+                            class="cf-turnstile"
                             data-sitekey="{{ config('services.turnstile.site_key') }}"
-                            data-theme="light">
+                            data-theme="light"
+                            data-callback="onTurnstileSuccess"
+                            data-expired-callback="onTurnstileExpired"
+                            data-error-callback="onTurnstileError">
                         </div>
                     </div>
+
+                    <p id="turnstileError" class="mt-2 text-xs font-bold text-rose-500 hidden">
+                        <i class="fas fa-exclamation-circle mr-1"></i> <span id="turnstileErrorMsg"></span>
+                    </p>
 
                     @error('cf-turnstile-response')
                         <p class="mt-2 text-xs font-bold text-rose-500">
@@ -183,6 +191,9 @@
     </div>
 </body>
 <script>
+    // ═══════════════════════════════════════════════
+    // Password Toggle
+    // ═══════════════════════════════════════════════
     function togglePasswordVisibility(id, el) {
         const input = document.getElementById(id);
         const icon = el.querySelector('i');
@@ -198,18 +209,194 @@
         }
     }
 
-    document.querySelector('form').addEventListener('submit', function(e) {
+    // ═══════════════════════════════════════════════
+    // Turnstile Callbacks & Auto-Reset
+    // ═══════════════════════════════════════════════
+    let turnstileReady = false;
+    let turnstileResetTimer = null;
+
+    function onTurnstileSuccess(token) {
+        turnstileReady = true;
+        hideTurnstileError();
+        // Reset Turnstile sebelum expired (Turnstile token berlaku ~300 detik)
+        clearTimeout(turnstileResetTimer);
+        turnstileResetTimer = setTimeout(() => {
+            resetTurnstile();
+        }, 250000); // Reset setelah ~4 menit 10 detik (sebelum 5 menit expired)
+    }
+
+    function onTurnstileExpired() {
+        turnstileReady = false;
+        showTurnstileError('CAPTCHA kedaluwarsa, sedang direset otomatis...');
+        resetTurnstile();
+    }
+
+    function onTurnstileError() {
+        turnstileReady = false;
+        showTurnstileError('CAPTCHA gagal dimuat. Coba refresh halaman.');
+    }
+
+    function resetTurnstile() {
+        turnstileReady = false;
+        if (typeof turnstile !== 'undefined') {
+            turnstile.reset('#turnstile-container');
+        }
+    }
+
+    function showTurnstileError(msg) {
+        const el = document.getElementById('turnstileError');
+        document.getElementById('turnstileErrorMsg').textContent = msg;
+        el.classList.remove('hidden');
+    }
+
+    function hideTurnstileError() {
+        document.getElementById('turnstileError').classList.add('hidden');
+    }
+
+    // ═══════════════════════════════════════════════
+    // CSRF Token Auto-Refresh (setiap 5 menit)
+    // ═══════════════════════════════════════════════
+    async function refreshCsrfToken() {
+        try {
+            const res = await fetch('/csrf-refresh', { credentials: 'same-origin' });
+            if (res.ok) {
+                const data = await res.json();
+                // Update meta tag
+                const meta = document.querySelector('meta[name="csrf-token"]');
+                if (meta) meta.content = data.token;
+                // Update hidden input di form
+                const input = document.querySelector('input[name="_token"]');
+                if (input) input.value = data.token;
+            }
+        } catch (e) {
+            // Silently fail - will retry next interval
+        }
+    }
+
+    // Refresh CSRF token setiap 5 menit
+    setInterval(refreshCsrfToken, 5 * 60 * 1000);
+
+    // ═══════════════════════════════════════════════
+    // Form Submit Handler (AJAX dengan retry 419)
+    // ═══════════════════════════════════════════════
+    document.querySelector('form').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Cegah native submit
+
+        const form = this;
         const btn = document.getElementById('submitBtn');
         const content = document.getElementById('btnContent');
         const loading = document.getElementById('btnLoading');
 
         // Cek Turnstile sudah diisi
         const turnstileResponse = document.querySelector('[name="cf-turnstile-response"]');
-        if (turnstileResponse && !turnstileResponse.value) return;
+        if (!turnstileResponse || !turnstileResponse.value) {
+            showTurnstileError('Selesaikan verifikasi CAPTCHA terlebih dahulu.');
+            return;
+        }
 
+        // Show loading
         btn.disabled = true;
         content.classList.add('hidden');
         loading.classList.remove('hidden');
+
+        try {
+            const formData = new FormData(form);
+
+            let res = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html',
+                },
+            });
+
+            // Jika 419 (CSRF expired), refresh token dan coba lagi SEKALI
+            if (res.status === 419) {
+                await refreshCsrfToken();
+                // Reset Turnstile juga karena mungkin expired
+                resetTurnstile();
+
+                // Tunggu Turnstile ready (max 10 detik)
+                let waited = 0;
+                while (!turnstileReady && waited < 10000) {
+                    await new Promise(r => setTimeout(r, 500));
+                    waited += 500;
+                }
+
+                if (!turnstileReady) {
+                    showFormError('Verifikasi keamanan gagal. Silakan refresh halaman dan coba lagi.');
+                    resetBtn(btn, content, loading);
+                    return;
+                }
+
+                // Rebuild FormData dengan token baru
+                const newFormData = new FormData(form);
+                res = await fetch(form.action, {
+                    method: 'POST',
+                    body: newFormData,
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html',
+                    },
+                });
+            }
+
+            // Jika berhasil redirect (302/303), follow redirect
+            if (res.redirected) {
+                window.location.href = res.url;
+                return;
+            }
+
+            // Jika server mengembalikan HTML (validation errors), parse dan tampilkan
+            if (res.status === 422 || res.status === 200) {
+                // Untuk 422, Laravel redirect back dengan errors
+                // Kita submit ulang secara native agar error tampil
+                const html = await res.text();
+
+                // Jika ada redirect di HTML
+                if (res.url && res.url !== window.location.href) {
+                    window.location.href = res.url;
+                    return;
+                }
+
+                // Replace halaman dengan response
+                document.open();
+                document.write(html);
+                document.close();
+                return;
+            }
+
+            // Fallback: submit native
+            form.removeEventListener('submit', arguments.callee);
+            form.submit();
+
+        } catch (err) {
+            showFormError('Koneksi gagal. Periksa internet Anda dan coba lagi.');
+            resetBtn(btn, content, loading);
+        }
     });
+
+    function resetBtn(btn, content, loading) {
+        btn.disabled = false;
+        content.classList.remove('hidden');
+        loading.classList.add('hidden');
+    }
+
+    function showFormError(msg) {
+        // Cek jika error container sudah ada
+        let errDiv = document.getElementById('ajaxErrorBanner');
+        if (!errDiv) {
+            errDiv = document.createElement('div');
+            errDiv.id = 'ajaxErrorBanner';
+            errDiv.className = 'w-full mb-6 bg-rose-50 dark:bg-rose-900/20 border-2 border-b-4 border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 px-5 py-4 rounded-2xl text-sm font-bold flex items-start gap-3';
+            const form = document.querySelector('form');
+            form.parentNode.insertBefore(errDiv, form);
+        }
+        errDiv.innerHTML = '<i class="fas fa-exclamation-triangle mt-0.5 text-lg"></i> ' + msg;
+        errDiv.classList.remove('hidden');
+    }
 </script>
 </html>

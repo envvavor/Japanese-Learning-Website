@@ -26,6 +26,11 @@ use Illuminate\Support\Facades\Http;
 
 
 
+// CSRF Token Refresh (prevents 419 on long-open forms)
+Route::get('/csrf-refresh', function () {
+    return response()->json(['token' => csrf_token()]);
+})->name('csrf.refresh');
+
 // Public routes
 Route::get('/', function () {
     return view('welcome');
