@@ -174,9 +174,11 @@
                         (ua.indexOf("FBAV") > -1) || 
                         (ua.indexOf("Instagram") > -1) || 
                         (ua.indexOf("Threads") > -1) ||
+                        (ua.indexOf("Barcelona") > -1) ||
                         (ua.indexOf("Line") > -1) ||
                         (ua.indexOf("TikTok") > -1) ||
-                        (ua.indexOf("MicroMessenger") > -1);
+                        (ua.indexOf("MicroMessenger") > -1) ||
+                        (ua.indexOf("; wv)") > -1);
 
         if (isInApp) {
             const banner = document.createElement('div');
