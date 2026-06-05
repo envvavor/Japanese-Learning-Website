@@ -456,7 +456,11 @@ function showResults(data) {
     h += '<div class="flex flex-col sm:flex-row gap-4 mt-6">';
     h += '<a href="/quizzes" class="flex-1 py-4 rounded-2xl text-sm font-black border-2 border-b-[6px] border-slate-200 dark:border-gray-600 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-700 active:translate-y-1 active:border-b-2 transition-all text-center uppercase tracking-widest"><i class="fas fa-map-marked-alt mr-2"></i> Peta</a>';
     if (!passed) {
-        h += '<button onclick="location.reload()" class="flex-1 py-4 rounded-2xl text-sm font-black border-2 border-b-[6px] border-[#1899d6] bg-[#1cb0f6] text-white hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all uppercase tracking-widest"><i class="fas fa-redo-alt mr-2"></i> Coba Lagi</button>';
+        let retryUrl = window.location.pathname;
+        if (data.wrong_item_ids && data.wrong_item_ids.length > 0) {
+            retryUrl += '?retry=' + data.wrong_item_ids.join(',');
+        }
+        h += '<button onclick="window.location.href=\'' + retryUrl + '\'" class="flex-1 py-4 rounded-2xl text-sm font-black border-2 border-b-[6px] border-[#1899d6] bg-[#1cb0f6] text-white hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all uppercase tracking-widest"><i class="fas fa-redo-alt mr-2"></i> Coba Lagi</button>';
     } else {
         h += '<a href="/quizzes" class="flex-1 py-4 rounded-2xl text-sm font-black border-2 border-b-[6px] border-emerald-600 bg-emerald-500 text-white hover:brightness-110 active:translate-y-1 active:border-b-2 transition-all text-center uppercase tracking-widest"><i class="fas fa-forward mr-2"></i> Lanjut</a>';
     }

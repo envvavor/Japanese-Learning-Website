@@ -52,7 +52,7 @@ class QuizNewController extends Controller
     /**
      * Show a single quiz (start screen + begin attempt).
      */
-    public function show(Quiz $quiz)
+    public function show(Request $request, Quiz $quiz)
     {
         $userId = Auth::id();
 
@@ -72,8 +72,18 @@ class QuizNewController extends Controller
             $q->orderBy('order');
         }, 'items.kanji']);
 
+        $items = $quiz->items;
+
+        // Filter if retry
+        if ($request->has('retry')) {
+            $retryIds = explode(',', $request->query('retry'));
+            $items = $items->filter(function($item) use ($retryIds) {
+                return in_array($item->id, $retryIds);
+            })->values(); // reset keys
+        }
+
         // Build questions payload for JS
-        $questions = $quiz->items->map(function ($item) {
+        $questions = $items->map(function ($item) {
             $data = [
                 'id'            => $item->id,
                 'question_type' => $item->question_type,
@@ -156,6 +166,7 @@ class QuizNewController extends Controller
         $userId          = Auth::id();
         $totalQuestions  = count($validated['answers']);
         $correctAnswers  = collect($validated['answers'])->where('is_correct', true)->count();
+        $wrongItemIds    = collect($validated['answers'])->where('is_correct', false)->pluck('item_id')->toArray();
         $score           = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100, 2) : 0;
         $passed          = ($score >= 100); // Must be perfect
 
@@ -185,6 +196,7 @@ class QuizNewController extends Controller
             'xp_earned' => $xpEarned,
             'new_level' => Auth::user()->level,
             'new_xp'    => Auth::user()->xp,
+            'wrong_item_ids' => $wrongItemIds,
         ]);
     }
 }
