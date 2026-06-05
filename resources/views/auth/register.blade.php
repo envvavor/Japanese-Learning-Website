@@ -398,5 +398,35 @@
         errDiv.innerHTML = '<i class="fas fa-exclamation-triangle mt-0.5 text-lg"></i> ' + msg;
         errDiv.classList.remove('hidden');
     }
+
+    // ═══════════════════════════════════════════════
+    // In-App Browser Detection
+    // ═══════════════════════════════════════════════
+    function detectInAppBrowser() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isInApp = (ua.indexOf("FBAN") > -1) || 
+                        (ua.indexOf("FBAV") > -1) || 
+                        (ua.indexOf("Instagram") > -1) || 
+                        (ua.indexOf("Threads") > -1) ||
+                        (ua.indexOf("Line") > -1) ||
+                        (ua.indexOf("TikTok") > -1) ||
+                        (ua.indexOf("MicroMessenger") > -1);
+
+        if (isInApp) {
+            const banner = document.createElement('div');
+            banner.className = 'fixed top-0 left-0 w-full bg-amber-500 border-b-4 border-amber-600 text-white p-4 z-[9999] shadow-lg flex flex-col items-center justify-center text-center';
+            banner.innerHTML = `
+                <div class="font-black uppercase tracking-widest text-sm mb-2"><i class="fas fa-exclamation-triangle mr-2"></i> Peringatan Aplikasi</div>
+                <div class="text-xs font-bold leading-relaxed max-w-md text-amber-50">
+                    Untuk mencegah error saat mendaftar, sangat disarankan membuka web ini langsung lewat aplikasi browser bawaan (Chrome/Safari) dengan memilih menu <b>"Open in Browser"</b>.
+                </div>
+                <button onclick="this.parentElement.remove()" class="mt-3 bg-white text-amber-600 border-2 border-b-4 border-amber-100 hover:bg-amber-50 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:translate-y-1 active:border-b-2 shadow-sm">
+                    Saya Mengerti
+                </button>
+            `;
+            document.body.appendChild(banner);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', detectInAppBrowser);
 </script>
 </html>
