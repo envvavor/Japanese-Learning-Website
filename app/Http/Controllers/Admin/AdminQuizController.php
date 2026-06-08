@@ -114,9 +114,9 @@ class AdminQuizController extends Controller
     public function storeItem(Request $request, Quiz $quiz)
     {
         $validated = $request->validate([
-            'question_type'  => 'required|in:multiple_choice,drawing,listening',
+            'question_type'  => 'required|in:multiple_choice,drawing,listening,matching',
             'question_text'  => 'required|string',
-            'correct_answer' => 'required|string',
+            'correct_answer' => 'nullable|string',
             'options'        => 'nullable|array',
             'options.*'      => 'nullable|string',
             'audio_url'      => 'nullable|string',
@@ -127,11 +127,12 @@ class AdminQuizController extends Controller
         if (in_array($validated['question_type'], ['multiple_choice', 'listening'])) {
             $options = array_values(array_filter($validated['options'] ?? [], fn($o) => !empty($o)));
             $validated['options'] = $options ?: null;
+        } elseif ($validated['question_type'] === 'matching') {
+            // For matching, options is an array of JSON pairs. Reindex and store as is.
+            $options = array_values(array_filter($validated['options'] ?? [], fn($o) => !empty($o)));
+            $validated['options'] = $options ?: null;
+            $validated['correct_answer'] = 'completed';
         } else {
-            $validated['options'] = null;
-        }
-
-        if ($validated['question_type'] === 'drawing') {
             $validated['options'] = null;
         }
 
@@ -162,9 +163,9 @@ class AdminQuizController extends Controller
     public function updateItem(Request $request, Quiz $quiz, QuizItem $item)
     {
         $validated = $request->validate([
-            'question_type'  => 'required|in:multiple_choice,drawing,listening',
+            'question_type'  => 'required|in:multiple_choice,drawing,listening,matching',
             'question_text'  => 'required|string',
-            'correct_answer' => 'required|string',
+            'correct_answer' => 'nullable|string',
             'options'        => 'nullable|array',
             'options.*'      => 'nullable|string',
             'audio_url'      => 'nullable|string',
@@ -175,11 +176,12 @@ class AdminQuizController extends Controller
         if (in_array($validated['question_type'], ['multiple_choice', 'listening'])) {
             $options = array_values(array_filter($validated['options'] ?? [], fn($o) => !empty($o)));
             $validated['options'] = $options ?: null;
+        } elseif ($validated['question_type'] === 'matching') {
+            // For matching, options is an array of JSON pairs. Reindex and store as is.
+            $options = array_values(array_filter($validated['options'] ?? [], fn($o) => !empty($o)));
+            $validated['options'] = $options ?: null;
+            $validated['correct_answer'] = 'completed';
         } else {
-            $validated['options'] = null;
-        }
-
-        if ($validated['question_type'] === 'drawing') {
             $validated['options'] = null;
         }
 

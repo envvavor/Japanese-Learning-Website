@@ -46,7 +46,7 @@
             {{-- === TYPE SELECTOR === --}}
             <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Pilih Jenis Soal</label>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <button type="button" onclick="selectType('multiple_choice')" data-type="multiple_choice"
                             class="type-btn p-4 rounded-xl border-2 text-left transition-all group">
                         <div class="flex items-center gap-2 mb-2">
@@ -76,6 +76,16 @@
                         </div>
                         <p class="font-bold text-gray-800 dark:text-gray-200">Listening</p>
                         <p class="text-xs text-gray-500 mt-1">Soal audio berbasis ElevenLabs.</p>
+                    </button>
+                    <button type="button" onclick="selectType('matching')" data-type="matching"
+                            class="type-btn p-4 rounded-xl border-2 text-left transition-all group">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-8 h-8 rounded-lg bg-pink-100 dark:bg-pink-900/40 flex items-center justify-center">
+                                <i class="fas fa-puzzle-piece text-pink-500 text-sm"></i>
+                            </div>
+                        </div>
+                        <p class="font-bold text-gray-800 dark:text-gray-200">Mencocokkan</p>
+                        <p class="text-xs text-gray-500 mt-1">Pasangkan kata kiri dan kanan.</p>
                     </button>
                 </div>
             </div>
@@ -236,6 +246,43 @@
                 </div>
             </div>
 
+            {{-- ================================================================
+                 MATCHING SECTION
+                 ================================================================ --}}
+            <div id="matching-section" class="hidden space-y-4 p-5 bg-pink-50 dark:bg-pink-900/10 rounded-xl border border-pink-100 dark:border-pink-900/50">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-sm font-bold text-pink-700 dark:text-pink-400">
+                        <i class="fas fa-puzzle-piece mr-1"></i> Pasangan Kata
+                    </p>
+                    <button type="button" onclick="addMatchingPair()"
+                            class="px-3 py-1.5 bg-pink-200 dark:bg-pink-800 hover:bg-pink-300 dark:hover:bg-pink-700 text-pink-700 dark:text-pink-100 text-xs font-bold rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-1"></i> Tambah
+                    </button>
+                </div>
+                
+                <div id="matching-pairs-container" class="space-y-3">
+                    <div class="matching-pair-row flex items-center gap-3">
+                        <input type="hidden" name="options[]" class="matching-json-input">
+                        <input type="text" placeholder="Kiri (ex: 犬)" class="matching-left flex-1 px-4 py-2.5 rounded-xl border border-pink-200 dark:border-pink-800 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500" oninput="updateMatchingJson(this)">
+                        <i class="fas fa-arrows-alt-h text-pink-300 dark:text-pink-700"></i>
+                        <input type="text" placeholder="Kanan (ex: Anjing)" class="matching-right flex-1 px-4 py-2.5 rounded-xl border border-pink-200 dark:border-pink-800 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500" oninput="updateMatchingJson(this)">
+                        <button type="button" onclick="removeMatchingPair(this)" class="w-10 h-10 flex items-center justify-center rounded-xl text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:text-rose-600 transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="matching-pair-row flex items-center gap-3">
+                        <input type="hidden" name="options[]" class="matching-json-input">
+                        <input type="text" placeholder="Kiri (ex: 猫)" class="matching-left flex-1 px-4 py-2.5 rounded-xl border border-pink-200 dark:border-pink-800 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500" oninput="updateMatchingJson(this)">
+                        <i class="fas fa-arrows-alt-h text-pink-300 dark:text-pink-700"></i>
+                        <input type="text" placeholder="Kanan (ex: Kucing)" class="matching-right flex-1 px-4 py-2.5 rounded-xl border border-pink-200 dark:border-pink-800 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500" oninput="updateMatchingJson(this)">
+                        <button type="button" onclick="removeMatchingPair(this)" class="w-10 h-10 flex items-center justify-center rounded-xl text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:text-rose-600 transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-pink-500 mt-2"><i class="fas fa-info-circle mr-1"></i> Kartu akan otomatis diacak saat kuis dimainkan.</p>
+            </div>
+
             {{-- === COMMON FIELD: ORDER === --}}
             <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -281,6 +328,7 @@
             multiple_choice: { border: 'border-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', ring: 'ring-indigo-500' },
             drawing:         { border: 'border-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', ring: 'ring-emerald-500' },
             listening:       { border: 'border-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', ring: 'ring-amber-500' },
+            matching:        { border: 'border-pink-500',   bg: 'bg-pink-50 dark:bg-pink-900/20',   ring: 'ring-pink-500' },
         };
 
         document.querySelectorAll('.type-btn').forEach(btn => {
@@ -297,6 +345,7 @@
             multiple_choice: 'mc-section',
             drawing:         'drawing-section',
             listening:       'listening-section',
+            matching:        'matching-section',
         };
 
         for (const [key, id] of Object.entries(sections)) {
@@ -314,6 +363,43 @@
     // ─── Action (Save vs Save & Add) ─────────────────────────────────────────
     function setAction(action) {
         document.getElementById('form_action').value = action;
+    }
+
+    // ─── Matching Handlers ───────────────────────────────────────────────────
+    function addMatchingPair() {
+        const container = document.getElementById('matching-pairs-container');
+        const html = `
+            <div class="matching-pair-row flex items-center gap-3">
+                <input type="hidden" name="options[]" class="matching-json-input">
+                <input type="text" placeholder="Kiri" class="matching-left flex-1 px-4 py-2.5 rounded-xl border border-pink-200 dark:border-pink-800 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500" oninput="updateMatchingJson(this)">
+                <i class="fas fa-arrows-alt-h text-pink-300 dark:text-pink-700"></i>
+                <input type="text" placeholder="Kanan" class="matching-right flex-1 px-4 py-2.5 rounded-xl border border-pink-200 dark:border-pink-800 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500" oninput="updateMatchingJson(this)">
+                <button type="button" onclick="removeMatchingPair(this)" class="w-10 h-10 flex items-center justify-center rounded-xl text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:text-rose-600 transition-colors">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function removeMatchingPair(btn) {
+        if (document.querySelectorAll('.matching-pair-row').length > 1) {
+            btn.closest('.matching-pair-row').remove();
+        } else {
+            showError('Minimal harus ada 1 pasangan!');
+        }
+    }
+
+    function updateMatchingJson(input) {
+        const row = input.closest('.matching-pair-row');
+        const left = row.querySelector('.matching-left').value.trim();
+        const right = row.querySelector('.matching-right').value.trim();
+        const hidden = row.querySelector('.matching-json-input');
+        if (left && right) {
+            hidden.value = JSON.stringify({ left, right });
+        } else {
+            hidden.value = '';
+        }
     }
 
     // ─── Multiple Choice Sync ─────────────────────────────────────────────────
@@ -531,6 +617,14 @@
             if (!checked || !checked.value.trim()) {
                 e.preventDefault();
                 showError('Pilih satu jawaban yang benar untuk soal Listening!');
+            }
+        } else if (currentType === 'matching') {
+            const pairs = document.querySelectorAll('.matching-json-input');
+            let validCount = 0;
+            pairs.forEach(p => { if (p.value) validCount++; });
+            if (validCount < 2) {
+                e.preventDefault();
+                showError('Soal mencocokkan minimal harus memiliki 2 pasangan yang terisi penuh!');
             }
         }
     });

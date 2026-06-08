@@ -42,7 +42,7 @@ class QuizController extends Controller
     {
         $validated = $request->validate([
             'category' => 'nullable|string',
-            'quiz_type' => 'required|in:multiple_choice,drawing,listening,mixed',
+            'quiz_type' => 'required|in:multiple_choice,drawing,listening,matching,mixed',
             'question_count' => 'required|in:5,10,15,20',
         ]);
 
@@ -90,14 +90,16 @@ class QuizController extends Controller
             $assignedType = $quizType;
 
             if ($quizType === 'mixed') {
-                // Random assign with weights: 40% MC, 30% drawing, 30% listening
+                // Random assign with weights: 30% MC, 20% drawing, 20% listening, 30% matching
                 $rand = mt_rand(1, 100);
-                if ($rand <= 40) {
+                if ($rand <= 30) {
                     $assignedType = 'multiple_choice';
-                } elseif ($rand <= 70) {
+                } elseif ($rand <= 50) {
                     $assignedType = 'drawing';
-                } else {
+                } elseif ($rand <= 70) {
                     $assignedType = 'listening';
+                } else {
+                    $assignedType = 'matching';
                 }
 
                 // Skip drawing if no strokes, reassign to MC
@@ -152,6 +154,8 @@ class QuizController extends Controller
                 return $this->generateDrawing($kanji);
             case 'listening':
                 return $this->generateListening($kanji, $allKanjis, $category, $firstVoiceId);
+            case 'matching':
+                return $this->generateMatching($kanji, $allKanjis, $category);
             default:
                 return $this->generateMultipleChoice($kanji, $allKanjis, $category);
         }
@@ -285,6 +289,46 @@ class QuizController extends Controller
     }
 
     /**
+     * Generate a matching question.
+     */
+    private function generateMatching(Kanji $kanji, $allKanjis, ?string $category): array
+    {
+        $questionText = "Pasangkan karakter dengan artinya yang tepat!";
+
+        // We need 4 pairs (1 from current kanji, 3 from others)
+        $sameCategory = $allKanjis->where('id', '!=', $kanji->id);
+        if ($category) {
+            $sameCategoryFiltered = $sameCategory->where('category', $category);
+            if ($sameCategoryFiltered->count() >= 3) {
+                $sameCategory = $sameCategoryFiltered;
+            }
+        }
+
+        $candidates = $sameCategory->filter(function ($k) {
+            return !empty($k->character) && !empty($k->meaning);
+        });
+
+        $others = $candidates->random(min(3, $candidates->count()));
+
+        $pairs = [];
+        $pairs[] = json_encode(['left' => $kanji->character, 'right' => $kanji->meaning]);
+        foreach ($others as $otherKanji) {
+            $pairs[] = json_encode(['left' => $otherKanji->character, 'right' => $otherKanji->meaning]);
+        }
+
+        shuffle($pairs);
+
+        return [
+            'question_type' => 'matching',
+            'question_subtype' => null,
+            'question_text' => $questionText,
+            'correct_answer' => 'completed',
+            'options' => $pairs,
+            'audio_url' => null,
+        ];
+    }
+
+    /**
      * Get 3 wrong options from other kanjis.
      */
     private function getWrongOptions(Kanji $kanji, $allKanjis, ?string $category, string $field): array
@@ -349,6 +393,8 @@ class QuizController extends Controller
         // Determine is_correct
         if ($question->question_type === 'drawing') {
             $isCorrect = $accuracyScore !== null && $accuracyScore >= 75;
+        } elseif ($question->question_type === 'matching') {
+            $isCorrect = trim($userAnswer) === 'completed';
         } else {
             $isCorrect = trim($userAnswer) === trim($question->correct_answer);
 
@@ -369,7 +415,7 @@ class QuizController extends Controller
             if ($hintUsed || $textRevealed) {
                 $pointsEarned = 1;
             } else {
-                if ($question->question_type === 'drawing') {
+                if ($question->question_type === 'drawing' || $question->question_type === 'matching') {
                     $pointsEarned = 2;
                 } else {
                     if ($timeTaken !== null && $timeTaken <= 5) {

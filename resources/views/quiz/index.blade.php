@@ -58,7 +58,7 @@
         <h2 class="text-lg font-black text-slate-800 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
             <i class="fas fa-bullseye text-[#1cb0f6]"></i> Jenis Quiz
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="quizTypeOptions">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="quizTypeOptions">
             <button type="button" onclick="selectQuizType('multiple_choice')" data-type="multiple_choice"
                 class="quiz-type-card p-5 rounded-2xl border-2 border-b-[6px] border-slate-200 dark:border-gray-600 text-left transition-all duration-150 hover:bg-slate-50 dark:hover:bg-gray-700 active:translate-y-1 active:border-b-2 group">
                 <div class="flex items-center gap-3 mb-2">
@@ -90,6 +90,17 @@
                     <h3 class="font-black text-slate-800 dark:text-white uppercase tracking-wide">Mendengarkan</h3>
                 </div>
                 <p class="text-xs font-bold text-slate-500 dark:text-slate-400 ml-[60px]">Dengarkan dan jawab</p>
+            </button>
+
+            <button type="button" onclick="selectQuizType('matching')" data-type="matching"
+                class="quiz-type-card p-5 rounded-2xl border-2 border-b-[6px] border-slate-200 dark:border-gray-600 text-left transition-all duration-150 hover:bg-slate-50 dark:hover:bg-gray-700 active:translate-y-1 active:border-b-2 group">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="w-12 h-12 rounded-xl bg-pink-100 dark:bg-pink-900/30 text-pink-500 flex items-center justify-center text-xl">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </span>
+                    <h3 class="font-black text-slate-800 dark:text-white uppercase tracking-wide">Mencocokkan</h3>
+                </div>
+                <p class="text-xs font-bold text-slate-500 dark:text-slate-400 ml-[60px]">Pasangkan kata dengan arti</p>
             </button>
 
             <button type="button" onclick="selectQuizType('mixed')" data-type="mixed"
@@ -167,6 +178,7 @@
                             @case('multiple_choice') <i class="fas fa-list-ul mr-1"></i> Ganda @break
                             @case('drawing') <i class="fas fa-pencil-alt mr-1"></i> Gambar @break
                             @case('listening') <i class="fas fa-headphones mr-1"></i> Dengar @break
+                            @case('matching') <i class="fas fa-puzzle-piece mr-1"></i> Cocok @break
                             @case('mixed') <i class="fas fa-random mr-1"></i> Campur @break
                             @default {{ ucfirst($session->quiz_type) }}
                         @endswitch

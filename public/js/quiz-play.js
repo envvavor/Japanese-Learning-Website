@@ -83,6 +83,7 @@ function renderQuestion(){
 
   if(q.question_type==='multiple_choice'||q.question_type==='listening'){renderMC(q,cc)}
   else if(q.question_type==='drawing'){renderDrawing(q,cc)}
+  else if(q.question_type==='matching'){renderMatching(q,cc)}
 
   if(q.question_type==='listening'&&q.audio_url){renderAudioPlayer(cc,q.audio_url)}
 
@@ -123,7 +124,21 @@ function showHintContent(q){
   if(!hintArea)return;
 
   let html='<div class="inline-flex flex-col items-center px-5 py-3 border border-b-[4px] border-amber-300 dark:border-amber-700 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-center">';
-  html+='<span class="text-sm font-bold text-amber-600 dark:text-amber-400">💡 Hint: '+(q.meaning||q.correct_answer||'')+'</span>';
+  if(q.question_type==='matching'){
+    let pairText = '';
+    try {
+      if(q.options && q.options.length>0){
+        q.options.forEach(opt => {
+          const p = JSON.parse(opt);
+          pairText += `<div class="bg-amber-100 dark:bg-amber-800/50 px-3 py-1.5 rounded-lg border border-amber-200 dark:border-amber-700/50 shadow-sm text-slate-800 dark:text-amber-100 font-bold">${p.left} = ${p.right}</div>`;
+        });
+      }
+    }catch(e){}
+    html+='<span class="text-sm font-bold text-amber-600 dark:text-amber-400 mb-2">💡 Kunci Jawaban Lengkap:</span>';
+    html+='<div class="flex flex-wrap justify-center gap-2">' + pairText + '</div>';
+  }else{
+    html+='<span class="text-sm font-bold text-amber-600 dark:text-amber-400">💡 Hint: '+(q.meaning||q.correct_answer||'')+'</span>';
+  }
 
   if(q.question_type==='drawing'){
     if(q.stroke_order_image){
@@ -161,6 +176,135 @@ function renderMC(q,container){
   container.querySelectorAll('.option-btn').forEach(btn=>{
     btn.addEventListener('click',()=>selectAnswer(decodeURIComponent(btn.dataset.answer)));
   });
+}
+
+// ── Matching Render ───────────────────────────────────────────
+
+let matchingSelectedBox = null;
+let matchingPairsLeft = 0;
+
+function renderMatching(q, container) {
+  let lefts = [];
+  let rights = [];
+  try {
+    q.options.forEach((opt, idx) => {
+      let p = JSON.parse(opt);
+      lefts.push({ text: p.left, pairId: idx });
+      rights.push({ text: p.right, pairId: idx });
+    });
+  } catch(e) {
+    console.error(e);
+  }
+  
+  // Shuffle lefts and rights independently
+  for (let i = lefts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [lefts[i], lefts[j]] = [lefts[j], lefts[i]];
+  }
+  for (let i = rights.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [rights[i], rights[j]] = [rights[j], rights[i]];
+  }
+
+  let pairs = [];
+  for (let i = 0; i < lefts.length; i++) {
+      pairs.push(lefts[i]);
+      pairs.push(rights[i]);
+  }
+
+  matchingPairsLeft = q.options.length;
+  matchingSelectedBox = null;
+
+  // Inject shake animation style if not exists
+  if (!document.getElementById('matching-styles')) {
+    const style = document.createElement('style');
+    style.id = 'matching-styles';
+    style.innerHTML = `
+      @keyframes shake-match {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+      .animate-shake-match { animation: shake-match 0.2s ease-in-out 2; }
+      .matching-box.matched { opacity: 0; pointer-events: none; transform: scale(0.9); }
+    `;
+    document.head.appendChild(style);
+  }
+
+  let h = '<div class="grid grid-cols-2 gap-3 md:gap-4">';
+  pairs.forEach((item, i) => {
+    h += `<button type="button" 
+            data-pair-id="${item.pairId}" 
+            onclick="handleMatchingClick(this)"
+            class="matching-box flex items-center justify-center min-h-[80px] p-3 rounded-xl border-b-[4px] border-2 border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-center text-sm md:text-base font-bold text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-50 dark:hover:bg-gray-700 hover:border-indigo-300">
+            ${item.text}
+          </button>`;
+  });
+  h += '</div>';
+  container.innerHTML = h;
+}
+
+window.handleMatchingClick = function(btn) {
+  if (btn.classList.contains('matched') || btn.classList.contains('opacity-0')) return;
+  
+  // If clicking the same box, deselect
+  if (matchingSelectedBox === btn) {
+    btn.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30', 'text-indigo-600', 'dark:text-indigo-300', 'border-b-indigo-600');
+    btn.classList.add('border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'text-slate-700', 'dark:text-slate-200');
+    matchingSelectedBox = null;
+    return;
+  }
+
+  // If no box is selected, select this one
+  if (!matchingSelectedBox) {
+    matchingSelectedBox = btn;
+    btn.classList.remove('border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'text-slate-700', 'dark:text-slate-200');
+    btn.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30', 'text-indigo-600', 'dark:text-indigo-300', 'border-b-indigo-600');
+    return;
+  }
+
+  // Check match
+  const pair1 = matchingSelectedBox.dataset.pairId;
+  const pair2 = btn.dataset.pairId;
+
+  const b1 = matchingSelectedBox;
+  const b2 = btn;
+
+  if (pair1 === pair2) {
+    // Correct
+    [b1, b2].forEach(b => {
+      b.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30', 'text-indigo-600', 'dark:text-indigo-300', 'border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'text-slate-700', 'dark:text-slate-200');
+      b.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/30', 'text-emerald-600', 'dark:text-emerald-300', 'border-b-emerald-600');
+    });
+    
+    setTimeout(() => {
+      b1.classList.add('matched');
+      b2.classList.add('matched');
+    }, 400);
+
+    matchingPairsLeft--;
+    matchingSelectedBox = null;
+
+    const capturedIdx = currentIdx;
+    if (matchingPairsLeft === 0) {
+      setTimeout(() => selectAnswer('completed', capturedIdx), 600);
+    }
+  } else {
+    // Wrong
+    [b1, b2].forEach(b => {
+      b.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30', 'text-indigo-600', 'dark:text-indigo-300', 'border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800');
+      b.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-900/30', 'text-rose-600', 'dark:text-rose-300', 'border-b-rose-600', 'animate-shake-match');
+    });
+
+    setTimeout(() => {
+      [b1, b2].forEach(b => {
+        b.classList.remove('border-rose-500', 'bg-rose-50', 'dark:bg-rose-900/30', 'text-rose-600', 'dark:text-rose-300', 'border-b-rose-600', 'animate-shake-match');
+        b.classList.add('border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'text-slate-700', 'dark:text-slate-200');
+      });
+    }, 600);
+
+    matchingSelectedBox = null;
+  }
 }
 
 // ── Drawing ───────────────────────────────────────────────────
@@ -342,6 +486,7 @@ function submitDrawing(){
       tCtx.stroke();
     });
     const imageData=tc.toDataURL('image/png');
+    const capturedIdx=currentIdx;
 
     fetch('/api/validate-ai',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},
       body:JSON.stringify({character:targetChar,image_base64:imageData})})
@@ -350,7 +495,7 @@ function submitDrawing(){
       if(data.success){
         if(data.is_supported===false){
           statusEl.innerHTML='<b>SEMPURNA!</b><br>Urutan goresan benar ('+overallPct.toFixed(1)+'%).<br><span class="text-xs text-indigo-600 dark:text-indigo-400 font-normal">Sistem AI belum dilatih untuk huruf ini, namun urutan goresan sudah tepat!</span>';
-          submitAnswer(targetChar,overallPct);return;
+          submitAnswer(targetChar,overallPct,capturedIdx);return;
         }
         let chartHtml='<div class="mt-3 pt-2 border-t border-slate-200 dark:border-gray-600 text-left">';
         chartHtml+='<p class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">Analisis Probabilitas AI:</p>';
@@ -364,19 +509,19 @@ function submitDrawing(){
         chartHtml+='</div>';
         if(data.is_match){
           statusEl.innerHTML='<b>SEMPURNA!</b><br>Urutan goresan benar ('+overallPct.toFixed(1)+'%).<br>AI yakin ini huruf <b>'+data.predicted_char+'</b>. '+chartHtml;
-          submitAnswer(targetChar,overallPct);
+          submitAnswer(targetChar,overallPct,capturedIdx);
         }else{
           statusEl.innerHTML='<b>HAMPIR!</b><br>Urutan benar, tapi AI menebak ini huruf <b>'+data.predicted_char+'</b>.<br>Coba perbaiki proporsi! '+chartHtml;
-          submitAnswer(targetChar,Math.max(overallPct*0.6,50));
+          submitAnswer(targetChar,Math.max(overallPct*0.6,50),capturedIdx);
         }
       }else{
         statusEl.innerHTML='Urutan Benar ('+overallPct.toFixed(1)+'%)!<br><span class="text-xs font-normal text-rose-500">Server AI sedang offline.</span>';
-        submitAnswer(targetChar,overallPct);
+        submitAnswer(targetChar,overallPct,capturedIdx);
       }
     })
     .catch(()=>{
       statusEl.innerHTML='Urutan Benar ('+overallPct.toFixed(1)+'%)!<br><span class="text-xs font-normal text-rose-500">Server AI tidak terjangkau.</span>';
-      submitAnswer(targetChar,overallPct);
+      submitAnswer(targetChar,overallPct,capturedIdx);
     });
 
   }else if(overallPct>=45&&userCount===templateCount){
@@ -388,14 +533,14 @@ function submitDrawing(){
 
 // ── Answer ────────────────────────────────────────────────────
 
-function selectAnswer(ans){submitAnswer(ans,null);}
+function selectAnswer(ans, specificIdx = currentIdx){submitAnswer(ans,null,specificIdx);}
 
-async function submitAnswer(ans,accuracyScore){
-  const q=questions[currentIdx];
-  if(answers[currentIdx])return;
-  const startTime=answers['_start_'+currentIdx]||0;
+async function submitAnswer(ans,accuracyScore,specificIdx = currentIdx){
+  const q=questions[specificIdx];
+  if(answers[specificIdx])return;
+  const startTime=answers['_start_'+specificIdx]||0;
   const timeTaken=elapsedSeconds-startTime;
-  const hintUsed=answers['_hint_'+currentIdx]||false;
+  const hintUsed=answers['_hint_'+specificIdx]||false;
   try{
     const res=await fetch('/quiz/answer',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrf(),'X-Requested-With':'XMLHttpRequest'},
       body:JSON.stringify({question_id:q.id,user_answer:String(ans),accuracy_score:accuracyScore,time_taken_seconds:timeTaken,hint_was_used:hintUsed})});
@@ -406,10 +551,16 @@ async function submitAnswer(ans,accuracyScore){
       return;
     }
     const data=await res.json();
-    answers[currentIdx]={user_answer:ans,is_correct:data.is_correct,correct_answer:data.correct_answer,points_earned:data.points_earned,explanation:data.explanation,accuracy_score:accuracyScore};
+    answers[specificIdx]={user_answer:ans,is_correct:data.is_correct,correct_answer:data.correct_answer,points_earned:data.points_earned,explanation:data.explanation,accuracy_score:accuracyScore};
     if(data.is_correct){streak++;if(streak>maxStreak)maxStreak=streak;}else{streak=0;}
     if(data.points_earned>0)showFloatingPoints(data.points_earned);
-    renderQuestion();
+    
+    if (specificIdx === currentIdx) {
+      renderQuestion();
+    } else {
+      updateNavButtons();
+      buildDots();
+    }
   }catch(e){console.error('Answer error:',e);alert('Network error: '+e.message);}
 }
 
@@ -431,6 +582,21 @@ function renderAnswered(q,container){
     h+='<p class="text-sm text-slate-600 dark:text-slate-300 mt-1">Akurasi: '+Math.round(a.accuracy_score||0)+'%</p>';
     if(q.stroke_order_image)h+='<img src="'+q.stroke_order_image+'" class="mx-auto mt-3 max-h-32 rounded-lg" alt="stroke order">';
     h+='</div>';
+    container.innerHTML=h;
+  }else if(q.question_type==='matching'){
+    let h='<div class="text-center p-6 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">';
+    h+='<p class="text-lg font-bold text-emerald-600 dark:text-emerald-400">✅ Puzle Diselesaikan!</p>';
+    h+='<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">';
+    q.options.forEach(optStr=>{
+      let pair;
+      try{pair=JSON.parse(optStr);}catch(e){pair={left:'?',right:'?'};}
+      h+=`<div class="p-3 bg-white dark:bg-gray-800 border-2 border-emerald-100 dark:border-emerald-800/50 rounded-xl flex justify-between items-center shadow-sm">
+            <span class="font-bold text-slate-700 dark:text-slate-200">${pair.left}</span>
+            <i class="fas fa-arrows-alt-h text-emerald-300 mx-2"></i>
+            <span class="font-bold text-slate-700 dark:text-slate-200">${pair.right}</span>
+          </div>`;
+    });
+    h+='</div></div>';
     container.innerHTML=h;
   }else{
     let h='<div class="grid gap-3">';
@@ -538,17 +704,23 @@ function showResults(data){
     const ic=r.is_correct;
     const icon=ic?'<i class="fas fa-check text-emerald-500"></i>':'<i class="fas fa-times text-rose-500"></i>';
     const bgClass=ic?'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50':'bg-rose-50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-800/50';
+    let mainText=r.character||'?';
+    let subText=r.meaning||'?';
+    if(r.question_type==='matching'){
+      mainText='<i class="fas fa-puzzle-piece text-[#1cb0f6] mr-2 text-xl"></i> Mencocokkan';
+      subText='Pasangan Kata Selesai';
+    }
     detailsHtml+=`
       <div class="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-2xl border-2 border-b-4 ${bgClass} transition-transform hover:-translate-y-1">
         <div class="flex items-center gap-4 flex-1">
           <div class="w-12 h-12 shrink-0 bg-white dark:bg-gray-800 rounded-xl border-2 border-b-4 border-slate-200 dark:border-gray-700 flex items-center justify-center text-xl shadow-sm">${icon}</div>
           <div>
-            <p class="text-2xl font-black text-slate-800 dark:text-white leading-none">${r.character}</p>
-            <p class="text-[10px] sm:text-xs font-bold text-slate-500 mt-1.5 uppercase tracking-widest">${r.meaning}</p>
+            <p class="text-2xl font-black text-slate-800 dark:text-white leading-none">${mainText}</p>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-500 mt-1.5 uppercase tracking-widest">${subText}</p>
           </div>
         </div>
         <div class="flex flex-col sm:items-end gap-2 mt-2 sm:mt-0">
-          ${!ic?`<span class="text-[10px] font-black text-rose-600 bg-rose-100 dark:bg-rose-900/30 px-3 py-1.5 rounded-lg border-2 border-rose-200 dark:border-rose-800 uppercase tracking-widest">Jawab: ${r.user_answer}</span>`:''}
+          ${!ic && r.question_type!=='matching'?`<span class="text-[10px] font-black text-rose-600 bg-rose-100 dark:bg-rose-900/30 px-3 py-1.5 rounded-lg border-2 border-rose-200 dark:border-rose-800 uppercase tracking-widest">Jawab: ${r.user_answer}</span>`:''}
           ${r.points_earned>0?`<span class="text-xs font-black text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg border-2 border-amber-200 dark:border-amber-800 uppercase tracking-widest"><i class="fas fa-star mr-1"></i>+${r.points_earned} XP</span>`:''}
         </div>
       </div>`;

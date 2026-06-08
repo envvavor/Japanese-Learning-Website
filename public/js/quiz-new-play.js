@@ -73,6 +73,7 @@ function renderQuestion() {
 
     if (q.question_type === 'multiple_choice' || q.question_type === 'listening') { renderMC(q, cc); }
     else if (q.question_type === 'drawing') { renderDrawing(q, cc); }
+    else if (q.question_type === 'matching') { renderMatching(q, cc); }
 
     if (q.question_type === 'listening' && q.audio_url) { renderAudioPlayer(cc, q.audio_url); }
 
@@ -104,6 +105,135 @@ function renderMC(q, container) {
     container.querySelectorAll('.option-btn').forEach(btn => {
         btn.addEventListener('click', () => selectAnswer(decodeURIComponent(btn.dataset.answer)));
     });
+}
+
+// ── Matching Render ───────────────────────────────────────────
+
+let matchingSelectedBox = null;
+let matchingPairsLeft = 0;
+
+function renderMatching(q, container) {
+  let lefts = [];
+  let rights = [];
+  try {
+    q.options.forEach((opt, idx) => {
+      let p = JSON.parse(opt);
+      lefts.push({ text: p.left, pairId: idx });
+      rights.push({ text: p.right, pairId: idx });
+    });
+  } catch(e) {
+    console.error(e);
+  }
+  
+  // Shuffle lefts and rights independently
+  for (let i = lefts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [lefts[i], lefts[j]] = [lefts[j], lefts[i]];
+  }
+  for (let i = rights.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [rights[i], rights[j]] = [rights[j], rights[i]];
+  }
+
+  let pairs = [];
+  for (let i = 0; i < lefts.length; i++) {
+      pairs.push(lefts[i]);
+      pairs.push(rights[i]);
+  }
+
+  matchingPairsLeft = q.options.length;
+  matchingSelectedBox = null;
+
+  // Inject shake animation style if not exists
+  if (!document.getElementById('matching-styles')) {
+    const style = document.createElement('style');
+    style.id = 'matching-styles';
+    style.innerHTML = `
+      @keyframes shake-match {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+      .animate-shake-match { animation: shake-match 0.2s ease-in-out 2; }
+      .matching-box.matched { opacity: 0; pointer-events: none; transform: scale(0.9); }
+    `;
+    document.head.appendChild(style);
+  }
+
+  let h = '<div class="grid grid-cols-2 gap-3 md:gap-4">';
+  pairs.forEach((item, i) => {
+    h += `<button type="button" 
+            data-pair-id="${item.pairId}" 
+            onclick="handleMatchingClick(this)"
+            class="matching-box flex items-center justify-center min-h-[80px] p-3 rounded-xl border-b-[4px] border-2 border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-center text-sm md:text-base font-bold text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-50 dark:hover:bg-gray-700 hover:border-indigo-300">
+            ${item.text}
+          </button>`;
+  });
+  h += '</div>';
+  container.innerHTML = h;
+}
+
+window.handleMatchingClick = function(btn) {
+  if (btn.classList.contains('matched') || btn.classList.contains('opacity-0')) return;
+  
+  // If clicking the same box, deselect
+  if (matchingSelectedBox === btn) {
+    btn.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30', 'text-indigo-600', 'dark:text-indigo-300', 'border-b-indigo-600');
+    btn.classList.add('border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'text-slate-700', 'dark:text-slate-200');
+    matchingSelectedBox = null;
+    return;
+  }
+
+  // If no box is selected, select this one
+  if (!matchingSelectedBox) {
+    matchingSelectedBox = btn;
+    btn.classList.remove('border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'text-slate-700', 'dark:text-slate-200');
+    btn.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30', 'text-indigo-600', 'dark:text-indigo-300', 'border-b-indigo-600');
+    return;
+  }
+
+  // Check match
+  const pair1 = matchingSelectedBox.dataset.pairId;
+  const pair2 = btn.dataset.pairId;
+
+  const b1 = matchingSelectedBox;
+  const b2 = btn;
+
+  if (pair1 === pair2) {
+    // Correct
+    [b1, b2].forEach(b => {
+      b.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30', 'text-indigo-600', 'dark:text-indigo-300', 'border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'text-slate-700', 'dark:text-slate-200');
+      b.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/30', 'text-emerald-600', 'dark:text-emerald-300', 'border-b-emerald-600');
+    });
+    
+    setTimeout(() => {
+      b1.classList.add('matched');
+      b2.classList.add('matched');
+    }, 400);
+
+    matchingPairsLeft--;
+    matchingSelectedBox = null;
+
+    const capturedIdx = currentIdx;
+    if (matchingPairsLeft === 0) {
+        setTimeout(() => selectAnswer('completed', capturedIdx), 600);
+    }
+  } else {
+    // Wrong
+    [b1, b2].forEach(b => {
+      b.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30', 'text-indigo-600', 'dark:text-indigo-300', 'border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800');
+      b.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-900/30', 'text-rose-600', 'dark:text-rose-300', 'border-b-rose-600', 'animate-shake-match');
+    });
+
+    setTimeout(() => {
+      [b1, b2].forEach(b => {
+        b.classList.remove('border-rose-500', 'bg-rose-50', 'dark:bg-rose-900/30', 'text-rose-600', 'dark:text-rose-300', 'border-b-rose-600', 'animate-shake-match');
+        b.classList.add('border-slate-200', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'text-slate-700', 'dark:text-slate-200');
+      });
+    }, 600);
+
+    matchingSelectedBox = null;
+  }
 }
 
 // ── Drawing ───────────────────────────────────────────────────
@@ -268,14 +398,16 @@ function submitDrawing() {
         tCtx.lineWidth = 3; tCtx.lineCap = 'round'; tCtx.strokeStyle = '#fff';
         normUser.forEach(stroke => { if (!stroke.length) return; tCtx.beginPath(); tCtx.moveTo((stroke[0].x * 0.45) + 32, (stroke[0].y * 0.45) + 32); for (let i = 1; i < stroke.length; i++) { tCtx.lineTo((stroke[i].x * 0.45) + 32, (stroke[i].y * 0.45) + 32); } tCtx.stroke(); });
 
+        const capturedIdx = currentIdx;
+
         fetch('/api/validate-ai', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf() }, body: JSON.stringify({ character: targetChar, image_base64: tc.toDataURL('image/png') }) })
             .then(r => r.json()).then(data => {
                 if (data.success) {
-                    if (data.is_supported === false) { statusEl.innerHTML = '<span class="text-emerald-500"><i class="fas fa-check-circle"></i> SEMPURNA!</span><br>Urutan goresan benar (' + overallPct.toFixed(1) + '%).'; submitAnswer(targetChar, overallPct); return; }
-                    if (data.is_match) { statusEl.innerHTML = '<span class="text-emerald-500"><i class="fas fa-check-circle"></i> SEMPURNA!</span><br>Urutan benar. AI yakin ini <b>' + data.predicted_char + '</b>.'; submitAnswer(targetChar, overallPct); }
-                    else { statusEl.innerHTML = '<span class="text-amber-500"><i class="fas fa-exclamation-circle"></i> HAMPIR!</span><br>Urutan benar, tapi AI menebak <b>' + data.predicted_char + '</b>.<br>Perbaiki proporsi!'; submitAnswer(targetChar, Math.max(overallPct * 0.6, 50)); }
-                } else { statusEl.innerHTML = 'Urutan Benar (' + overallPct.toFixed(1) + '%)!<br><span class="text-xs text-rose-500">Server AI offline.</span>'; submitAnswer(targetChar, overallPct); }
-            }).catch(() => { statusEl.innerHTML = 'Urutan Benar (' + overallPct.toFixed(1) + '%)!'; submitAnswer(targetChar, overallPct); });
+                    if (data.is_supported === false) { statusEl.innerHTML = '<span class="text-emerald-500"><i class="fas fa-check-circle"></i> SEMPURNA!</span><br>Urutan goresan benar (' + overallPct.toFixed(1) + '%).'; submitAnswer(targetChar, overallPct, capturedIdx); return; }
+                    if (data.is_match) { statusEl.innerHTML = '<span class="text-emerald-500"><i class="fas fa-check-circle"></i> SEMPURNA!</span><br>Urutan benar. AI yakin ini <b>' + data.predicted_char + '</b>.'; submitAnswer(targetChar, overallPct, capturedIdx); }
+                    else { statusEl.innerHTML = '<span class="text-amber-500"><i class="fas fa-exclamation-circle"></i> HAMPIR!</span><br>Urutan benar, tapi AI menebak <b>' + data.predicted_char + '</b>.<br>Perbaiki proporsi!'; submitAnswer(targetChar, Math.max(overallPct * 0.6, 50), capturedIdx); }
+                } else { statusEl.innerHTML = 'Urutan Benar (' + overallPct.toFixed(1) + '%)!<br><span class="text-xs text-rose-500">Server AI offline.</span>'; submitAnswer(targetChar, overallPct, capturedIdx); }
+            }).catch(() => { statusEl.innerHTML = 'Urutan Benar (' + overallPct.toFixed(1) + '%)!'; submitAnswer(targetChar, overallPct, capturedIdx); });
     } else if (overallPct >= 45 && userCount === templateCount) {
         statusEl.innerHTML = '<span class="text-amber-500 font-black"><i class="fas fa-exclamation-triangle"></i> Hampir Benar!</span><br>' + msg;
     } else {
@@ -299,7 +431,21 @@ function useHint() {
 
 function showHintContent(q, container) {
     let html = '<div class="inline-flex flex-col items-center px-6 py-4 border-2 border-b-[6px] border-amber-300 dark:border-amber-700 rounded-2xl bg-amber-50 dark:bg-amber-900/20 text-center w-full sm:w-auto">';
-    html += '<span class="text-sm font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest"><i class="fas fa-lightbulb text-lg mr-1"></i> Hint: <span class="text-slate-800 dark:text-white capitalize">' + (q.meaning || q.correct_answer) + '</span></span>';
+    if (q.question_type === 'matching') {
+        let pairText = '';
+        try {
+            if(q.options && q.options.length>0){
+                q.options.forEach(opt => {
+                    const p = JSON.parse(opt);
+                    pairText += `<div class="bg-amber-100 dark:bg-amber-800/50 px-3 py-1.5 rounded-xl border-2 border-amber-200 dark:border-amber-700/50 shadow-sm text-slate-800 dark:text-amber-100 font-bold capitalize">${p.left} = ${p.right}</div>`;
+                });
+            }
+        }catch(e){}
+        html += '<span class="text-sm font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3"><i class="fas fa-lightbulb text-lg mr-1"></i> Kunci Jawaban Lengkap:</span>';
+        html += '<div class="flex flex-wrap justify-center gap-2">' + pairText + '</div>';
+    } else {
+        html += '<span class="text-sm font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest"><i class="fas fa-lightbulb text-lg mr-1"></i> Hint: <span class="text-slate-800 dark:text-white capitalize">' + (q.meaning || q.correct_answer) + '</span></span>';
+    }
 
     // Jika tipe soal gambar, munculkan huruf atau petunjuk goresan
     if (q.question_type === 'drawing') {
@@ -315,11 +461,11 @@ function showHintContent(q, container) {
 }
 
 // ── Answer Submission ─────────────────────────────────────────
-function selectAnswer(ans) { submitAnswer(ans, null); }
+function selectAnswer(ans, specificIdx = currentIdx) { submitAnswer(ans, null, specificIdx); }
 
-async function submitAnswer(ans, accuracyScore) {
-    const q = QUESTIONS[currentIdx];
-    if (answers[currentIdx]) return;
+async function submitAnswer(ans, accuracyScore, specificIdx = currentIdx) {
+    const q = QUESTIONS[specificIdx];
+    if (answers[specificIdx]) return;
 
     try {
         const res = await fetch('/quizzes/' + QUIZ_ID + '/answer', {
@@ -334,9 +480,15 @@ async function submitAnswer(ans, accuracyScore) {
             return;
         }
         const data = await res.json();
-        answers[currentIdx] = { user_answer: ans, is_correct: data.is_correct, correct_answer: data.correct_answer, accuracy_score: accuracyScore };
+        answers[specificIdx] = { user_answer: ans, is_correct: data.is_correct, correct_answer: data.correct_answer, accuracy_score: accuracyScore };
         if (data.is_correct) streak++; else streak = 0;
-        renderQuestion();
+        
+        if (specificIdx === currentIdx) {
+            renderQuestion();
+        } else {
+            updateNavButtons();
+            buildDots();
+        }
     } catch (e) { console.error('Answer error:', e); alert('Network error: ' + e.message); }
 }
 
@@ -349,6 +501,21 @@ function renderAnswered(q, container) {
         h += '<p class="text-sm font-bold text-slate-600 dark:text-slate-400 mt-2 uppercase tracking-widest">Akurasi: ' + Math.round(a.accuracy_score || 0) + '%</p>';
         if (q.stroke_order_image) h += '<img src="' + q.stroke_order_image + '" class="mx-auto mt-4 max-h-32 rounded-xl bg-white p-2 border-2 border-slate-200 shadow-sm" alt="stroke order">';
         h += '</div>';
+        container.innerHTML = h;
+    } else if (q.question_type === 'matching') {
+        let h = '<div class="text-center p-6 rounded-2xl border-2 border-b-[6px] bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-800">';
+        h += '<p class="text-2xl font-black uppercase tracking-widest text-emerald-500"><i class="fas fa-check-circle"></i> Berhasil!</p>';
+        h += '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 text-left">';
+        (q.options || []).forEach(optStr => {
+            let pair;
+            try { pair = JSON.parse(optStr); } catch(e){ pair = {left:'?', right:'?'}; }
+            h += `<div class="p-4 bg-white dark:bg-gray-800 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-xl flex justify-between items-center">
+                    <span class="font-bold text-slate-700 dark:text-slate-200">${pair.left}</span>
+                    <i class="fas fa-arrows-alt-h text-emerald-400 mx-2"></i>
+                    <span class="font-bold text-slate-700 dark:text-slate-200">${pair.right}</span>
+                  </div>`;
+        });
+        h += '</div></div>';
         container.innerHTML = h;
     } else {
         let h = '<div class="grid gap-3">';

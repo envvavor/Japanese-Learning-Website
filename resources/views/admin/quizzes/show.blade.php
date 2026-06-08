@@ -49,6 +49,10 @@
         <p class="text-3xl font-black text-amber-600 dark:text-amber-400">{{ $quiz->items->where('question_type','listening')->count() }}</p>
         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Listening</p>
     </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 text-center shadow-sm">
+        <p class="text-3xl font-black text-pink-600 dark:text-pink-400">{{ $quiz->items->where('question_type','matching')->count() }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mencocokkan</p>
+    </div>
 </div>
 
 {{-- Items List --}}
@@ -74,12 +78,14 @@
                     <div class="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-black
                         @if($item->question_type === 'multiple_choice') bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400
                         @elseif($item->question_type === 'drawing') bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400
+                        @elseif($item->question_type === 'matching') bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400
                         @else bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 @endif">
                         {{ $item->order }}
                     </div>
                     <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
                         @if($item->question_type === 'multiple_choice') MC
                         @elseif($item->question_type === 'drawing') <i class="fa fa-pen"></i>
+                        @elseif($item->question_type === 'matching') <i class="fa fa-puzzle-piece"></i>
                         @else <i class="fa fa-volume-up"></i> @endif
                     </span>
                 </div>
@@ -96,7 +102,7 @@
                         </div>
                     @endif
 
-                    @if($item->question_type !== 'drawing' && $item->options)
+                    @if($item->question_type !== 'drawing' && $item->question_type !== 'matching' && $item->options)
                         <div class="flex flex-wrap gap-2 mt-2">
                             @foreach($item->options as $opt)
                                 <span class="px-2.5 py-1 rounded-lg text-xs font-medium
@@ -104,6 +110,17 @@
                                         ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700'
                                         : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300' }}">
                                     @if($opt === $item->correct_answer) ✓ @endif {{ $opt }}
+                                </span>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @if($item->question_type === 'matching' && $item->options)
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            @foreach($item->options as $jsonPair)
+                                @php $p = json_decode($jsonPair, true); @endphp
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800">
+                                    {{ $p['left'] ?? '' }} ↔ {{ $p['right'] ?? '' }}
                                 </span>
                             @endforeach
                         </div>
