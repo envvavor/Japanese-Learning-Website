@@ -70,7 +70,7 @@
 
                 {{-- 2nd Place --}}
                 @if($top2)
-                <div class="flex flex-col items-center flex-1 max-w-[160px]">
+                <div class="flex flex-col items-center flex-1 max-w-[160px] podium-item-2">
                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-[3px] border-slate-300 dark:border-slate-500 {{ $top2->google_avatar ? '' : 'bg-slate-300 dark:bg-slate-600' }} text-white flex items-center justify-center font-black text-lg sm:text-xl mb-2 overflow-hidden shrink-0">
                         @if($top2->google_avatar)
                             <img src="{{ $top2->google_avatar }}" class="w-full h-full object-cover" referrerpolicy="no-referrer"
@@ -93,9 +93,9 @@
 
                 {{-- 1st Place --}}
                 @if($top1)
-                <div class="flex flex-col items-center flex-1 max-w-[180px]">
+                <div class="flex flex-col items-center flex-1 max-w-[180px] podium-item-1">
                     <div class="relative mb-2">
-                        <i class="fas fa-crown absolute -top-6 left-1/2 -translate-x-1/2 text-2xl text-amber-400 drop-shadow-sm"></i>
+                        <i class="fas fa-crown absolute -top-6 left-1/2 -translate-x-1/2 text-2xl text-amber-400 drop-shadow-sm animate-bounce"></i>
                         <div class="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-[20px] border-4 border-amber-400 dark:border-amber-500 {{ $top1->google_avatar ? '' : 'bg-amber-400' }} text-white flex items-center justify-center font-black text-2xl shadow-sm overflow-hidden shrink-0">
                             @if($top1->google_avatar)
                                 <img src="{{ $top1->google_avatar }}" class="w-full h-full object-cover" referrerpolicy="no-referrer"
@@ -119,7 +119,7 @@
 
                 {{-- 3rd Place --}}
                 @if($top3)
-                <div class="flex flex-col items-center flex-1 max-w-[160px]">
+                <div class="flex flex-col items-center flex-1 max-w-[160px] podium-item-3">
                     <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-[3px] border-amber-700 dark:border-amber-800 {{ $top3->google_avatar ? '' : 'bg-amber-600' }} text-white flex items-center justify-center font-black text-lg sm:text-xl mb-2 overflow-hidden shrink-0">
                         @if($top3->google_avatar)
                             <img src="{{ $top3->google_avatar }}" class="w-full h-full object-cover" referrerpolicy="no-referrer"
@@ -168,9 +168,13 @@
             @forelse($leaderboard as $index => $user)
                 @php
                     $rank = $index + 1;
+                @endphp
+                @continue($rank <= 3)
+                
+                @php
                     $isMe = $user->id === $currentUser->id;
 
-                    // Medal colors for top 3
+                    // Medal colors for top 3 (actually skipped now, but kept logic for safety)
                     $medalColor = match($rank) {
                         1 => 'bg-amber-400 text-white border-amber-500',
                         2 => 'bg-slate-300 text-white border-slate-400',
