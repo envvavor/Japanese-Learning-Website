@@ -49,6 +49,102 @@
             </div>
         </div>
 
+        {{-- ===== PODIUM TOP 3 ===== --}}
+        @if($leaderboard->count() >= 1)
+        @php
+            $top1 = $leaderboard->get(0);
+            $top2 = $leaderboard->get(1);
+            $top3 = $leaderboard->get(2);
+        @endphp
+        <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] overflow-hidden shadow-sm mb-8">
+
+            {{-- Label --}}
+            <div class="bg-slate-50 dark:bg-gray-900/50 border-b-2 border-slate-200 dark:border-gray-700 py-4 text-center">
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <i class="fas fa-trophy text-amber-400 mr-1.5"></i> Top Peringkat
+                </p>
+            </div>
+
+            {{-- Podium --}}
+            <div class="flex items-end justify-center gap-2 sm:gap-4 px-4 sm:px-8 pt-10 pb-0 bg-slate-50 dark:bg-gray-900/30">
+
+                {{-- 2nd Place --}}
+                @if($top2)
+                <div class="flex flex-col items-center flex-1 max-w-[160px]">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-[3px] border-slate-300 dark:border-slate-500 {{ $top2->google_avatar ? '' : 'bg-slate-300 dark:bg-slate-600' }} text-white flex items-center justify-center font-black text-lg sm:text-xl mb-2 overflow-hidden shrink-0">
+                        @if($top2->google_avatar)
+                            <img src="{{ $top2->google_avatar }}" class="w-full h-full object-cover" referrerpolicy="no-referrer"
+                                onerror="this.outerHTML='<span class=\'font-black text-white text-xl\'>{{ strtoupper(substr($top2->name, 0, 1)) }}</span>'">
+                        @else
+                            {{ strtoupper(substr($top2->name, 0, 1)) }}
+                        @endif
+                    </div>
+                    <p class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate max-w-[110px] text-center leading-tight">{{ $top2->name }}</p>
+                    <p class="text-[9px] font-bold text-slate-400 mt-0.5"><i class="fas fa-bolt text-amber-400 text-[8px]"></i> {{ number_format($top2->xp) }} XP</p>
+                    <span class="mt-1.5 text-[10px] font-black px-2 py-1 rounded-lg border-2 bg-slate-50 dark:bg-slate-700/50 border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                        <i class="fas fa-shield-alt text-[8px]"></i> Lv.{{ $top2->level }}
+                    </span>
+                    {{-- Podium Block --}}
+                    <div class="w-full mt-3 rounded-t-2xl border-t-[3px] border-x-2 border-slate-300 dark:border-slate-600 bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700/50 dark:to-slate-800/50 h-16 flex items-center justify-center text-3xl font-black text-slate-400 dark:text-slate-500 select-none">
+                        2
+                    </div>
+                </div>
+                @endif
+
+                {{-- 1st Place --}}
+                @if($top1)
+                <div class="flex flex-col items-center flex-1 max-w-[180px]">
+                    <div class="relative mb-2">
+                        <i class="fas fa-crown absolute -top-6 left-1/2 -translate-x-1/2 text-2xl text-amber-400 drop-shadow-sm"></i>
+                        <div class="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-[20px] border-4 border-amber-400 dark:border-amber-500 {{ $top1->google_avatar ? '' : 'bg-amber-400' }} text-white flex items-center justify-center font-black text-2xl shadow-sm overflow-hidden shrink-0">
+                            @if($top1->google_avatar)
+                                <img src="{{ $top1->google_avatar }}" class="w-full h-full object-cover" referrerpolicy="no-referrer"
+                                    onerror="this.outerHTML='<span class=\'font-black text-white text-2xl\'>{{ strtoupper(substr($top1->name, 0, 1)) }}</span>'">
+                            @else
+                                {{ strtoupper(substr($top1->name, 0, 1)) }}
+                            @endif
+                        </div>
+                    </div>
+                    <p class="text-sm font-black text-slate-800 dark:text-white truncate max-w-[140px] text-center leading-tight">{{ $top1->name }}</p>
+                    <p class="text-[10px] font-bold text-slate-400 mt-0.5"><i class="fas fa-bolt text-amber-400 text-[9px]"></i> {{ number_format($top1->xp) }} XP</p>
+                    <span class="mt-1.5 text-xs font-black px-3 py-1.5 rounded-xl border-2 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 whitespace-nowrap">
+                        <i class="fas fa-shield-alt text-[10px]"></i> Lv.{{ $top1->level }}
+                    </span>
+                    {{-- Podium Block --}}
+                    <div class="w-full mt-3 rounded-t-2xl border-t-[3px] border-x-2 border-amber-400 dark:border-amber-500 bg-gradient-to-b from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-900/20 h-28 flex items-center justify-center text-4xl font-black text-amber-500 dark:text-amber-400 select-none">
+                        1
+                    </div>
+                </div>
+                @endif
+
+                {{-- 3rd Place --}}
+                @if($top3)
+                <div class="flex flex-col items-center flex-1 max-w-[160px]">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-[3px] border-amber-700 dark:border-amber-800 {{ $top3->google_avatar ? '' : 'bg-amber-600' }} text-white flex items-center justify-center font-black text-lg sm:text-xl mb-2 overflow-hidden shrink-0">
+                        @if($top3->google_avatar)
+                            <img src="{{ $top3->google_avatar }}" class="w-full h-full object-cover" referrerpolicy="no-referrer"
+                                onerror="this.outerHTML='<span class=\'font-black text-white text-xl\'>{{ strtoupper(substr($top3->name, 0, 1)) }}</span>'">
+                        @else
+                            {{ strtoupper(substr($top3->name, 0, 1)) }}
+                        @endif
+                    </div>
+                    <p class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate max-w-[110px] text-center leading-tight">{{ $top3->name }}</p>
+                    <p class="text-[9px] font-bold text-slate-400 mt-0.5"><i class="fas fa-bolt text-amber-400 text-[8px]"></i> {{ number_format($top3->xp) }} XP</p>
+                    <span class="mt-1.5 text-[10px] font-black px-2 py-1 rounded-lg border-2 bg-amber-50 dark:bg-amber-900/20 border-amber-700/40 dark:border-amber-800 text-amber-700 dark:text-amber-500 whitespace-nowrap">
+                        <i class="fas fa-shield-alt text-[8px]"></i> Lv.{{ $top3->level }}
+                    </span>
+                    {{-- Podium Block --}}
+                    <div class="w-full mt-3 rounded-t-2xl border-t-[3px] border-x-2 border-amber-600 dark:border-amber-700 bg-gradient-to-b from-amber-50 to-amber-100 dark:from-amber-900/25 dark:to-amber-900/10 h-12 flex items-center justify-center text-2xl font-black text-amber-700 dark:text-amber-600 select-none">
+                        3
+                    </div>
+                </div>
+                @endif
+
+            </div>
+        </div>
+        @endif
+        {{-- ===== END PODIUM ===== --}}
+
         {{-- Leaderboard Table --}}
         <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] overflow-hidden shadow-sm">
 
@@ -169,6 +265,15 @@
     .leaderboard-row:nth-child(9) { animation-delay: 0.45s; }
     .leaderboard-row:nth-child(10) { animation-delay: 0.5s; }
     .leaderboard-row:nth-child(n+11) { animation-delay: 0.55s; }
+
+    /* Podium entrance animation */
+    @keyframes podiumRise {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .podium-item-1 { animation: podiumRise 0.5s ease-out 0.1s both; }
+    .podium-item-2 { animation: podiumRise 0.5s ease-out 0.25s both; }
+    .podium-item-3 { animation: podiumRise 0.5s ease-out 0.4s both; }
 </style>
 @endpush
 @endsection
