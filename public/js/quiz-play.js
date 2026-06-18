@@ -47,6 +47,7 @@ function renderQuestion(){
   const tb=document.getElementById('typeBadge');
   if(q.question_type==='multiple_choice'){tb.textContent='📝 Pilihan Ganda';tb.className='absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'}
   else if(q.question_type==='drawing'){tb.textContent='✏️ Menggambar';tb.className='absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'}
+  else if(q.question_type==='matching'){tb.textContent='🧩 Mencocokkan';tb.className='absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'}
   else{tb.textContent='🔊 Mendengarkan';tb.className='absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'}
 
   // Streak badge

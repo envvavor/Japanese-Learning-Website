@@ -43,6 +43,9 @@ function renderQuestion() {
     else if (q.question_type === 'drawing') {
         tb.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Menggambar';
     }
+    else if (q.question_type === 'matching') {
+        tb.innerHTML = '<i class="fas fa-random mr-1"></i> Mencocokkan';
+    }
     else {
         tb.innerHTML = '<i class="fas fa-headphones mr-1"></i> Mendengarkan';
     }

@@ -145,59 +145,194 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
 
-                <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
-                    <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 border-2 border-b-4 border-indigo-200 dark:border-indigo-800 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-pen-nib"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Latihan Menulis</h3>
-                    <p class="text-sm font-bold text-slate-400 leading-relaxed">Tulis huruf langsung di canvas interaktif. Sistem akan memvalidasi urutan goresan dan bentuk tulisanmu secara real-time.</p>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
-                    <div class="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-500 border-2 border-b-4 border-rose-200 dark:border-rose-800 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Materi</h3>
-                    <p class="text-sm font-bold text-slate-400 leading-relaxed">Akses berbagai materi pembelajaran bahasa Jepang yang terstruktur dan mudah dipahami, mulai dari dasar hingga tingkat lanjut.</p>
-                </div>
-
+                {{-- Peta Quiz — sesuai dashboard --}}
                 <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
                     <div class="w-16 h-16 bg-[#1cb0f6]/10 text-[#1cb0f6] border-2 border-b-4 border-[#1cb0f6]/20 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
                         <i class="fas fa-map-marked-alt"></i>
                     </div>
-                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Quiz</h3>
-                    <p class="text-sm font-bold text-slate-400 leading-relaxed">Sistem quiz bertahap. Pilihan ganda, hearing, dan menulis huruf. Selesaikan satu baru bisa lanjut ke berikutnya.</p>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Peta Quiz</h3>
+                    <p class="text-sm font-bold text-slate-400 leading-relaxed mb-5">Uji kemampuanmu di mode petualangan! Selesaikan misi quiz bertahap dengan pilihan ganda, hearing, menulis huruf, dan mencocokkan.</p>
+                    {{-- Visual Preview: Roadmap mini --}}
+                    <div class="bg-gradient-to-b from-sky-50 to-indigo-50 dark:from-slate-800/50 dark:to-indigo-950/30 border-2 border-slate-200 dark:border-gray-700 border-b-4 rounded-xl p-4">
+                        <div class="flex flex-col items-center gap-2">
+                            {{-- Misi selesai --}}
+                            <div class="w-12 h-12 rounded-full bg-[#ffc800] border-2 border-b-4 border-[#d6a800] flex items-center justify-center">
+                                <i class="fas fa-crown text-white text-lg"></i>
+                            </div>
+                            <svg class="w-1 h-4 text-amber-400" viewBox="0 0 2 16"><line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+                            {{-- Misi aktif --}}
+                            <div class="w-14 h-14 rounded-full bg-[#1cb0f6] border-2 border-b-4 border-[#1899d6] flex items-center justify-center relative">
+                                <i class="fas fa-play text-white text-lg ml-0.5"></i>
+                                <span class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-yellow-400 rounded-full border-2 border-white dark:border-gray-800"></span>
+                            </div>
+                            <svg class="w-1 h-4 text-slate-300 dark:text-gray-600" viewBox="0 0 2 16"><line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+                            {{-- Misi terkunci --}}
+                            <div class="w-12 h-12 rounded-full bg-slate-200 dark:bg-gray-700 border-2 border-b-4 border-slate-300 dark:border-gray-800 flex items-center justify-center">
+                                <i class="fas fa-lock text-slate-400 dark:text-gray-500"></i>
+                            </div>
+                        </div>
+                        <p class="text-[9px] font-bold text-slate-400 text-center mt-2 uppercase tracking-wider">Selesaikan satu, buka berikutnya!</p>
+                    </div>
                 </div>
 
+                {{-- Materi — sesuai dashboard --}}
+                <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
+                    <div class="w-16 h-16 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-500 border-2 border-b-4 border-cyan-200 dark:border-cyan-800 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Materi</h3>
+                    <p class="text-sm font-bold text-slate-400 leading-relaxed mb-5">Baca materi pelajaran bahasa Jepang terbaru. Terstruktur dengan TTS suara Jepang dan furigana interaktif.</p>
+                    {{-- Visual Preview --}}
+                    <div class="bg-slate-50 dark:bg-gray-900/50 border-2 border-slate-200 dark:border-gray-700 border-b-4 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-white dark:bg-gray-800 border-2 border-cyan-200 dark:border-cyan-800/50">
+                            <div class="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 text-cyan-500 flex items-center justify-center text-sm font-black border border-cyan-200 dark:border-cyan-800 shrink-0"><i class="fas fa-book-open text-xs"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate">Pengenalan Hiragana</p>
+                            </div>
+                            <i class="fas fa-check-circle text-emerald-500 text-xs"></i>
+                        </div>
+                        <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-white dark:bg-gray-800 border-2 border-cyan-200 dark:border-cyan-800/50">
+                            <div class="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 text-cyan-500 flex items-center justify-center text-sm font-black border border-cyan-200 dark:border-cyan-800 shrink-0"><i class="fas fa-book-open text-xs"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate">Partikel Dasar が・は</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-slate-300 dark:text-gray-600 text-[10px]"></i>
+                        </div>
+                        <div class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-white dark:bg-gray-800 border-2 border-cyan-200 dark:border-cyan-800/50">
+                            <div class="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 text-cyan-500 flex items-center justify-center text-sm font-black border border-cyan-200 dark:border-cyan-800 shrink-0"><i class="fas fa-book-open text-xs"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate">Kata Kerja Bentuk ます</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-slate-300 dark:text-gray-600 text-[10px]"></i>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Semua Huruf — sesuai dashboard --}}
+                <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
+                    <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-500 border-2 border-b-4 border-amber-200 dark:border-amber-800 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-font"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Semua Huruf</h3>
+                    <p class="text-sm font-bold text-slate-400 leading-relaxed mb-5">Jelajahi Hiragana, Katakana, dan Kanji lengkap. Latihan menulis langsung di kanvas dengan validasi AI.</p>
+                    {{-- Visual Preview: 3 character tiles --}}
+                    <div class="bg-slate-50 dark:bg-gray-900/50 border-2 border-slate-200 dark:border-gray-700 border-b-4 rounded-xl p-4">
+                        <div class="grid grid-cols-3 gap-2 mb-3">
+                            <div class="flex flex-col items-center p-2 rounded-lg bg-rose-50 dark:bg-rose-900/20 border-2 border-rose-200 dark:border-rose-800/50">
+                                <span class="text-2xl font-black text-rose-500 mb-1">あ</span>
+                                <span class="text-[8px] font-black uppercase tracking-widest text-rose-400">Hiragana</span>
+                            </div>
+                            <div class="flex flex-col items-center p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800/50">
+                                <span class="text-2xl font-black text-blue-500 mb-1">ア</span>
+                                <span class="text-[8px] font-black uppercase tracking-widest text-blue-400">Katakana</span>
+                            </div>
+                            <div class="flex flex-col items-center p-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-200 dark:border-emerald-800/50">
+                                <span class="text-2xl font-black text-emerald-500 mb-1">漢</span>
+                                <span class="text-[8px] font-black uppercase tracking-widest text-emerald-400">Kanji</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 justify-center">
+                            <span class="inline-flex items-center gap-1 px-2 py-1 text-[9px] font-black uppercase tracking-wider rounded-lg border-2 border-b-[3px] border-slate-200 dark:border-gray-600 text-slate-400 bg-white dark:bg-gray-700"><i class="fas fa-pen-nib text-[8px]"></i> Tulis</span>
+                            <span class="inline-flex items-center gap-1 px-2 py-1 text-[9px] font-black uppercase tracking-wider rounded-lg border-2 border-b-[3px] border-slate-200 dark:border-gray-600 text-slate-400 bg-white dark:bg-gray-700"><i class="fas fa-volume-up text-[8px]"></i> Dengar</span>
+                            <span class="inline-flex items-center gap-1 px-2 py-1 text-[9px] font-black uppercase tracking-wider rounded-lg border-2 border-b-[3px] border-slate-200 dark:border-gray-600 text-slate-400 bg-white dark:bg-gray-700"><i class="fas fa-info-circle text-[8px]"></i> Detail</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Kosakata — sesuai dashboard --}}
+                <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
+                    <div class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 border-2 border-b-4 border-indigo-200 dark:border-indigo-800 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Kosakata</h3>
+                    <p class="text-sm font-bold text-slate-400 leading-relaxed mb-5">Perkaya perbendaharaan kata bahasa Jepangmu. Cari, dengarkan pelafalan, dan pelajari contoh kalimat.</p>
+                    {{-- Visual Preview --}}
+                    <div class="bg-slate-50 dark:bg-gray-900/50 border-2 border-slate-200 dark:border-gray-700 border-b-4 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border-2 border-indigo-200 dark:border-indigo-800/50">
+                            <span class="text-lg font-black text-indigo-500">食べる</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[10px] font-bold text-slate-400 truncate">たべる — Makan</p>
+                            </div>
+                            <i class="fas fa-volume-up text-indigo-400 text-xs"></i>
+                        </div>
+                        <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border-2 border-indigo-200 dark:border-indigo-800/50">
+                            <span class="text-lg font-black text-indigo-500">飲む</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[10px] font-bold text-slate-400 truncate">のむ — Minum</p>
+                            </div>
+                            <i class="fas fa-volume-up text-indigo-400 text-xs"></i>
+                        </div>
+                        <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border-2 border-indigo-200 dark:border-indigo-800/50">
+                            <span class="text-lg font-black text-indigo-500">見る</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[10px] font-bold text-slate-400 truncate">みる — Melihat</p>
+                            </div>
+                            <i class="fas fa-volume-up text-indigo-400 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Folder Kosakata — sesuai dashboard --}}
+                <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
+                    <div class="w-16 h-16 bg-teal-100 dark:bg-teal-900/30 text-teal-500 border-2 border-b-4 border-teal-200 dark:border-teal-800 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Folder Kosakata</h3>
+                    <p class="text-sm font-bold text-slate-400 leading-relaxed mb-5">Kelompokkan & latih kosakata dengan flashcard. Buat folder pribadi dan latih hafalanmu!</p>
+                    {{-- Visual Preview --}}
+                    <div class="bg-slate-50 dark:bg-gray-900/50 border-2 border-slate-200 dark:border-gray-700 border-b-4 rounded-xl p-4">
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <div class="flex flex-col items-center p-3 rounded-lg bg-white dark:bg-gray-800 border-2 border-teal-200 dark:border-teal-800/50">
+                                <i class="fas fa-folder text-teal-400 text-lg mb-1"></i>
+                                <p class="text-[10px] font-black text-slate-600 dark:text-slate-300 truncate w-full text-center">Hewan 🐾</p>
+                                <p class="text-[8px] font-bold text-slate-400 mt-0.5">12 kata</p>
+                            </div>
+                            <div class="flex flex-col items-center p-3 rounded-lg bg-white dark:bg-gray-800 border-2 border-teal-200 dark:border-teal-800/50">
+                                <i class="fas fa-folder text-teal-400 text-lg mb-1"></i>
+                                <p class="text-[10px] font-black text-slate-600 dark:text-slate-300 truncate w-full text-center">Makanan 🍱</p>
+                                <p class="text-[8px] font-bold text-slate-400 mt-0.5">8 kata</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-center gap-1.5">
+                            <span class="inline-flex items-center gap-1 px-2 py-1 text-[9px] font-black uppercase tracking-wider rounded-lg border-2 border-b-[3px] border-teal-200 dark:border-teal-700 text-teal-500 bg-teal-50 dark:bg-teal-900/20"><i class="fas fa-clone text-[8px]"></i> Flashcard</span>
+                            <span class="inline-flex items-center gap-1 px-2 py-1 text-[9px] font-black uppercase tracking-wider rounded-lg border-2 border-b-[3px] border-teal-200 dark:border-teal-700 text-teal-500 bg-teal-50 dark:bg-teal-900/20"><i class="fas fa-dumbbell text-[8px]"></i> Latihan</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Visual Novel — sesuai dashboard --}}
                 <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
                     <div class="w-16 h-16 bg-violet-100 dark:bg-violet-900/30 text-violet-500 border-2 border-b-4 border-violet-200 dark:border-violet-800 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
                         <i class="fas fa-theater-masks"></i>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Visual Novel</h3>
-                    <p class="text-sm font-bold text-slate-400 leading-relaxed">Belajar lewat cerita interaktif bergaya visual novel Jepang! Lengkap dengan karakter, dialog bercabang, dan voice-over AI.</p>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
-                    <div class="w-16 h-16 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-500 border-2 border-b-4 border-cyan-200 dark:border-cyan-800 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-headphones"></i>
+                    <p class="text-sm font-bold text-slate-400 leading-relaxed mb-5">Belajar bahasa Jepang via cerita interaktif! Lengkap dengan karakter, dialog bercabang, dan voice-over AI.</p>
+                    {{-- Visual Preview --}}
+                    <div class="bg-gradient-to-b from-violet-100 to-indigo-100 dark:from-violet-950/50 dark:to-indigo-950/50 border-2 border-violet-200 dark:border-violet-800 border-b-4 rounded-xl p-4 relative overflow-hidden">
+                        {{-- Mini scene --}}
+                        <div class="flex items-end justify-center gap-3 mb-3 h-16 relative">
+                            <div class="w-10 h-14 rounded-lg bg-violet-300 dark:bg-violet-700 border-2 border-violet-400 dark:border-violet-600 flex items-center justify-center overflow-hidden">
+                                <i class="fas fa-user text-violet-100 dark:text-violet-400 text-xl"></i>
+                            </div>
+                            <i class="fas fa-comment-dots text-violet-400 dark:text-violet-500 text-xl absolute top-0 right-1/4"></i>
+                        </div>
+                        {{-- Dialogue box --}}
+                        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-violet-200 dark:border-violet-700">
+                            <p class="text-[9px] font-black text-violet-500 dark:text-violet-400 uppercase tracking-widest mb-0.5">Sensei</p>
+                            <p class="text-[11px] font-bold text-slate-600 dark:text-slate-300">「こんにちは！」 — Hai semuanya!</p>
+                        </div>
+                        <div class="flex gap-1.5 mt-2">
+                            <span class="flex-1 text-center px-2 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-lg border-2 border-b-[3px] border-violet-300 dark:border-violet-700 text-violet-500 dark:text-violet-400 bg-white dark:bg-gray-800">Balas 🗨️</span>
+                            <span class="flex-1 text-center px-2 py-1.5 text-[9px] font-black uppercase tracking-wider rounded-lg border-2 border-b-[3px] border-violet-300 dark:border-violet-700 text-violet-500 dark:text-violet-400 bg-white dark:bg-gray-800">Tanya ❓</span>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Audio ElevenLabs</h3>
-                    <p class="text-sm font-bold text-slate-400 leading-relaxed">Dengarkan pelafalan asli yang dihasilkan oleh AI text-to-speech ElevenLabs. Latihan listening jadi lebih natural!</p>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 border-2 border-b-[8px] border-slate-200 dark:border-gray-700 rounded-[2rem] p-8 hover:-translate-y-2 transition-all group">
-                    <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-500 border-2 border-b-4 border-amber-200 dark:border-amber-800 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-wide mb-3">Gamifikasi & XP</h3>
-                    <p class="text-sm font-bold text-slate-400 leading-relaxed">Dapatkan XP setiap kali menyelesaikan quiz! Naik level, kumpulkan streak harian, dan pantau progresmu di dashboard.</p>
                 </div>
 
             </div>
         </div>
     </section>
 
-    <section class="py-20 sm:py-28">
+    <!-- <section class="py-20 sm:py-28">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <div class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-100 dark:bg-emerald-900/30 border-2 border-b-4 border-emerald-200 dark:border-emerald-800 rounded-2xl text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-6">
@@ -237,7 +372,7 @@
 
             </div>
         </div>
-    </section>
+    </section> -->
 
     <section class="py-20 sm:py-28 bg-white dark:bg-gray-800/50 border-y-2 border-slate-200 dark:border-gray-800">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
