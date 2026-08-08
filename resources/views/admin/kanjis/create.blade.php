@@ -111,6 +111,48 @@
                 <input type="hidden" name="strokes" id="strokesData" value="{{ old('strokes', '[]') }}">
             </div>
 
+            {{-- ===== KOORDINAT JSON EDITOR ===== --}}
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
+                    <label class="block text-sm font-bold text-gray-800 dark:text-gray-100">
+                        <i class="fas fa-code mr-2 text-emerald-500 dark:text-emerald-400"></i> Koordinat JSON (Template Gambar)
+                        <span class="text-gray-400 dark:text-gray-500 font-normal ml-1 text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Opsional</span>
+                    </label>
+                    <button type="button" id="toggleJsonEditor" 
+                            class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-1.5">
+                        <i class="fas fa-chevron-down text-[10px]" id="toggleJsonIcon"></i>
+                        <span id="toggleJsonText">Tampilkan</span>
+                    </button>
+                </div>
+                <div id="jsonEditorPanel" class="hidden">
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-5 space-y-3">
+                        <div class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-200 p-3 rounded-lg text-xs border border-emerald-100 dark:border-emerald-800 leading-relaxed">
+                            <i class="fas fa-info-circle mr-1.5 text-emerald-600 dark:text-emerald-400"></i>
+                            <strong>Format:</strong> Array of strokes, setiap stroke berisi array koordinat <code class="bg-emerald-100 dark:bg-emerald-900/50 px-1 py-0.5 rounded text-[11px]">[{"x":..,"y":..}, ...]</code>. 
+                            Paste JSON di sini untuk langsung muncul di canvas, atau edit data dari hasil gambar.
+                        </div>
+                        <textarea id="jsonCoordinateInput" rows="6" 
+                                  class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors shadow-sm font-mono text-xs leading-relaxed placeholder-gray-400 dark:placeholder-gray-500 resize-y"
+                                  placeholder='Contoh: [[{"x":150,"y":50},{"x":150,"y":250}],[{"x":50,"y":150},{"x":250,"y":150}]]'></textarea>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" id="applyJsonBtn" 
+                                    class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors flex items-center gap-1.5 shadow-sm">
+                                <i class="fas fa-check"></i> Terapkan ke Canvas
+                            </button>
+                            <button type="button" id="formatJsonBtn" 
+                                    class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 font-semibold rounded-lg text-xs border border-gray-300 dark:border-gray-600 transition-colors flex items-center gap-1.5 shadow-sm">
+                                <i class="fas fa-align-left"></i> Format JSON
+                            </button>
+                            <button type="button" id="copyJsonBtn" 
+                                    class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 font-semibold rounded-lg text-xs border border-gray-300 dark:border-gray-600 transition-colors flex items-center gap-1.5 shadow-sm">
+                                <i class="fas fa-copy"></i> Salin JSON
+                            </button>
+                        </div>
+                        <div id="jsonStatus" class="hidden text-xs font-semibold px-3 py-2 rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="mb-8 p-6 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl">
                 <div class="flex justify-between items-center mb-6">
                     <div>
@@ -448,6 +490,102 @@
                 alert('Tolong rekam minimal 1 coretan (stroke) kanji.');
             }
         });
+
+        // ── JSON KOORDINAT EDITOR ─────────────────────────────────
+        const jsonPanel     = document.getElementById('jsonEditorPanel');
+        const jsonToggleBtn = document.getElementById('toggleJsonEditor');
+        const jsonToggleIcon = document.getElementById('toggleJsonIcon');
+        const jsonToggleText = document.getElementById('toggleJsonText');
+        const jsonInput     = document.getElementById('jsonCoordinateInput');
+        const jsonStatus    = document.getElementById('jsonStatus');
+
+        // Toggle panel
+        jsonToggleBtn.addEventListener('click', () => {
+            const isHidden = jsonPanel.classList.contains('hidden');
+            jsonPanel.classList.toggle('hidden');
+            jsonToggleIcon.classList.toggle('fa-chevron-down', !isHidden);
+            jsonToggleIcon.classList.toggle('fa-chevron-up', isHidden);
+            jsonToggleText.textContent = isHidden ? 'Sembunyikan' : 'Tampilkan';
+            if (isHidden) {
+                // Sync current strokes to textarea when opening
+                jsonInput.value = allStrokes.length > 0 ? JSON.stringify(allStrokes, null, 2) : '';
+            }
+        });
+
+        // Show status message
+        function showJsonStatus(msg, type) {
+            jsonStatus.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-red-100', 'text-red-800', 'dark:bg-emerald-900/30', 'dark:text-emerald-300', 'dark:bg-red-900/30', 'dark:text-red-300');
+            if (type === 'success') {
+                jsonStatus.classList.add('bg-emerald-100', 'text-emerald-800', 'dark:bg-emerald-900/30', 'dark:text-emerald-300');
+            } else {
+                jsonStatus.classList.add('bg-red-100', 'text-red-800', 'dark:bg-red-900/30', 'dark:text-red-300');
+            }
+            jsonStatus.textContent = msg;
+            jsonStatus.classList.remove('hidden');
+            setTimeout(() => jsonStatus.classList.add('hidden'), 4000);
+        }
+
+        // Apply JSON to canvas
+        document.getElementById('applyJsonBtn').addEventListener('click', () => {
+            const val = jsonInput.value.trim();
+            if (!val) {
+                showJsonStatus('Textarea kosong. Masukkan data JSON terlebih dahulu.', 'error');
+                return;
+            }
+            try {
+                const parsed = JSON.parse(val);
+                if (!Array.isArray(parsed)) throw new Error('Data harus berupa Array.');
+                // Validate structure
+                parsed.forEach((stroke, i) => {
+                    if (!Array.isArray(stroke)) throw new Error(`Stroke ke-${i+1} harus berupa Array.`);
+                    stroke.forEach((pt, j) => {
+                        if (typeof pt.x !== 'number' || typeof pt.y !== 'number') {
+                            throw new Error(`Titik ke-${j+1} di stroke ke-${i+1} harus punya "x" dan "y" bertipe number.`);
+                        }
+                    });
+                });
+                allStrokes = parsed;
+                redrawBoth();
+                showJsonStatus(`Berhasil! ${parsed.length} stroke diterapkan ke canvas.`, 'success');
+            } catch (err) {
+                showJsonStatus('JSON Error: ' + err.message, 'error');
+            }
+        });
+
+        // Format JSON
+        document.getElementById('formatJsonBtn').addEventListener('click', () => {
+            const val = jsonInput.value.trim();
+            if (!val) return;
+            try {
+                const parsed = JSON.parse(val);
+                jsonInput.value = JSON.stringify(parsed, null, 2);
+                showJsonStatus('JSON berhasil diformat.', 'success');
+            } catch (err) {
+                showJsonStatus('JSON Error: ' + err.message, 'error');
+            }
+        });
+
+        // Copy JSON
+        document.getElementById('copyJsonBtn').addEventListener('click', () => {
+            const val = jsonInput.value.trim() || JSON.stringify(allStrokes);
+            navigator.clipboard.writeText(val).then(() => {
+                showJsonStatus('JSON berhasil disalin ke clipboard!', 'success');
+            }).catch(() => {
+                // Fallback
+                jsonInput.select();
+                document.execCommand('copy');
+                showJsonStatus('JSON berhasil disalin!', 'success');
+            });
+        });
+
+        // Sync canvas drawing to textarea (update when panel is visible)
+        const origSyncData = syncData;
+        syncData = function() {
+            origSyncData();
+            if (!jsonPanel.classList.contains('hidden')) {
+                jsonInput.value = allStrokes.length > 0 ? JSON.stringify(allStrokes, null, 2) : '';
+            }
+        };
     });
 </script>
 @endpush
